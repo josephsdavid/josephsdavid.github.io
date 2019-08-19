@@ -1,1 +1,4 @@
-my launchpad
+# David Josephs
+## Data Scientist
+
+Talk about myself
