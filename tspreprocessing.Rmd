@@ -31,7 +31,7 @@ In China, [millions](https://www.cnbc.com/2017/02/14/around-22-million-deaths-in
 
 This is a tricky part. Forecast too short (single digit hours), and there will be no time to prepare. Forecast too far ahead, and we risk making a bad forecast. In order to better decide, it is important to do a quick search on relevant literature, websites, etc. [The world air quality sit](http://aqicn.org/forecast/world/) forecasts 8 days ahead. [The EPA](https://www3.epa.gov/airnow/aq_forecasting_guidance-1016.pdf) suggests that for local forecasts (cities and regions of cities) we forecast a few days ahead, and that we also know when it starts to ramp up. Therefore, we will need to develop a model that accurately forecasts every hour for 3 days, or 72 hours.
 
-## Getting Data
+# Getting Data
 
 For now, before we deploy our model with a data collection script, we will use the data referenced in [this paper](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2016JD024877). If you are following this blog, you can get the data at:
 
@@ -43,7 +43,7 @@ In the data directory.
 
 `r newthought('The next step')` before doing anything is to define the data. We have Data collected in 5 cities: Beijing, Chengdu, Guangzhou, Shanghai, and Shenyang. Each of these datasets contains: air quality measurements from multiple locations within each city, humidity, air pressure, temperature, precipitation, wind direction, and wind speed, as well as info on date. For now, we will just look at the data from Beijing, measured at the US Embassy. Then, we will expand that to the other locations within Beijing, and all the other locations in the other cities. First we must build a good single model. However, keeping in mind that we will be interested in all the data when we preprocess it will save us time in the future. We must write code that can be scaled to a much larger degree.
 
-## Batch Importing CSVs
+# Batch Importing CSVs
 
 As our data is in the format of multiple CSVs, we must first write a function to batch imort CSVs. In this case, we want to grab all the files in the `data` directory. We will need an understanding of `lapply`, as well as basic regex, in order to import our files into a list. We will also need a file import function (any will do). In my case, I will use `data.table::fread`, in order to quickly read in the files. You can also use `vroom::vroom`, but i frequently have issues with the lazy evaluation it provides, and find it leads to unexpected slow points in my code. 
 
@@ -70,6 +70,8 @@ import <- function(path) {
   return(imports)
 }
 ```
+
+## Checking for Missing Data
 
 `r newthought('The next important step')` is to check for missing data, so we know wether or not we have to import it. We can do this quickly with `rapply`, which recursively applies a function to the deepest itemset of each item in a nested list:
 
