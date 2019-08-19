@@ -248,7 +248,7 @@ We now have a function that imports a directory of csv's, converts the proper it
 ```{r}
 china <- preprocess("data/")
 str(china)
-china$BeijingPM_
+head(china$BeijingPM_)
 ```
 
 Finally, lets save our work for next time:
