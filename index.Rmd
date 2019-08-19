@@ -30,6 +30,11 @@ I am a:
 
 * [TA to a graduate level data science course](https://github.com/josephsdavid/teachR)
 
+
+# My blog
+
+[Forecasting Air Pollution Part 1: Preprocessing](tspreprocessing.html)
+
 # Things I love
 
 * R
@@ -95,7 +100,4 @@ I am a:
 * Managed data analytics for a local election at [Uptown Dallas, Inc](http://uptowndallas.net/)
 
 
-# My blog
-
-[Forecasting Air Pollution Part 1: Preprocessing](tspreprocessing.html)
 
