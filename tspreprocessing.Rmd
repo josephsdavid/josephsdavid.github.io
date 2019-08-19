@@ -47,7 +47,9 @@ In the data directory.
 As our data is in the format of multiple CSVs, we must first write a function to batch imort CSVs. In this case, we want to grab all the files in the `data` directory. We will need an understanding of `lapply`, as well as basic regex, in order to import our files into a list. We will also need a file import function (any will do). In my case, I will use `data.table::fread`, in order to quickly read in the files. You can also use `vroom::vroom`, but i frequently have issues with the lazy evaluation it provides, and find it leads to unexpected slow points in my code. 
 
 ```{r}
-library(data.table)
+library(data.table) # fast tabular data structures
+library(pipeR) # fast %>>% dumb %>>% pipes
+library(magrittr) # slow %>% smart %>% pipes
 import <- function(path) {
   # first we list the files in the directory
   files  <- list.files(path)
@@ -64,6 +66,7 @@ import <- function(path) {
   #and any numbers
   filenames <- gsub("[[:digit:]]+", "", filenames)
   names(imports) <- filenames
+  return(imports)
 }
 ```
 
@@ -71,8 +74,10 @@ import <- function(path) {
 
 ```{r}
 naPerc <- function(xs) { 
-  rapply(xs, function(x) 100 * sum(is.na(x) / length(x)))
+  rapply(xs, function(x) 100 * sum(is.na(x) / length(x)), how = "list")
 }
+
+import("data/") %>>% naPerc %>% .[[1]] %>>% data.frame %>% .[-(1:6)]
 ```
 
 By applying this, we see that in the data collected by the US embassy in Beijing there are about 4% NA values, and in the weather data a few too. The other data collection sites have far worse data quality. All in all, we have to deal with them.
