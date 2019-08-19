@@ -220,7 +220,7 @@ imputeAll <- function(xs){
   lapply(xs, imputeDf)
 }
 
-str(imputeAll(allToTs(import("data/"))))
+#> str(imputeAll(allToTs(import("data/"))))
 ```
 
 # Converting to a Convenient Data Structure
@@ -248,7 +248,7 @@ We now have a function that imports a directory of csv's, converts the proper it
 ```{r}
 china <- preprocess("data/")
 str(china)
-head(china$BeijingPM_)
+head(china$BeijingPM_, 100)
 ```
 
 Finally, lets save our work for next time:
