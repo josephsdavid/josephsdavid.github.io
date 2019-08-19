@@ -81,6 +81,12 @@ I am a:
 
 * Extensively done [classification on census data using python](https://github.com/drake-smu/7331-lab-2)
 
+* Built a snowflake schema data store at [treehouse](https://www.dmagazine.com/sponsored/2017/06/treehouse-has-arrived-in-dallas/)
+  
+  * Developed a SKU system for all products, ranging from paint to refrigerators
+
+* Managed data analytics for a local election at [Uptown Dallas, Inc](http://uptowndallas.net/)
+
 
 # My blog
 
