@@ -11,4 +11,4 @@ output:
 
 Before we begin any data science project, it is important to discuss the motivation and setting for it. This is especially important for time series data, as a realistic forecast horizon (how far we wish to forecast into the future) 
 
-
+[launchpad](index.html)
