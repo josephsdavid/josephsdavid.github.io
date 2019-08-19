@@ -203,7 +203,7 @@ If our imputation works, we return the result of it, otherwise we return the ori
 ```{r}
 library(parallel)
 cores <- detectCores() - 1
-#> [1] 11
+## [1] 11
 
 imputeDf <- function(df){
   result <- mclapply(df, tryImpute, mc.cores = 11)
@@ -220,7 +220,7 @@ imputeAll <- function(xs){
   lapply(xs, imputeDf)
 }
 
-#> str(imputeAll(allToTs(import("data/"))))
+## str(imputeAll(allToTs(import("data/"))))
 ```
 
 # Converting to a Convenient Data Structure
