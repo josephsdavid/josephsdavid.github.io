@@ -10,7 +10,7 @@ output:
 ---
 
 
-[go home](index.html)
+[Back to Navigation](index.html)
 
 ```{r setup, include = F}
 library(tint)
