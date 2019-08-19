@@ -1,0 +1,14 @@
+---
+title: "Preprocessing Time Series Data"
+author: "David Josephs"
+date: "`r Sys.Date()`"
+output: 
+  tint::tintHtml:
+    df_print: paged
+---
+
+# Project Setting
+
+Before we begin any data science project, it is important to discuss the motivation and setting for it. This is especially important for time series data, as a realistic forecast horizon (how far we wish to forecast into the future) 
+
+

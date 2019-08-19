@@ -1,8 +1,88 @@
 ---
-title: "index"
-author: "David Josephs"
+title: "David Josephs"
+output:
+  rmdformats::material:
+    highlight: kate
+    code_folding: show
+    gallery: true
 ---
 
-# David Josephs
+```{r, echo = F, fig.align = 'center'}
+knitr::include_graphics("images/me.png")
 
-Welcome to my website
+```
+
+# About Me
+
+
+I am a:
+
+* Aspiring data scientist
+
+* Open source contributor (author of 1.5 [R packages](https://rdrr.io/github/josephsdavid/tswgewrapped/))
+
+* [Chess player](https://lichess.org/@/Jdj8af)
+
+* Vim and Linux enthusiast
+
+* [TA to a graduate level data science course](https://github.com/josephsdavid/teachR)
+
+# Things I love
+
+* R
+
+* Python
+
+* [Nix](https://nixos.org/nix/)
+
+* Writing
+
+* Ensemble Models
+
+* Time Series
+
+* Dynamic Time Warping
+
+* Keras
+
+* American cheese
+
+* Association rule mining
+
+* My dog
+
+# Things I am doing
+* Getting a master's in data science
+
+* Attempting to pick an interesting and difficult capstone topic
+
+* Helping graduate students succeed and understand the entire data science workflow from data attainment to deployment (head TA for a survey of data science course)
+
+* Going in depth with deep learning
+
+  * Working on image classification with CNNs
+
+  * Time series analysis with LSTMs and WaveNet CNN architecture
+
+  * (Hopefully) building a chess AI that uses reinforcement learning
+
+
+# Things I have done
+
+* Worked for NASA
+
+  * Acted as translator, astronomer, and lead scout for the [ultima thule mission](https://www.nasa.gov/feature/nasa-s-new-horizons-team-strikes-gold-in-argentina/)
+
+  * [Conducted televised interviews in Argentina](https://twitter.com/UVaOccultChaser/status/885859356054622209)
+
+* Performed [extensive time series analysis](https://github.com/josephsdavid/ChinesePM) of $PM_{2.5}$ content in Beijing, using models ranging from ARIMA and VAR to LSTMs, and ensembling methods
+
+* Conducted [ARM using R](https://github.com/drake-smu/7331-lab-3) on census data, yielding unsurprising results
+
+* Extensively done [classification on census data using python](https://github.com/drake-smu/7331-lab-2)
+
+
+# My blog
+
+[Preprocessing pipeline for time series data](tspreprocessing.html)
+

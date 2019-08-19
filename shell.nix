@@ -5,6 +5,9 @@ in
     name = "blogR";
     buildInputs = with pkgs; [
       vscode
+      rPackages.prettydoc
+      rPackages.tint
+      rPackages.rmdformats
 #       jupyterEnvironment
        python37
        python37Packages.pandas
