@@ -29,6 +29,7 @@ in
        python37Packages.simplegeneric
        R
        rstudio
+       rPackages.data_table
        rPackages.mlbench
        rPackages.lobstr
        rPackages.lubridate
