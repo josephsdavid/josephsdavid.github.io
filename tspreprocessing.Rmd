@@ -21,7 +21,7 @@ knitr::opts_chunk$set(tidy = T)
 
 # Forecasting Air Pollution: Preprocessing
 
-`r newthought('Before we begin')` any data science project, it is important to discuss the motivation and setting for it. This is especially important for time series data, as a realistic forecast horizon (how far we wish to forecast into the future). 
+`r newthought('Before we begin')` any data science project, it is important to discuss the motivation and setting for it. This is especially important for time series data, as a realistic forecast horizon (how far we wish to forecast into the future) is highly important. 
 
 ```{r, fig.fullwidth =  T, echo = F}
 knitr::include_graphics("images/Airpol.jpg")
@@ -31,7 +31,7 @@ In China, [millions](https://www.cnbc.com/2017/02/14/around-22-million-deaths-in
 
 > What forecast horizon will be most useful?
 
-This is a tricky part. Forecast too short (single digit hours), and there will be no time to prepare. Forecast too far ahead, and we risk making a bad forecast. In order to better decide, it is important to do a quick search on relevant literature, websites, etc. [The world air quality sit](http://aqicn.org/forecast/world/) forecasts 8 days ahead. [The EPA](https://www3.epa.gov/airnow/aq_forecasting_guidance-1016.pdf) suggests that for local forecasts (cities and regions of cities) we forecast a few days ahead, and that we also know when it starts to ramp up. Therefore, we will need to develop a model that accurately forecasts every hour for 3 days, or 72 hours.
+This is a tricky part. Forecast too short (single digit hours), and there will be no time to prepare. Forecast too far ahead, and we risk making a bad forecast. In order to better decide, it is important to do a quick search on relevant literature, websites, etc. [The world air quality site](http://aqicn.org/forecast/world/) forecasts 8 days ahead. [The EPA](https://www3.epa.gov/airnow/aq_forecasting_guidance-1016.pdf) suggests that for local forecasts (cities and regions of cities) we forecast a few days ahead, and that we also know when it starts to ramp up. Therefore, we will need to develop a model that accurately forecasts every hour for 3 days, or 72 hours.
 
 # Getting Data
 
