@@ -4,15 +4,17 @@ output:
   rmdformats::material:
     highlight: kate
     code_folding: show
-    gallery: true
+    thumbnails: true
 ---
+
+
+# About Me
+
 
 ```{r, echo = F, fig.align = 'center'}
 knitr::include_graphics("images/me.png")
 
 ```
-
-# About Me
 
 
 I am a:
