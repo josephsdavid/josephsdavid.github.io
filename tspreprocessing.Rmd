@@ -10,7 +10,7 @@ output:
 ---
 
 
-[Back to Navigation](index.html)
+[Back to Navigation](index.html#my-blog)
 
 ```{r setup, include = F}
 library(tint)
