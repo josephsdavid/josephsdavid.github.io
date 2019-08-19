@@ -1571,11 +1571,45 @@ if (window.hljs) {
 <p class="caption marginnote shownote">
 </p>
 </div>
-<p>In China, <a href="https://www.cnbc.com/2017/02/14/around-22-million-deaths-in-india-and-china-from-air-pollution-study.html">millions</a> die due to air pollution each year. We would like to see if we can use data science to help them out. By forecasting when pollution will be at its worse, we can help policymakers and communities implement smart, short-term energy policies to combat it, as well as distribute masks, and prepare for the worst, in order to minimize the damage.</p>
+<p>In China, <a href="https://www.cnbc.com/2017/02/14/around-22-million-deaths-in-india-and-china-from-air-pollution-study.html">millions</a> die due to air pollution each year. We would like to see if we can use data science to help them out. By forecasting when pollution will be at its worst, we can help policymakers and communities implement smart, short-term energy policies to combat it, as well as distribute masks, and prepare for the worst, in order to minimize the damage.</p>
 <blockquote>
 <p>What forecast horizon will be most useful?</p>
 </blockquote>
-<p>This is a tricky part. Forecast too short (single digit hours)</p>
+<p>This is a tricky part. Forecast too short (single digit hours), and there will be no time to prepare. Forecast too far ahead, and we risk making a bad forecast. In order to better decide, it is important to do a quick search on relevant literature, websites, etc. <a href="http://aqicn.org/forecast/world/">The world air quality sit</a> forecasts 8 days ahead. <a href="https://www3.epa.gov/airnow/aq_forecasting_guidance-1016.pdf">The EPA</a> suggests that for local forecasts (cities and regions of cities) we forecast a few days ahead, and that we also know when it starts to ramp up. Therefore, we will need to develop a model that accurately forecasts every hour for 3 days, or 72 hours.</p>
+</div>
+<div id="getting-data" class="section level1">
+<h1>Getting Data</h1>
+<p>For now, before we deploy our model with a data collection script, we will use the data referenced in <a href="https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2016JD024877">this paper</a>. If you are following this blog, you can get the data at:</p>
+<pre class="sh"><code>git clone https://github.com/josephsdavid/ChinsePM.git</code></pre>
+<p>In the data directory.</p>
+<p><span class="newthought">The next step</span> before doing anything is to define the data. We have Data collected in 5 cities: Beijing, Chengdu, Guangzhou, Shanghai, and Shenyang. Each of these datasets contains: air quality measurements from multiple locations within each city, humidity, air pressure, temperature, precipitation, wind direction, and wind speed, as well as info on date. For now, we will just look at the data from Beijing, measured at the US Embassy. Then, we will expand that to the other locations within Beijing, and all the other locations in the other cities. First we must build a good single model. However, keeping in mind that we will be interested in all the data when we preprocess it will save us time in the future. We must write code that can be scaled to a much larger degree.</p>
+</div>
+<div id="batch-importing-csvs" class="section level1">
+<h1>Batch Importing CSVs</h1>
+<p>As our data is in the format of multiple CSVs, we must first write a function to batch imort CSVs. In this case, we want to grab all the files in the <code>data</code> directory. We will need an understanding of <code>lapply</code>, as well as basic regex, in order to import our files into a list. We will also need a file import function (any will do). In my case, I will use <code>data.table::fread</code>, in order to quickly read in the files. You can also use <code>vroom::vroom</code>, but i frequently have issues with the lazy evaluation it provides, and find it leads to unexpected slow points in my code.</p>
+<pre class="r"><code>library(data.table)
+import &lt;- function(path) {
+  # first we list the files in the directory
+  files  &lt;- list.files(path)
+  # next we search for csvs using grepl
+  files &lt;- files[grepl(files, pattern = &quot;.csv&quot;)]
+  # next we append the path to the list of files:
+  # we use vapply because we want vector output, and its 
+  # incredibly fast (the fastest of the apply family)
+  filepaths &lt;- vapply(files, function(x) paste0(path, x), character(1))
+  # import the files as a list
+  imports &lt;- lapply(filepaths, fread)
+  # next we set up the names of each import to the list
+  filenames &lt;- gsub(&quot;.csv&quot;, &quot;&quot;, files)
+  #and any numbers
+  filenames &lt;- gsub(&quot;[[:digit:]]+&quot;, &quot;&quot;, filenames)
+  names(imports) &lt;- filenames
+}</code></pre>
+<p><span class="newthought">The next important step</span> is to check for missing data, so we know wether or not we have to import it. We can do this quickly with <code>rapply</code>, which recursively applies a function to the deepest itemset of each item in a nested list:</p>
+<pre class="r"><code>naPerc &lt;- function(xs) { 
+  rapply(xs, function(x) 100 * sum(is.na(x) / length(x)))
+}</code></pre>
+<p>By applying this, we see that in the data collected by the US embassy in Beijing there are about 4% NA values, and in the weather data a few too. The other data collection sites have far worse data quality. All in all, we have to deal with them.</p>
 <p><a href="index.html#my-blog">launchpad</a></p>
 </div>
 

@@ -70,7 +70,7 @@ import <- function(path) {
 
 ```{r}
 naPerc <- function(xs) { 
-  rapply(xs, function(x) 100 * sum(is.na(x) / length(x))
+  rapply(xs, function(x) 100 * sum(is.na(x) / length(x)))
 }
 ```
 
