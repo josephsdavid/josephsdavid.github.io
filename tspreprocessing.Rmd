@@ -15,6 +15,8 @@ output:
 ```{r setup, include = F}
 library(tint)
 knitr::opts_chunk$set(message = F, warning = F)
+knitr::opts_chunk$set(comment = '#>')
+knitr::opts_chunk$set(tidy = T)
 ```
 
 # Forecasting Air Pollution: Preprocessing
@@ -84,6 +86,178 @@ import("data/") %>>% naPerc %>% .[[1]] %>>% data.frame %>% .[-(1:6)]
 ```
 
 By applying this, we see that in the data collected by the US embassy in Beijing there are about 4% NA values, and in the weather data a few too. The other data collection sites have far worse data quality. All in all, we have to deal with them.
+
+# Imputing NAs in Time Series Data
+
+As this is time series data, we will have to deal with missing values a little differently. If this were normal data, and we had 50,000 rows and 4-5% of the data we care about contains missing values, we would be just fine just getting rid of them. However, in a time series, we care about the order of events, and in general they must be **evenly** sampled, in order to preserve the frequency of the dataset (there are a few ways to get around this, for example in astronomical time series they frequently use [Least-Squares Spectral Analysis or the Lomb-Scargle periodigram](https://en.wikipedia.org/wiki/Least-squares_spectral_analysis)). However, this adds a degree of complexity and inaccuracy to our data which we would like to avoid if possible. To do this, we can use some interpolation.
+
+
+## Spline Interpolation
+
+There are many types of interpolation, other useful techniques include the Kalman filter and linear interpolation. However, spline interpolation is very very fast, has good accuracy (good enough to handle 4% of 50,000 points). 
+
+
+```{r, echo = F, fig.cap = "Spline Interpolation Between 8 points", fig.align = "center"}
+knitr::include_graphics("images/spline.png")
+```
+
+> What is Spline Interpolation?
+
+In a very hand wavy sense (complex math is involved), spline interpolation is an algorithm that draws the the straghtest line possible (technically, the least bendy line), given the frequency of the dataset, and the other points. It will draw a more natural, and curvier line than linear interpolation, and is often used in time series data
+
+
+Before we can interpolate the NAs in our data, we must first change the data type
+
+## Converting data types in lists of lists
+
+Currently, we have a list of data frames, which in its most primitive form can be described as a list of lists. We need to find a way to transform the proper columns of each nested list into a time series object.
+
+### Dealing with recursive lists: Pattern 1
+
+When dealing with a recursive data structure, such as a list of lists or a list of data frames, we have a few very convenient patterns. The first one we already saw, `rapply`, which recursively applies a function to the deepest layer of our object. However, this does not preserve the structure of the data, unless we use the `how = 'replace'` argument, which is incredibly slow. So, we have a three step method to deal with this:
+
+1. Write a function that works on an individual vector
+
+2. Write a function that applies that function to a nested data frame or list
+
+3. Write a function that applies the previous function over the entire list
+
+In our case, we will first write a function that converts a vector to a time series:
+
+```{r}
+toTs <- function(v) {
+    ts(v, frequency = 365 * 24)
+}
+```
+
+Then, we will write a function that works over the whole nested data frame. In our case, we also need to not convert some of our columns into time series format, such as the categorical variables and variables describing the date
+
+```{r}
+
+noConvert <- c("No", 
+             "year", 
+             "month", 
+             "day", 
+             "hour", 
+             "season", 
+             "cbwd")
+dfToTs <- function(df, ignore = noConvert){
+  dfNames <- colnames(df)
+  result <- (df)
+  for (name in dfNames) {
+    if (name %in% ignore) {
+      result[[name]] <- result[[name]]
+    } else {
+      result[[name]] <- toTs(result[[name]])
+    }
+  }
+  # return the created list
+  return(result)  # its a list dont be tricked
+}
+
+```
+
+Then we scale it up
+
+```{r}
+allToTs <- function(xs){
+  lapply(xs, dfToTs)
+}
+
+# To check 
+# import("data/") %>>% allToTs %>>% str
+```
+
+Now that we have the proper data types, we can interpolate our NA's
+
+## Interpolating NAs Over a Data Structure using the Try-Type Pattern
+
+Instead of dealing with a function that uses column names, we can use the basic error checking pattern in R to quickly impute only time series data. The pattern is (in pseudo code) as follows: `x <- try(expression); if(is.myClass(x) do something, else do something else)`. As an example:
+
+```{r}
+x  <- try(sum(c("cat","dog", "mouse")))
+x
+class(x)
+
+y <- try(sum(1:4))
+y
+class(y)
+```
+
+We see that the class of the object changes depending on whether or not our code fails. For our problem, that would be (in the case of a vector)
+
+```{r}
+library(imputeTS)
+tryImpute <- function(vec){
+  result <- try(na.interpolation(vec, "spline"))
+  ifelse(
+         is.ts(result),
+         return(result),
+         return(vec)
+  )
+}
+```
+
+If our imputation works, we return the result of it, otherwise we return the original vector. Our next step is to run it over an entire data frame, preferably in parallel, so it can be fast:
+
+```{r}
+library(parallel)
+cores <- detectCores() - 1
+#> [1] 11
+
+imputeDf <- function(df){
+  result <- mclapply(df, tryImpute, mc.cores = 11)
+  return(as.data.frame(result))
+}
+
+import("data/") %>% allToTs %>% .[[1]] %>% imputeDf %>% head
+```
+
+It works. Now lets follow our pattern and run that over the entire list:
+
+```{r}
+imputeAll <- function(xs){
+  lapply(xs, imputeDf)
+}
+
+str(imputeAll(allToTs(import("data/"))))
+```
+
+# Converting to a Convenient Data Structure
+
+As we will be passing this information into a lot of other documents and scripts, and growing and manipulating it frequently, we would like to put it into a convenient data structure, that is scalable, extensible, and fast. That structure is an associative array, or a hash table, the swiss army knife data structure of data science. We will use it to store *all* models created, variations of our dataset, and anything else, and pass this between files. For analysis on the speed and power of the hash table, please refer to [this link](https://blog.dominodatalab.com/a-quick-benchmark-of-hashtable-implementations-in-r/).
+
+```{r}
+toHash <- function(xs){
+  list2env(x = xs, hash = TRUE, envir = NULL)
+}
+```
+
+# Chaining it All Together
+
+We have done a lot of work, and put together a nice little pipeline. Now, if we are going to be calling these functions a lot, it is not super convenient or efficient to chain them together with `%>%` or `%>>%` pipes. Instead, we will make a ***composition of functions***. If we have three functions, $f(x)$, $g(x)$, and $h(x)$, a composition of the three would be $f(g(h(x)))$. We will do the same using the `functional` library:
+
+```{r}
+library(functional)
+preprocess <- Compose(import, allToTs, imputeAll, toHash)
+preprocess
+```
+
+We now have a function that imports a directory of csv's, converts the proper items to time series objects, spline interpolates the NAs, and converts to a hash table:
+
+```{r}
+china <- preprocess("data/")
+str(china)
+china$BeijingPM_
+```
+
+Finally, lets save our work for next time:
+
+```{r}
+saveRDS(china, file = "store/china.Rds")
+```
+
+
 
 # Navigation
 

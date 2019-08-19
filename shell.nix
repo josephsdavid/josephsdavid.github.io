@@ -6,6 +6,7 @@ in
     buildInputs = with pkgs; [
       vscode
       rPackages.prettydoc
+      rPackages.functional
       rPackages.tint
       rPackages.rmdformats
 #       jupyterEnvironment
@@ -29,6 +30,7 @@ in
        python37Packages.simplegeneric
        R
        rstudio
+       rPackages.imputeTS
        rPackages.data_table
        rPackages.mlbench
        rPackages.lobstr
