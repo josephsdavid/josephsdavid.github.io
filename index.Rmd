@@ -1,7 +1,8 @@
 ---
 title: "David Josephs"
 output:
-  rmdformats::material:
+  rmdformats::readthedown:
+    css: custom.css
     highlight: kate
     code_folding: show
     thumbnails: true

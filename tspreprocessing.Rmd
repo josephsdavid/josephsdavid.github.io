@@ -3,7 +3,8 @@ title: "Preprocessing Time Series Data"
 author: "David Josephs"
 date: "`r Sys.Date()`"
 output: 
-  rmdformats::material:
+  rmdformats::readthedown:
+    css: custom.css
     df_print: paged
     cards: false
 ---
