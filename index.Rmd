@@ -37,6 +37,10 @@ I am a:
 
 * [Nix](https://nixos.org/nix/)
 
+* Long walks
+
+* Chess
+
 * Writing
 
 * Ensemble Models
