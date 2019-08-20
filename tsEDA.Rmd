@@ -237,7 +237,25 @@ We see the same behavior demonstrated nicely here. There is a clear, strong, yea
 
 # The Parzen Window
 
-COMING up
+The final plot which I use frequently is the `smoothed periodogram`, in this case specifically the parzen window. What it shows basically is at what frequencies a lot of our data seems to be. Lets start out with a parzen plot of our original data:
+
+```{r, fig.cap = "Parzen window of hourly data"}
+library(tswge)
+parzen <- parzen.wge(uvar)
+```
+
+What does this mean? Well, first, we see the overall shape of the graph: it peaks on the left, and decays going to the right. This is indicative of strong low frequency patterns in the data. This also, on its own, indicates a lot of times a model with a clear trend (ARIMA). However, we know from our previous EDA that there is not much of an up or down trend here, so this peak at zero could be indiciative of a very long seasonal pattern, or a high order AR component. These other peaks all along the time series are typically evidence of an ARIMA model with seasonality (such as the classic airline data). Again, this data does not appear to have any integrated (ARIMA) order or root on the unit circle (If you dont know what this means, stay tuned for next time). So this in our case could be a sign of a long seasonality, combined with some shorter seasonalities. Lets one more sample plot to confirm the presence of a yearly seasonality:
+
+```{r}
+quarters <- resamples$quarterly
+parzenq <- parzen.wge(quarters)
+```
+
+We see a peak at 0.25, indiciative of a period of 4 observations, or in this case quarters. This means again we have a yearly trend in our series
+
+# Conclusions
+
+We have detected probably 3 seasonalities in our data: daily, weekly, and yearly. By resampling our data, we were able to eaily observe these patterns. Next, we need to think about what sort of models we want to use. Given  the complexity of the data, and the presence of an exceptionally long (and multiple) seasonal patterns, we are likely going to have a hard time to find appropriate pure ARIMA and other classical models (which we will do next time). We will likely need to consider moving to more interesting fourier based models in the future. Stay tuned!
 
 # Navigation
 
