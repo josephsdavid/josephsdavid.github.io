@@ -1,0 +1,104 @@
+---
+title: "Preprocessing Time Series Data"
+author: "David Josephs"
+date: "`r Sys.Date()`"
+output: 
+  rmdformats::readthedown:
+    css: custom.css
+    df_print: paged
+    cards: false
+---
+
+
+[Part 1](tspreprocessing.html)
+
+[Back to Navigation](index.html#my-blog)
+
+```{r setup, include = F}
+library(tint)
+knitr::opts_chunk$set(message = F, warning = F)
+knitr::opts_chunk$set(cache = T, autodep = T)
+knitr::opts_chunk$set(comment = '#>')
+knitr::opts_chunk$set(tidy = T)
+```
+
+# Forecasting Air Pollution: Univariate EDA
+
+The next important step in any data science workflow is to use **exploratory data analysis** to get to know the patterns and structure of our data. For time series, this is especially imortant, as we want to be able to identify any **seasonal** patterns, **trends**, and **stationarity** of our series, in order to help us understand what type of model we should be using to forecast into the future. 
+
+## Dealing Thousands of Points
+
+One issue that pops up a lot in data science and data mining is that when you have too many data points, EDA becomes very slow, and your plots become unreadable, as no human can really detect a pattern when there are more points than there are pixels in your plot. So, to combat this, we can make an assumption to guide our analysis:
+
+1. Hourly data which depends on the weather, and on the flow of people, typically has a daily seasonality (i.e. hourly patterns repeat daily to some degree, due to day and night), a weekly seasonality (due to the work schedule), and a yearly seasonality. This way already know what to look for.
+
+# Loading our Data
+
+In [Part 1](tspreprocessing.html), we already preprocessed our data, and stored it as a hash table. We can simply load that up:
+
+```{r}
+china <- readRDS("store/china.Rds")
+beijing <- china$BeijingPM_
+```
+
+## Initial plot
+
+Before we get into it, lets make a simple plot of our data:
+
+```{r, fig.cap = "Preprocessed and Unclean Time Series"}
+library(ggplot2)
+library(forecast)
+library(ggthemes)
+autoplot(beijing$PM_US) + 
+  theme_hc() + labs(y = "PM2.5")
+```
+
+The first thing we notice, immediately, is that we have ***negative*** values a few times. This is impossible. These are likely due to issues with A) the sensor (a high likelihood event), B) data input error (less likely, hopefully nobody input this by hand), or C) something weird happening with our spline interpolation (a definite possibility). Lets see how many of these points there are:
+
+```{r}
+library(tidyverse)
+colnames(beijing)
+beijing %>% filter(PM_US.Post < 0) %>% nrow/(nrow(beijing)) * 100
+read.csv("data/BeijingPM20100101_20151231.csv") %>% filter(PM_US.Post < 0) %>% nrow/nrow(beijing) * 100
+```
+
+## Tidying up
+
+So 0.4% of our points are negative, and and they are all due to our interpolation. This is an important thing to check. Luckily, there are very few and they are at a small value, so we can feel safe in takin their absolute value. We will also go ahead and clean away any extreme values in our time series. As we are forecasting trends, with large prediction intervals, if a point is twice as high as an already high point (and hitting 1000 PPM is exceptionally high), it will not improve our forecast of the pattern. Regardless of if the value is 400 or 1000, that is high enough to put out a critical air quality alert, and keeping the points at 1000 will only hurt our forecast. Along with this, it has been shown in numerous reports that these sensors have issues at high levels, and create errors just like this. A cursory autoplot confirms that these are not due to our interpolation but actual measured data. So, we will fix the negative values and shrink the exceptional ones so our whole series is on the same, useful scale:
+
+```{r}
+library(pipeR)
+uvar <- beijing$PM_US %>>% abs %>>% tsclean
+
+# Save our work to the hash table
+china[['uvar']] <- uvar
+```
+
+# First Steps: Raw Data Scatterplot
+
+```{r, fig.cap = "Preprocessed and Cleaned Time Series"}
+autoplot(uvar) + theme_hc() + labs(y = "PM2.5")
+```
+
+There we go, now we finally have a time series we can work with. Lets go ahead and discuss what we can see in this plot. First, we can see with a great deal of certainty theres a long term seasonal pattern, potentially yearly. Lets try to zoom in a bit to see if we can find a weekly and daily pattern, just using the raw data:
+
+## Scanning for Daily Seasonality
+
+We will first cut our time series and pick a random week or two of data, and then plot it, drawing lines at midnight every day.
+
+```{r, fig.cap = "2 weeks of PM 2.5 measurements"}
+uvarShort <- window(uvar, start = 4, end = c(4,7*48) )
+uvarShort <- ts(uvarShort, frequency = 24)
+plot(uvarShort, ylab = "PM2.5")
+abline(v = 1:14, col = "red")
+```
+
+This plot confirms our first assumption: There is a 24 hour pattern in the data
+
+WORK IN PROGRESS
+
+# Navigation
+
+[Part 1](tspreprocessing.html)
+
+[Back to Navigation](index.html#my-blog)

@@ -1,57 +1,48 @@
 let
-    pkgs = import <nixpkgs> {};
+  pkgs = import <nixpkgs> {};
 in
   pkgs.mkShell {
     name = "blogR";
     buildInputs = with pkgs; [
       vscode
       rPackages.prettydoc
+      rPackages.tswge
+      rPackages.vars
+      rPackages.forecast
+      rPackages.ggplot2
+      rPackages.ggthemes
+      rPackages.cowplot
       rPackages.functional
       rPackages.tint
       rPackages.rmdformats
-#       jupyterEnvironment
-       python37
-       python37Packages.pandas
-       python37Packages.numpy
-       python37Packages.matplotlib
-       #python37Packages.sqlite
-       python37Packages.notebook
-       python37Packages.ipython
-       python37Packages.jupytext
-       python37Packages.scikitlearn
-       python37Packages.seaborn
-       python37Packages.scipy
-       python37Packages.plotly
-       python37Packages.ipywidgets
-       python37Packages.future
-       python37Packages.scikitimage
-       #Todo Package graphlab
-       python37Packages.tzlocal
-       python37Packages.simplegeneric
-       R
-       rstudio
-       rPackages.imputeTS
-       rPackages.data_table
-       rPackages.mlbench
-       rPackages.lobstr
-       rPackages.lubridate
-       rPackages.stringr
-       rPackages.abind
-       rPackages.foreign
-       rPackages.downloader
-       rPackages.memoise
-       rPackages.lattice
-       rPackages.microbenchmark
-       rPackages.arules
-       rPackages.tidyverse
-       rPackages.devtools
-       rPackages.pander
-       rPackages.Rcpp
-       rPackages.RNHANES
-       rPackages.reticulate
-       python37Packages.pprintpp
-       rPackages.blogdown
-       hugo
+      R
+      rstudio
+      rPackages.imputeTS
+      rPackages.data_table
+      rPackages.tint
+      rPackages.rmdformats
+      rPackages.mlbench
+      rPackages.lubridate
+      rPackages.stringr
+      rPackages.abind
+      rPackages.foreign
+      rPackages.downloader
+      rPackages.memoise
+      rPackages.lattice
+      rPackages.microbenchmark
+      rPackages.tidyverse
+      rPackages.devtools
+      rPackages.pander
+      rPackages.Rcpp
+      rPackages.RNHANES
+      rPackages.reticulate
+      rPackages.blogdown
+      hugo
     ];
-    
+    shellHook = ''
+#     echo "#!/usr/bin/env Rscript" > libs.R
+#     echo "devtools::install_github('csgillespie/efficient', build_vignettes=TRUE)" >> libs.R
+#     Rscript libs.R
+     R CMD INSTALL /home/david/scratch/tswgewrapped
+    '';
   }

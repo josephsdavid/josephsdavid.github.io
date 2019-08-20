@@ -10,6 +10,8 @@ output:
 ---
 
 
+[Part 2](tsEDA.html)
+
 [Back to Navigation](index.html#my-blog)
 
 ```{r setup, include = F}
@@ -266,3 +268,5 @@ Thanks for reading!
 # Navigation
 
 [launchpad](index.html#my-blog)
+
+[Part 2](tsEDA.html)
