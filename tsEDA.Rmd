@@ -255,7 +255,9 @@ We see a peak at 0.25, indiciative of a period of 4 observations, or in this cas
 
 # Conclusions
 
-We have detected probably 3 seasonalities in our data: daily, weekly, and yearly. By resampling our data, we were able to eaily observe these patterns. Next, we need to think about what sort of models we want to use. Given  the complexity of the data, and the presence of an exceptionally long (and multiple) seasonal patterns, we are likely going to have a hard time to find appropriate pure ARIMA and other classical models (which we will do next time). We will likely need to consider moving to more interesting fourier based models in the future. Stay tuned!
+We have detected probably 3 seasonalities in our data: daily, weekly, and yearly. By resampling our data, we were able to eaily observe these patterns. Next, we need to think about what sort of models we want to use. Given  the complexity of the data, and the presence of an exceptionally long (and multiple) seasonal patterns, we are likely going to have a hard time to find appropriate pure ARIMA and other classical models (which we will do next time). We will likely need to consider moving to more interesting fourier based models in the future. 
+
+We do not see any evidence of a non-seasonal trend in our data, and as far as stationarity (constant mean, constant variance, constant autocorrelation structure), we have clearly violated it. Therefore, a model with a minimal of a seasonal ARIMA model is going to be required. We will next time explore classical univariate models, as well as determining model appropriacy. Stay tuned!
 
 ## Saving our work:
 
