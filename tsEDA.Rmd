@@ -257,6 +257,14 @@ We see a peak at 0.25, indiciative of a period of 4 observations, or in this cas
 
 We have detected probably 3 seasonalities in our data: daily, weekly, and yearly. By resampling our data, we were able to eaily observe these patterns. Next, we need to think about what sort of models we want to use. Given  the complexity of the data, and the presence of an exceptionally long (and multiple) seasonal patterns, we are likely going to have a hard time to find appropriate pure ARIMA and other classical models (which we will do next time). We will likely need to consider moving to more interesting fourier based models in the future. Stay tuned!
 
+## Saving our work:
+
+We updated our "china" hash table, so we are going to go ahead and update it on our disk too (to include this `uvar` object):
+
+```{r}
+saveRDS(china, file = 'store/china.Rds')
+```
+
 # Navigation
 
 [Part 1](tspreprocessing.html)
