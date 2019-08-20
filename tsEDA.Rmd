@@ -203,7 +203,7 @@ Well, we havent learned everything, but we have learned one important thing: The
 
 # Detecting a Weekly Trend
 
-To detect the weekly trend, lets revisit our base R plot with lines on each period trick. We will use our daily data, and take maybe 
+To detect the weekly trend, lets revisit our base R plot with lines on each period trick. We will use our daily data, and take maybe 10 or so weeks (as at some point we start to overplot). These weeks were chosen completely at random:
 
 ```{r}
 uvarWeeks <- window(resamples$daily, 
