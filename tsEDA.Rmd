@@ -1,5 +1,5 @@
 ---
-title: "Preprocessing Time Series Data"
+title: "Diving in: Exploring Time Series Data"
 author: "David Josephs"
 date: "`r Sys.Date()`"
 output: 
@@ -19,14 +19,14 @@ library(tint)
 knitr::opts_chunk$set(message = F, warning = F)
 knitr::opts_chunk$set(cache = T, autodep = T)
 knitr::opts_chunk$set(comment = '#>')
-knitr::opts_chunk$set(tidy = T)
+#knitr::opts_chunk$set(tidy = T)
 ```
 
 # Forecasting Air Pollution: Univariate EDA
 
 The next important step in any data science workflow is to use **exploratory data analysis** to get to know the patterns and structure of our data. For time series, this is especially imortant, as we want to be able to identify any **seasonal** patterns, **trends**, and **stationarity** of our series, in order to help us understand what type of model we should be using to forecast into the future. 
 
-## Dealing Thousands of Points
+## Dealing With Thousands of Points
 
 One issue that pops up a lot in data science and data mining is that when you have too many data points, EDA becomes very slow, and your plots become unreadable, as no human can really detect a pattern when there are more points than there are pixels in your plot. So, to combat this, we can make an assumption to guide our analysis:
 
@@ -58,8 +58,11 @@ The first thing we notice, immediately, is that we have ***negative*** values a 
 ```{r}
 library(tidyverse)
 colnames(beijing)
-beijing %>% filter(PM_US.Post < 0) %>% nrow/(nrow(beijing)) * 100
-read.csv("data/BeijingPM20100101_20151231.csv") %>% filter(PM_US.Post < 0) %>% nrow/nrow(beijing) * 100
+beijing %>% filter(PM_US.Post < 0) %>% 
+  nrow/(nrow(beijing)) * 100
+read.csv("data/BeijingPM20100101_20151231.csv") %>% 
+  filter(PM_US.Post < 0) %>% 
+  nrow/nrow(beijing) * 100
 ```
 
 ## Tidying up
@@ -68,7 +71,8 @@ So 0.4% of our points are negative, and and they are all due to our interpolatio
 
 ```{r}
 library(pipeR)
-uvar <- beijing$PM_US %>>% abs %>>% tsclean
+uvar <- beijing$PM_US %>>% 
+  abs %>>% tsclean
 
 # Save our work to the hash table
 china[['uvar']] <- uvar
@@ -87,15 +91,153 @@ There we go, now we finally have a time series we can work with. Lets go ahead a
 We will first cut our time series and pick a random week or two of data, and then plot it, drawing lines at midnight every day.
 
 ```{r, fig.cap = "2 weeks of PM 2.5 measurements"}
-uvarShort <- window(uvar, start = 4, end = c(4,7*48) )
+uvarShort <- window(uvar, 
+                    start = c(4), 
+                    end = c(4,7*48))
 uvarShort <- ts(uvarShort, frequency = 24)
 plot(uvarShort, ylab = "PM2.5")
 abline(v = 1:14, col = "red")
 ```
 
-This plot confirms our first assumption: There is a 24 hour pattern in the data
+What is imortant to look at here is the pattern in between each day (red lines). We see here that there appears to be a peak in the nighttime hours, and a trough in the daytime hours. This pattern is not consistent in scale, but it is pretty consistent in occurence. We can take another look, with a ***season plot***, where a time series is cut into periods, and each period is plotted repeatedly over each other. We will only look at 10 days here.
 
-WORK IN PROGRESS
+```{r, fig.cap = "Season plot of hourly data over 10 days" }
+uvarDays <- ts(uvar,
+               frequency = 24, 
+               start = c(4, 24*70), 
+               end = c(4, 24*80))
+ggseasonplot(uvarDays) +  theme_hc()  + scale_color_hc()
+```
+
+In this plot, we are looking at matching and trends lining up. What we see is clear evidence that during the morning and day time, PM 2.5 seems to dip, whereas at nighttime (especially 6 pm to like 4-5 am), we are getting a peak. This is another sign of daily seasonality.
+
+# Resampling a Time Series
+
+In order to see the more long term trends in a time series, we are going to need to resample it, to a lower frequency. Otherwise, the data is simply too noisy for us to understand (overplotting). We are going to want to take daily, weekly, and quarterly samples in order to see different trends (just as hourly data helped us see the daily pattern, daily data will help us see a weekly pattern, weekly quarterly or monthly, and quarterly a yearly pattern, and so on). As we are going to do this multiple times, at different frequencies, instead of writing multiple functions by hand, lets write a function that outputs a function, so that we can quickly generate resampling functions on the fly. Before we can do that, lets discuss a plan of attack, and another useful R tool: `tapply`.
+
+## The `tapply` function
+The tapply function is an incredibly powerful function that should be in everyones toolbelt, as when you need it, it can cut down the number of lines of code you need. `tapply` allow us to apply a function to subsets of a vector, using another vector as a subsetting tool. In our case, we will subset by the number of times our desired period divides our original time series. To do this we will use the `%/%` operator.
+
+### The `%/%` Operator
+
+This operator does sort of the opposite of the `%%` operator: instead of returning the remainder, it returns the number of times the RHS can divide the LHS. As an example, lets say we have 50 points, and want to group them with a period of four. We can then define our grouping vector as follows:
+
+```{r}
+x <- 1:50
+#  [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
+# [27] 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50
+y <- (x-1) %/% 4
+y
+```
+
+We see the first 4 values, denoted by `0`, represent the first period of our series. The next 4 values, denoted by `1`, represent the second period. Note that to get our periods to work out nicely like this, we had to subtract 1 from the original vector. Now, let us resample:
+
+```{r}
+changeSamples <- function(period){
+  function(vec) {
+    result <- unname(tapply(vec,
+                            (seq_along(vec)-1) %/% period, 
+                            mean))
+    return(
+           ts(result, frequency = (8760/period))
+    )
+  }
+}
+```
+
+Next, using our resampling function, lets quickly write a daily, weekly, monthly, and quarterly resampler:
+
+```{r}
+toDays <- changeSamples(24)
+toWeeks <- changeSamples(24 * 7)
+toMonths  <- changeSamples(24 * 7 * 4)
+toQuarters <- changeSamples(24 * 365 / 4)
+```
+
+## Working with Lists of Functions
+
+A lesser known R trick, when you have bunch of functions you want to run over a dataset, is to use a list of functions, and lapply them over the dataset:
+
+```{r}
+resamplers <- list(
+                   daily =  toDays,
+                   weekly = toWeeks,
+                   monthly = toMonths,
+                   quarterly = toQuarters
+)
+
+resamples <- lapply(resamplers, function(f) f(uvar))
+data.frame(t(sapply(resamples, frequency))) 
+```
+
+This monthly sampling is a little off, but otherwise this is a very useful set of data we now have, and we can go on with our EDA.
+
+# Seasonal Plots En Masse
+
+Instead of painstakingly writing code to make each plot, now that we are familiar with the general structure, I can suggest two ways of plotting our seasonal plots: a base R way with `lapply`, and a clean way with `walk`. I have strong opinions against purrr as a whole, however, walk, which applies a function to an object but only returns the functions "side effects" is incredibly useful. Lets show an example with our seasonal plot:
+
+```{r}
+themedSeason <- function(ts) {
+  p <- ggseasonplot(ts) + 
+    scale_color_hc() + 
+    theme_hc() 
+  print(p)
+}
+
+walk(resamples, themedSeason)
+```
+
+We instantly produced four well themed plots. Now, instead of this, we may want to plot them in a grid, and with that we can use another incredibly useful function `cowplot::plot_grid`:
+
+```{r, fig.cap = "Daily, Weekly, Monthly, and Quarterly Seasonal Plots"}
+seasonPlots <- lapply(resamples, function(x) {
+                        ggseasonplot(x) + scale_color_hc() + theme_hc()})
+cowplot::plot_grid(plotlist = seasonPlots)
+```
+
+## Interpretation
+
+> What have we learned from these seasonal plots?
+
+Well, we havent learned everything, but we have learned one important thing: There is a clear yearly trend. Especially looking at the quarterly lot, but really in each plot (except the monthly plot, which is a mess), we see that the average PM2.5 content is more or less the same each year, as the shape of each year lines up.
+
+# Detecting a Weekly Trend
+
+To detect the weekly trend, lets revisit our base R plot with lines on each period trick. We will use our daily data, and take maybe 
+
+```{r}
+uvarWeeks <- window(resamples$daily, 
+                    start = c(5, 30*7), 
+                    end = c(5, 40*7))
+uvarWeeks <- ts(uvarWeeks, frequency = 7)
+plot(uvarWeeks)
+abline(v = 1:26, col = "red")
+```
+
+This is a very clear example of a weekly seasonality, there is a peak in the middle of each week. This makes sense, as there is a lot more driving during the work week.
+
+# ACF
+
+In time series, another very imortant tool is the ACF, and more specifically the ACF plot. What this shows, is how the current observation is correlated with the observation $\ell$ timesteps, or lags ago. Lets check it out on each sampling of our data:
+
+```{r, fig.cap = "ACF: Hourly Data"}
+acf(uvar, lag.max = 8760)
+```
+
+This tells us a ton about the nature of our data. On short time scales (think hours), our data exhibits explosive growth. What this means is that the value at the present time is ***highly positively correlated*** with what occured recently. Looking at our previous plots, this behavior is readily visible. What is very interesting however, is the strong negative correlation region at about half a year. This means that values now are ***highly negatively correlated*** with what happened about 6 months ago. Referring back to our quarterly season plot, we can very clearly see this behavior. What this plot also tells us, with its extreme complexity and very high ACFs overall, is this data is going to be incredibly difficult to analyze through classical methods, as theres an inherently complex and likely multiseasonal autocorrelation structure.
+
+## ACFs at other sampling rates:
+
+```{r, fig.height = 10}
+par(mfrow = c(2,2))
+walk(resamples, function(x) acf(x, lag.max = frequency(x)))
+```
+
+We see the same behavior demonstrated nicely here. There is a clear, strong, yearly seasonality, which will be quite a challenge for us to deal with, as there are other more subtle seasonalities which we were able to pick up on with our other plots.
+
+# The Parzen Window
+
+COMING up
 
 # Navigation
 
