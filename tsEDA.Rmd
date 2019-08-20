@@ -265,6 +265,8 @@ We updated our "china" hash table, so we are going to go ahead and update it on 
 saveRDS(china, file = 'store/china.Rds')
 ```
 
+Thanks for reading!
+
 # Navigation
 
 [Part 1](tspreprocessing.html)
