@@ -12,8 +12,6 @@ output:
 
 [Part 1](tspreprocessing.html)
 
-
-
 [Back to Navigation](Dsblog.html)
 
 ```{r setup, include = F}
