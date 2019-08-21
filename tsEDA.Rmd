@@ -12,7 +12,7 @@ output:
 
 [Part 1](tspreprocessing.html)
 
-[Back to Navigation](Dsblog.html)
+[Back to Navigation](DSblog.html)
 
 ```{r setup, include = F}
 library(tint)
@@ -271,6 +271,6 @@ Thanks for reading!
 
 # Navigation
 
-[Part 1](Dsblog.html)
+[Part 1](DSblog.html)
 
 [Back to Navigation](index.html#my-blog)

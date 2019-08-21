@@ -35,7 +35,7 @@ I am a:
 
 ## Data Science Blog:
 
-[Home Page](Dsblog.html)
+[Home Page](DSblog.html)
 
 ### Recent Articles:
 
