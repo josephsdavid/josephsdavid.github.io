@@ -15,7 +15,7 @@ Hello and welcome to my data science blog! I am thrilled you are here. The goal 
 
 # Index:
 
-[about me](index.html)
+[About Me](index.html)
 
 [Forecasting Air Pollution Part 1: Preprocessing](tspreprocessing.html)
 
