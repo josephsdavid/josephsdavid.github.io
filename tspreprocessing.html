@@ -10,7 +10,7 @@
 
 <meta name="author" content="David Josephs" />
 
-<meta name="date" content="2019-08-20" />
+<meta name="date" content="2019-08-21" />
 
 <title>Preprocessing Time Series Data</title>
 
@@ -2693,19 +2693,18 @@ window.onload = function() {
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -2726,7 +2725,7 @@ pre.numberSource { margin-left: 3em; border-left: 1px solid #a0a0a0;  padding-le
 div.sourceCode
   { color: #1f1c1b; background-color: #ffffff; }
 @media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span. { color: #1f1c1b; } /* Normal */
 code span.al { color: #bf0303; background-color: #f7e6e6; font-weight: bold; } /* Alert */
@@ -2850,7 +2849,7 @@ $(document).ready(function () {
 
 <div id="main">
 <p><a href="tsEDA.html">Part 2</a></p>
-<p><a href="index.html#my-blog">Back to Navigation</a></p>
+<p><a href="Dsblog.html">Back to Navigation</a></p>
 <div id="forecasting-air-pollution-preprocessing" class="section level1">
 <h1>Forecasting Air Pollution: Preprocessing</h1>
 <p><span class="newthought">Before we begin</span> any data science project, it is important to discuss the motivation and setting for it. This is especially important for time series data, as a realistic forecast horizon (how far we wish to forecast into the future) is highly important.</p>
@@ -3029,12 +3028,12 @@ Spline Interpolation Between 8 points
 <span id="cb21-3"><a href="#cb21-3"></a>preprocess</span></code></pre></div>
 <pre><code>#&gt; function (...) 
 #&gt; Reduce(function(x, f) f(x), fs, ...)
-#&gt; &lt;bytecode: 0x7b1cd50&gt;
-#&gt; &lt;environment: 0x7b19818&gt;</code></pre>
+#&gt; &lt;bytecode: 0xa405180&gt;
+#&gt; &lt;environment: 0xa4086b8&gt;</code></pre>
 <p>We now have a function that imports a directory of csv’s, converts the proper items to time series objects, spline interpolates the NAs, and converts to a hash table:</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>china &lt;-<span class="st"> </span><span class="kw">preprocess</span>(<span class="st">&quot;data/&quot;</span>)</span>
 <span id="cb23-2"><a href="#cb23-2"></a><span class="kw">str</span>(china)</span></code></pre></div>
-<pre><code>#&gt; &lt;environment: 0x90af2e8&gt;</code></pre>
+<pre><code>#&gt; &lt;environment: 0xaba5da0&gt;</code></pre>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="kw">head</span>(china<span class="op">$</span>BeijingPM_, <span class="dv">100</span>)</span></code></pre></div>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
@@ -3050,7 +3049,7 @@ Spline Interpolation Between 8 points
 </div>
 <div id="navigation" class="section level1">
 <h1>Navigation</h1>
-<p><a href="index.html#my-blog">launchpad</a></p>
+<p><a href="Dsblog.html">launchpad</a></p>
 <p><a href="tsEDA.html">Part 2</a></p>
 </div>
 </div>
@@ -3060,7 +3059,7 @@ Spline Interpolation Between 8 points
 
 <div id="postamble" data-toggle="wy-nav-shift" class="status">
 <p class="author"><span class="glyphicon glyphicon-user"></span> David Josephs</p>
-<p class="date"><span class="glyphicon glyphicon-calendar"></span> 2019-08-20</p>
+<p class="date"><span class="glyphicon glyphicon-calendar"></span> 2019-08-21</p>
 </div>
 
 

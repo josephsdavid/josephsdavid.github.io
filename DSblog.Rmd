@@ -1,0 +1,22 @@
+---
+title: "David Does Data"
+output:
+  rmdformats::readthedown:
+    css: custom.css
+    highlight: kate
+    code_folding: show
+    thumbnails: true
+---
+
+# Welcome
+
+Hello and welcome to my data science blog! I am thrilled you are here. The goal of this blog is to share in depth, high quality material that I feel the data science community needs more of. If you have any ideas for further posts, questions, complaints, or just want to chat, [send me an email!](mailto:josephsd@smu.edu)
+
+
+# Index:
+
+[about me](index.html)
+
+[Forecasting Air Pollution Part 1: Preprocessing](tspreprocessing.html)
+
+[Forecasting Air Pollution Part 2: Univariate Exploratory Data Analysis](tsEDA.html)

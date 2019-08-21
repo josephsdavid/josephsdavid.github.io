@@ -12,7 +12,7 @@ output:
 
 [Part 2](tsEDA.html)
 
-[Back to Navigation](index.html#my-blog)
+[Back to Navigation](Dsblog.html)
 
 ```{r setup, include = F}
 library(tint)
@@ -267,6 +267,6 @@ Thanks for reading!
 
 # Navigation
 
-[launchpad](index.html#my-blog)
+[launchpad](Dsblog.html)
 
 [Part 2](tsEDA.html)
