@@ -273,4 +273,4 @@ Thanks for reading!
 
 [Part 1](DSblog.html)
 
-[Back to Navigation](index.html#my-blog)
+[Back to Navigation](DSblog.html)
