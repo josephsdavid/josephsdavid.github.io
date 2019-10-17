@@ -1,0 +1,134 @@
+---
+title: "Building a Reproducible Data Science Environment with Nix"
+author: "David Josephs"
+date: "`r Sys.Date()`"
+output: 
+  rmdformats::readthedown:
+    css: custom.css
+    df_print: paged
+    cards: false
+---
+
+[Back to Navigation](DSblog.html)
+
+
+```{r setup, include = F}
+library(tint)
+knitr::opts_chunk$set(message = F, warning = F)
+knitr::opts_chunk$set(cache = T, autodep = T)
+knitr::opts_chunk$set(comment = '#>')
+#knitr::opts_chunk$set(tidy = T)
+```
+
+# Why Nix?
+
+Data science environments are a massive headache. We depend on lots of *languages*, including python, R, sometimes javascript, and many more. We also depend on lots of *packages* within each language, some of which have dependencies outside of the language, for example if we are using tensorflow or pytorch with CUDA, or almost any fast R package. This creates for each project more or less a complex web of dependencies, to the point where our entire project, or any old project, can be more or less ruined by a simple update, or some issue when we install a new package. This is especially true in Python.
+
+Luckily for Python users everywhere, we have some workarounds. We can use conda, which resolves dependencies itself, but is very difficult to rollback and oftentimes mysterious and frustrating. We can also develop an elaborate setup with pipenv or virtualenv and pip or whatever, but what about dependencies outside of python? How do we intend to deploy our model?
+
+Enter [nix](https://nixos.org/nix/). Nix is a 100% reproducible package manager, for all languages and all things. This means your python environment, your R environment, your models, your ***entire computer*** can be completely reproduced, all using the magic of nix. In this article, we will walk through setting up a simple, reproducible, and failproof data science stack with nix, including importing packages not found on nixpkgs, caching the builds online, and making a docker container.
+
+## How does Nix work?
+
+Let us first think about how an environment is managed on a normal system. For that, the easiest way to think of it is to imagine a cobweb
+
+```{r, echo = FALSE, fig.cap = "/usr/bin..."}
+knitr::include_graphics("cobweb.jpeg")
+```
+
+Each time you add a new package to your environment, it goes into /usr/bin or somewhere similar, and connects itself to all the other packages it depends on and the ones which may depend on it, through a crazy web of symlinks and fresh hell. You are adding another connected node to the cobweb.
+
+Now, try updating your computer, or working on a project that needs an older version of one of these dependencies. Suddenly, you are applying a force to the cobweb, moving nodes around. Unsurprisingly, this breaks the cobweb, and ***nothing*** works anymore.
+
+Now, lets discuss how nix does it. Instead of /usr/bin, or whatever, a package managed by nix goes in /nix/store, named by a cryptographic hash for that specific version of that package. So this means that for example python 3.7 is stored in /nix/store/someverylongandcomplexhash-python37, while python 3.6 is stored in /nix/store/someotherlongcomplexhash-python36. Within these directories, the dependencies are stored for each package. So instead of a densely connected node in a cobweb, we can visualize each package as a tree in a forest.
+
+```{r, echo = FALSE, fig.cap = "/nix/store :)"}
+knitr::include_graphics("forest.jpg")
+```
+
+Each tree minds its own business, and has its own roots, branches and leaves. If one tree moves or falls down or anyting like that, it does not affect the other trees. This is the same as /nix/store. Similarly, if we were to "update" our system, none of the old trees would die. Instead, new trees would grow, still separate from the old trees. This means that A) it is literally impossible to enter dependency hell, or break packages by changing other packages, and B) we can work with multiple versions of the same package.
+
+Let us now, for the purposes of data science, ask a question. Can I represent my environment ***for a single project*** as a package? Of course!!!! We can *easily* wrap up our entire data science environment as a completely isolated tree in our forest of packages. This means we can work on one project without any fear of it messing up our other projects, or anything on our computer!!
+
+# Making a reproducible, isolated environment
+
+First, I will show the code used to make a solid working environment, and then we will walk through it line by line. Name this file `shell.nix`
+
+```nix
+let
+  pkgs = import <nixpkgs> {};
+in
+  pkgs.mkShell {
+    name = "simpleEnv";
+    buildInputs = with pkgs; [
+    # basic python dependencies
+      python37
+      python37Packages.numpy
+      python37Packages.scikitlearn
+      python37Packages.scipy
+      python37Packages.matplotlib
+    # a couple of deep learning libraries
+      python37Packages.tensorflowWithCuda # note if you get rid of WithCuda then you will not be using Cuda
+      python37Packages.keras
+      python37Packages.pytorchWithCuda
+
+    # Lets assume we also want to use R, maybe to compare sklearn and R models
+      R
+      rPackages.mlr
+      rPackages.data_table # "_" replaces "."
+      rPackages.ggplot2
+    ];
+   shellHook = ''
+      '';
+  }
+```
+
+Now, lets walk through the code.
+
+## let ... in
+
+First, we define I would say really our imports. I am not sure what the technical word for this isbut its the stuff in between let and in.
+
+```nix
+let
+  pkgs = import <nixpkgs> {};
+```
+
+On the left hand half of the equation (this is simple review, but it is intimidating seing a new language), we have the name of the variable, which can be called after `in`. Next we have the trickier statement:
+
+```nix
+import <nixpkgs> {};
+```
+
+What this is doing is naming our connection to the nix package repository (`<nixpkgs>`) online. The thing in the `<>` is the name of the nix channel we are connecting to. This is really boilerplate and will never change for any of our use case. We will see later on what the `{}` does. Basically it is a space for any options or specific parts of `<nixpkgs>` we want to import. For now, it is just boilerplate.
+
+
+## pkgs.mkShell 
+
+Here is the first important bit. We are building what is called a `nix shell`. What this is, is when you type `nix-shell` in this directory on the command line, your computer is going to drop you into a new shell with the little environment we are building in its $PATH. This means you can still access your computer and all your files, but also access these include packages, without having it affect your system or touch any of your other environments.
+
+The `name = "simpleEnv"` line is very simple, we are specifying what the name of our environment package will be in /nix/store. It is also the name it will appear as in our shell.
+
+Next we come to the buildInputs. ***This is where you put the packages***. Note that `with pkgs; [...]` essentially means we dont have to type
+
+```
+pkgs.python37
+pkgs.python37Packages.numpy
+...
+...
+```
+
+thankfully.
+
+Finally, after this bit, we have an optional `shellHook = '' ''` line. This allows us to run any scripts, set up any services, or anything like that we may want to do. For me this line is useful when developing R packages, but otherwise I do not use.
+
+And that is it :) You have made your first isolated, reproducible environment in Nix. To activate it, simply cd into the directory where the shell.nix is located, and type `nix-shell`. Note that if this is slow, you may want to try `nix-shell -j 8`, or however many cores you have, to make it build faster.
+
+
+# But what if my python package isnt in nixpkgs?
+
+## How can I search for nix packages?
+
+# How can I make this quicker??
+
+# How can I put this in a containter

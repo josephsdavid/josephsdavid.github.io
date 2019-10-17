@@ -14,6 +14,8 @@ output:
 
 [Back to Navigation](DSblog.html)
 
+[Part 3](classicalTs.html)
+
 ```{r setup, include = F}
 library(tint)
 knitr::opts_chunk$set(message = F, warning = F)
@@ -272,5 +274,7 @@ Thanks for reading!
 # Navigation
 
 [Part 1](DSblog.html)
+
+[Part 3](classicalTs.html)
 
 [Back to Navigation](DSblog.html)

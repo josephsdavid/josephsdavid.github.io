@@ -39,6 +39,8 @@ I am a:
 
 ### Recent Articles:
 
+[Building a Reproducible Data Science Environment with Nix](nix.html)
+
 [Forecasting Air Pollution Part 1: Preprocessing](tspreprocessing.html)
 
 [Forecasting Air Pollution Part 2: Univariate Exploratory Data Analysis](tsEDA.html)
