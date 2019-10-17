@@ -69,7 +69,7 @@ in
       python37Packages.matplotlib
     # a couple of deep learning libraries
       python37Packages.tensorflowWithCuda # note if you get rid of WithCuda then you will not be using Cuda
-      python37Packages.keras
+      python37Packages.Keras
       python37Packages.pytorchWithCuda
 
     # Lets assume we also want to use R, maybe to compare sklearn and R models
@@ -127,8 +127,260 @@ And that is it :) You have made your first isolated, reproducible environment in
 
 # But what if my python package isnt in nixpkgs?
 
-## How can I search for nix packages?
+Let us say we are also interested in the cool data science visualization package [yellowbrick](https://www.scikit-yb.org/en/latest/). First, lets search the nix repository for it, using a convenient command line tool:
+
+```bash
+nix search yellowbrick
+```
+
+We can search for anything this way, with results automatically popping out in less. Unfortunately, this gives us no results. That means yellowbrick, which is in pypi, is not available in nipkgs by default. This is not the end of the world by any means, and we have a few ways to deal with it:
+
+## Method one: Cheating and using virtualenv like a baby
+
+This time, we can just cheat, and use virtualenv in our shellHook along with requirements.txt. This is super lame, impure, and not advised, but sometimes we are all lazy. Please note the simple changes we made to wrap our nix environment in a virtualenv:
+
+```nix
+let
+  pkgs = import <nixpkgs> {};
+in
+  pkgs.mkShell {
+    name = "simpleEnv";
+    buildInputs = with pkgs; [
+    # basic python dependencies
+      python37
+      python37Packages.numpy
+      python37Packages.scikitlearn
+      python37Packages.scipy
+      python37Packages.matplotlib
+
+
+    # a couple of deep learning libraries
+      python37Packages.tensorflow
+    # python37Packages.tensorflowWithCuda # note if you get rid of WithCuda then you will not be using Cuda
+      python37Packages.Keras
+      python37Packages.pytorch # used for speedy examples
+    # python37Packages.pytorchWithCuda
+
+    # Lets assume we also want to use R, maybe to compare sklearn and R models
+      R
+      rPackages.mlr
+      rPackages.data_table # "_" replaces "."
+      rPackages.ggplot2
+
+    # dirty virtualenv dependencies
+      python37Packages.pip
+      python37Packages.virtualenv
+    ];
+   shellHook = ''
+    echo "yellowbrick" > requirements.txt
+    virtualenv simpleEnv
+    source simpleEnv/bin/activate
+    pip install -r requirements.txt 
+      '';
+  }
+```
+
+This will always work, but it is incredibly lame, and we cant do cooler things with this. We are simply putting yellowbrick in requirements.txt, activating a virtualenv, and then installing it, after we enter the nix shell. This is two layers of abstraction, but it is definitely possible. Not recommended at all.
+
+## Doing it the Nix way
+
+Doing this the nix way is very simple. We can pull the package from PyPi (or GitHub/GitLab/wherever) using two lovely Nix builtins: `fetchFromPyPi` and `fetchFromGithub` (very appropriately named). Lets now proceed to fetch yellowBrick from PyPi in the let ... in section of our `shell.nix`:
+
+```nix
+
+let
+  pkgs = import <nixpkgs> {};
+
+
+  # bring in yellowbrick from pypi, building it with a recursive list
+    yellowbrick = pkgs.python37.pkgs.buildPythonPackage rec {
+      pname = "yellowbrick";
+      version = "1.0.1" ;
+
+      src = pkgs.python37.pkgs.fetchPypi {
+        inherit pname version;
+        sha256 = "1q659ayr657p786gwrh11lw56jw5bdpnl6hp11qlckvh15haywvk";
+      };
+
+# no tests because this is a simple example
+      doCheck = false;
+
+# dependencies for yellowbrick
+      buildInputs = with pkgs.python37Packages; [
+      pytest 
+      pytestrunner 
+      pytest-flakes  
+      numpy 
+      matplotlib 
+      scipy 
+      scikitlearn
+    ];
+  };
+in
+  pkgs.mkShell {
+    name = "simpleEnv";
+    buildInputs = with pkgs; [
+    # basic python dependencies
+      python37
+      python37Packages.numpy
+      python37Packages.scikitlearn
+      python37Packages.scipy
+      python37Packages.matplotlib
+    # a couple of deep learning libraries
+      python37Packages.tensorflow
+    # python37Packages.tensorflowWithCuda # note if you get rid of WithCuda then you will not be using Cuda
+      python37Packages.Keras
+      python37Packages.pytorch # used for speedy examples
+    # python37Packages.pytorchWithCuda
+
+    # Lets assume we also want to use R, maybe to compare sklearn and R models
+      R
+      rPackages.mlr
+      rPackages.data_table # "_" replaces "."
+      rPackages.ggplot2
+
+      yellowbrick
+    ];
+   shellHook = ''
+      '';
+  }
+```
+
+Lets now walk through this code, which seems very scary but is actually very simple. 
+
+First important bit is `pkgs.python37.pkgs.buildPythonPackage`, which is calling from nixpkgs (online repo), the buildPythonPackage function, which clearly allows us to build a python package. As an input, this function takes in a recursive set `rec {...}`.
+
+The first thing we need to specify is the package name (`pname`), and the package version. Next, we need to specify the source (`src`) of the package, or where it comes from. This calls the name and the version of the package mentioned above, as well as a SHA256 hash sent in from Pypi. To get this hash, we can either do it an [elegant and pure way](https://github.com/target/nix-fetchers), or the lazy David way. To get the proper hash the lazy way, simply put the wrong hash in and let nix correct you. 
+
+After that, we need to construct our tree. For this simple example. we will not run any python checkPhase, so we will say `doCheck = false`. After this example we will desimplify the recipe a bit.
+
+The final step is we need to specify what dependencies are needed to build our package. In this case we use `buildInputs`. In this case, the package will not build without pytest et al, matplotlib, numpy, scipy, and sklearn. And that is it. Go ahead and try running the following code, to test that it worked:
+
+```python
+import sklearn.datasets
+X,Y = sklearn.datasets.load_breast_cancer(return_X_y=True)
+
+from yellowbrick.features import ParallelCoordinates
+
+visualizer = ParallelCoordinates()
+visualizer.fit_transform(X, Y)
+visualizer.show()
+```
+
+## Desimplifying buildInputs
+
+Lets assume we are building production code. Obviously, we will probably want to run the checks on our package. So the first thing we do is we delete the `doCheck =  false` line. The next thing we need to do is move the test dependencies away from buildInputs. These are actually only used during the check phase, so we write a new set of inputs, `checkInputs`
+
+In this case we will now have
+
+```nix
+checkInputs = with pkgs.python37Packages; [
+  pytest
+  pytestruner
+  pytest-flakes
+];
+buildInputs = with pkgs.python37Packages; [
+  numpy 
+  matplotlib 
+  scipy 
+  scikitlearn
+];
+```
+
+So pytest and friends will be called during the check phase, and the rest will be called when actually constructing the package. Finally, if there were some other packages that were `runtime dependencies` for the python package we were to install, we would put them in `propogatedBuildInputs`. For more extensive and technical documentation on doing this, please refer to the excellent [nix python documentation](https://github.com/NixOS/nixpkgs/blob/master/doc/languages-frameworks/python.section.md)
 
 # How can I make this quicker??
 
-# How can I put this in a containter
+One thing you may notice, especially if you are compiling your environment to run with Cuda, is this build can take forever. Sometimes you end up having to compile very big packages, and this is never quick business. Thankfully, there is an amazing workaround to that. We can actually construct our environment as an honest to goodness package, in binary form, and then put that binary in an online cache, so we can simply download our tree whenever we want to use it. This is also an incredible tool for working in teams when you want total reproducibility. Every member of the team will have the exact same environment compiled under the exact same system.
+
+For this, we will use [cachix](https://cachix.org/). The first thing we are going to do is write a new file, `default.nix`, which we build a nix ***derivation***(read: recipe) which compiles to a binary which we can dump into the online cache.
+
+We will need to change the boilerplate code slightly to get this to work, but in general this is simple. As with the other examples, I will show it first then walk through what we did:
+
+```nix
+let
+  pkgs = import <nixpkgs> {}; # standard
+  # bring in yellowbrick from pypi, building it with a recursive list
+    yellowbrick = pkgs.python37.pkgs.buildPythonPackage rec {
+      pname = "yellowbrick";
+      version = "1.0.1";
+
+      src = pkgs.python37.pkgs.fetchPypi {
+        inherit pname version;
+        sha256 = "1q659ayr657p786gwrh11lw56jw5bdpnl6hp11qlckvh15haywvk";
+      };
+
+# no tests because this is a simple example
+      doCheck = false;
+
+# dependencies for yellowbrick
+      buildInputs = with pkgs.python37Packages; [
+      pytest 
+      pytestrunner 
+      pytest-flakes  
+      numpy 
+      matplotlib 
+      scipy 
+      scikitlearn
+    ];
+  };
+  in with import <nixpkgs> {};
+stdenv.mkDerivation rec { # new boilerplate
+  name = "simpleEnv";
+
+  # Mandatory boilerplate for buildable env
+  # this boilerplate is courtesy of Asko Soukka
+  env = buildEnv { name = name; paths = buildInputs; };
+  builder = builtins.toFile "builder.sh" ''
+    source $stdenv/setup; ln -s $env $out
+  '';
+
+  buildInputs = [
+
+      python37
+      python37Packages.numpy
+      python37Packages.scikitlearn
+      python37Packages.scipy
+      python37Packages.matplotlib
+      yellowbrick
+
+      python37Packages.tensorflowWithCuda
+      python37Packages.Keras
+      python37Packages.pytorchWithCuda
+
+      R
+      rPackages.mlr
+      rPackages.data_table # "_" replaces "."
+      rPackages.ggplot2
+  ];
+
+}
+```
+
+And there we have it. We have built our first nix package/recipe. Lets now talk through the boilerplate.
+
+The first thing we notice is instead of mkShell, we are using stdenv.mkDerivation, which makes a nix derivation (recipe). It is defined with a recursive set `rec`. Next, just as in the shell.nix, we give it a name. Then, in the `env = ...` bit, we define where nix should look to build the environment. In this case, it should look for the name we made, and the build inputs we define next.
+
+We also have to define what tool is going to build it, in this case we are using a builtin (to nix) build script, which again is just boilerplate.
+
+Finally, we have our buildInputs as usual, and then we are done. To see what we have done, try `nix-build` in the directory containing `default.nix` (you can also `nix-build default.nix`, but that is not needed). we can now look around the tree for the package which we are made, which is symlinked to `/nix/store/longhash-simpleEnv`.
+
+To get this on an online cache, so we dont have to build our environment over and over, first you must sign up for cachix. Then, try out `cachix create simpleEnv`, so you create room in the online cache for you.
+
+Next, enter in `nix-build | cachix push simpleEnv`. This builds the derivation and pipes the binary into the cachix push command and stores it.
+
+Now, simply type `cachix use simpleEnv`. This connects your computer to your lovely cache, and any time you are using a package that is part of this environment, in nix shell or otherwise, it will instead of being built slowly, simply pull down that cached binary onto your computer.
+
+
+# Until next time
+
+Hopefully, you now can quickly create nix environments for your data science workflow, and a bit of the boilerplate nix is demystified. Next time, we will look at building a container from nix expressions, fully reproducible Jupyter Notebooks and kernels, and packaging a machine learning model using nix (and deploying it as a service).
+
+# References
+
+For more info from people significantly smarter than I, check out:
+
+* [nix python documentation](https://github.com/NixOS/nixpkgs/blob/master/doc/languages-frameworks/python.section.md)
+
+* [Asko Soukka's Brilliant Blog](https://datakurre.pandala.org/2015/10/nix-for-python-developers.html/)
+
