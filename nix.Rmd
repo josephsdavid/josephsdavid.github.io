@@ -26,7 +26,7 @@ Data science environments are a massive headache. We depend on lots of *language
 
 Luckily for Python users everywhere, we have some workarounds. We can use conda, which resolves dependencies itself, but is very difficult to rollback and oftentimes mysterious and frustrating. We can also develop an elaborate setup with pipenv or virtualenv and pip or whatever, but what about dependencies outside of python? How do we intend to deploy our model?
 
-Enter [nix](https://nixos.org/nix/). Nix is a 100% reproducible package manager, for all languages and all things. This means your python environment, your R environment, your models, your ***entire computer*** can be completely reproduced, all using the magic of nix. In this article, we will walk through setting up a simple, reproducible, and failproof data science stack with nix, including importing packages not found on nixpkgs, caching the builds online, and making a docker container.
+Enter [nix](https://nixos.org/nix/). Nix is a 100% reproducible package manager, for all languages and all things. This means your python environment, your R environment, your models, your ***entire computer*** can be completely reproduced, all using the magic of nix. In this article, we will walk through setting up a simple, reproducible, and failproof data science stack with nix, including importing packages not found on nixpkgs and caching the builds online
 
 ## How does Nix work?
 
