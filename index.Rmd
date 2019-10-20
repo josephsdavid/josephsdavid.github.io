@@ -24,7 +24,7 @@ I am a:
 
 * Open source contributor (author of 1.5 [R packages](https://rdrr.io/github/josephsdavid/tswgewrapped/))
 
-* [Chess player](https://lichess.org/@/Jdj8af)
+* [Chess player](https://lichess.org/@/SchevyHeavy)
 
 * Vim and Linux enthusiast
 
@@ -80,16 +80,18 @@ Work in progress
 # Things I am doing
 * Getting a master's in data science
 
-* Attempting to pick an interesting and difficult capstone topic
+* Working on my capstone project (Unsupervised Learning for MS):
+  * Autosegmentation of brain lesions using standard clustering as well as deep methods
+  * Prediction of entire brain (PET scan) using autosegmented MRIs and GANs
+  * Grouping of MS patients using time based features, unsupervised, and semisupervised methods (likely bayesian as well)
+  * Prediction of MS relapses
 
 * Helping graduate students succeed and understand the entire data science workflow from data attainment to deployment (head TA for a survey of data science course)
 
 * Going in depth with deep learning
-
+  * Building fake images of food with a GAN  (future blog post)
   * Working on image classification with CNNs
-
   * Time series analysis with LSTMs and WaveNet CNN architecture
-
   * (Hopefully) building a chess AI that uses reinforcement learning
 
 
