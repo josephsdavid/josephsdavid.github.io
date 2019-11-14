@@ -22,7 +22,7 @@ I am a:
 
 * Aspiring data scientist
 
-* Open source contributor (author of 1.5 [R packages](https://rdrr.io/github/josephsdavid/tswgewrapped/))
+* Open source contributor (author of 1.5 [R packages](https://rdrr.io/github/josephsdavid/tswgewrapped/) and 1 [python package](https://pypi.org/project/n2d/))
 
 * [Chess player](https://lichess.org/@/SchevyHeavy)
 
@@ -80,11 +80,9 @@ Work in progress
 # Things I am doing
 * Getting a master's in data science
 
-* Working on my capstone project (Unsupervised Learning for MS):
-  * Autosegmentation of brain lesions using standard clustering as well as deep methods
-  * Prediction of entire brain (PET scan) using autosegmented MRIs and GANs
-  * Grouping of MS patients using time based features, unsupervised, and semisupervised methods (likely bayesian as well)
-  * Prediction of MS relapses
+* Working on my capstone project (Unsupervised and Supervised Learning for MS Diagnoses):
+  * Build SVM and LSTM based classifiers using gait data to determine EDSS score computationally
+  * Cluster gait data to build a new mobility metric for MS patients as well as highlight relationships between other MS phenotypes and gait
 
 * Helping graduate students succeed and understand the entire data science workflow from data attainment to deployment (head TA for a survey of data science course)
 
@@ -93,6 +91,8 @@ Work in progress
   * Working on image classification with CNNs
   * Time series analysis with LSTMs and WaveNet CNN architecture
   * (Hopefully) building a chess AI that uses reinforcement learning
+
+* Maintaining and growing my first large python library
 
 
 # Things I have done

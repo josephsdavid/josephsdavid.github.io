@@ -384,3 +384,4 @@ For more info from people significantly smarter than I, check out:
 
 * [Asko Soukka's Brilliant Blog](https://datakurre.pandala.org/2015/10/nix-for-python-developers.html/)
 
+[part 2](nix2.html)

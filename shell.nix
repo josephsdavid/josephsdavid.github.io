@@ -8,7 +8,6 @@ in
       rPackages.prettydoc
       rPackages.tswge
       rPackages.vars
-      rPackages.forecast
       rPackages.ggplot2
       rPackages.ggthemes
       rPackages.cowplot
@@ -17,7 +16,7 @@ in
       rPackages.rmdformats
       R
       rstudio
-      rPackages.imputeTS
+#      rPackages.imputeTS
       rPackages.data_table
       rPackages.tint
       rPackages.rmdformats
@@ -37,12 +36,14 @@ in
       rPackages.RNHANES
       rPackages.reticulate
       rPackages.blogdown
+      rPackages.vars
+      rPackages.RcppArmadillo
+      rPackages.urca
       hugo
     ];
     shellHook = ''
 #     echo "#!/usr/bin/env Rscript" > libs.R
 #     echo "devtools::install_github('csgillespie/efficient', build_vignettes=TRUE)" >> libs.R
 #     Rscript libs.R
-     R CMD INSTALL /home/david/scratch/tswgewrapped
     '';
   }

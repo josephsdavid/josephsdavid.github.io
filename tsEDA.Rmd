@@ -244,6 +244,11 @@ The final plot which I use frequently is the `smoothed periodogram`, in this cas
 ```{r, fig.cap = "Parzen window of hourly data"}
 library(tswge)
 parzen <- parzen.wge(uvar)
+str(parzen)
+# List of 2
+#  $ freq  : num [1:26292] 1.90e-05 3.80e-05 5.71e-05 7.61e-05 9.51e-05 ...
+#  $ pzgram: num [1:26292] 17.2 17.2 17.2 17.2 17.2 ...
+# NULL
 ```
 
 What does this mean? Well, first, we see the overall shape of the graph: it peaks on the left, and decays going to the right. This is indicative of strong low frequency patterns in the data. This also, on its own, indicates a lot of times a model with a clear trend (ARIMA). However, we know from our previous EDA that there is not much of an up or down trend here, so this peak at zero could be indiciative of a very long seasonal pattern, or a high order AR component. These other peaks all along the time series are typically evidence of an ARIMA model with seasonality (such as the classic airline data). Again, this data does not appear to have any integrated (ARIMA) order or root on the unit circle (If you dont know what this means, stay tuned for next time). So this in our case could be a sign of a long seasonality, combined with some shorter seasonalities. Lets one more sample plot to confirm the presence of a yearly seasonality:
@@ -251,6 +256,12 @@ What does this mean? Well, first, we see the overall shape of the graph: it peak
 ```{r}
 quarters <- resamples$quarterly
 parzenq <- parzen.wge(quarters)
+str(parzenq)
+
+res <- lapply(resamples, function(x) data.frame(parzen.wge(x,plot = FALSE)))
+print(res)
+
+mapply(function(x,y) write.csv(x,y), res, sapply(names(res)), function(x) paste0(x,".csv"))
 ```
 
 We see a peak at 0.25, indiciative of a period of 4 observations, or in this case quarters. This means again we have a yearly trend in our series

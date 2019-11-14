@@ -1,0 +1,22 @@
+---
+title: "Practical Nix for Data Science: Part 2"
+author: "David Josephs"
+date: "`r Sys.Date()`"
+output: 
+  rmdformats::readthedown:
+    css: custom.css
+    df_print: paged
+    cards: false
+---
+
+[Back to Navigation](DSblog.html)
+[Nix part 1](nix.html)
+
+
+In this post, we will discuss many very unique and practical aspects of Nix for data science, including scripts which manage their own dependencies and run in isolated environments, 100% reproducible jupyter notebooks/kernels, and containerizing nix environments.
+
+# Nix Shell Shebangs
+
+Before we get into this, lets talk about my complaints for other environment managing systems, such as conda and virtualenv. Lets say I am working on a project, and I realize that this script I wrote for an older project works perfectly for this one too.
+However, that script likely depends on packges and versions specific to that environment, and we would have to add them to our current environment too. This creates more work for us, and further complicates our environment.
+
