@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="David Josephs" />
+
+<meta name="date" content="2019-12-06" />
+
+<title>Diving in: Exploring Time Series Data</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    background-color: #ffffff;
+    color: #a0a0a0;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #a0a0a0;  padding-left: 4px; }
+div.sourceCode
+  { color: #1f1c1b; background-color: #ffffff; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span. { color: #1f1c1b; } /* Normal */
+code span.al { color: #bf0303; background-color: #f7e6e6; font-weight: bold; } /* Alert */
+code span.an { color: #ca60ca; } /* Annotation */
+code span.at { color: #0057ae; } /* Attribute */
+code span.bn { color: #b08000; } /* BaseN */
+code span.bu { color: #644a9b; font-weight: bold; } /* BuiltIn */
+code span.cf { color: #1f1c1b; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #924c9d; } /* Char */
+code span.cn { color: #aa5500; } /* Constant */
+code span.co { color: #898887; } /* Comment */
+code span.cv { color: #0095ff; } /* CommentVar */
+code span.do { color: #607880; } /* Documentation */
+code span.dt { color: #0057ae; } /* DataType */
+code span.dv { color: #b08000; } /* DecVal */
+code span.er { color: #bf0303; text-decoration: underline; } /* Error */
+code span.ex { color: #0095ff; font-weight: bold; } /* Extension */
+code span.fl { color: #b08000; } /* Float */
+code span.fu { color: #644a9b; } /* Function */
+code span.im { color: #ff5500; } /* Import */
+code span.in { color: #b08000; } /* Information */
+code span.kw { color: #1f1c1b; font-weight: bold; } /* Keyword */
+code span.op { color: #1f1c1b; } /* Operator */
+code span.ot { color: #006e28; } /* Other */
+code span.pp { color: #006e28; } /* Preprocessor */
+code span.re { color: #0057ae; background-color: #e0e9f8; } /* RegionMarker */
+code span.sc { color: #3daee9; } /* SpecialChar */
+code span.ss { color: #ff5500; } /* SpecialString */
+code span.st { color: #bf0303; } /* String */
+code span.va { color: #0057ae; } /* Variable */
+code span.vs { color: #bf0303; } /* VerbatimString */
+code span.wa { color: #bf0303; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">David Does Data</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Nix
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="nix.html">Nix for Data Science 1</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Time Series
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="tsEDA.html">Time Series EDA</a>
+    </li>
+    <li>
+      <a href="tspreprocessing.html">Time Series Cleaning</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/josephsdavid">
+    <span class=" https://image.flaticon.com/icons/svg/25/25231.svg"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Diving in: Exploring Time Series Data</h1>
+<h4 class="author">David Josephs</h4>
+<h4 class="date">2019-12-06</h4>
+
+</div>
+
+
+<p><a href="tspreprocessing.html">Part 1</a></p>
+<p><a href="DSblog.html">Back to Navigation</a></p>
+<p><a href="classicalTs.html">Part 3</a></p>
+<div id="forecasting-air-pollution-univariate-eda" class="section level1">
+<h1>Forecasting Air Pollution: Univariate EDA</h1>
+<p>The next important step in any data science workflow is to use <strong>exploratory data analysis</strong> to get to know the patterns and structure of our data. For time series, this is especially imortant, as we want to be able to identify any <strong>seasonal</strong> patterns, <strong>trends</strong>, and <strong>stationarity</strong> of our series, in order to help us understand what type of model we should be using to forecast into the future.</p>
+<div id="dealing-with-thousands-of-points" class="section level2">
+<h2>Dealing With Thousands of Points</h2>
+<p>One issue that pops up a lot in data science and data mining is that when you have too many data points, EDA becomes very slow, and your plots become unreadable, as no human can really detect a pattern when there are more points than there are pixels in your plot. So, to combat this, we can make an assumption to guide our analysis:</p>
+<ol style="list-style-type: decimal">
+<li>Hourly data which depends on the weather, and on the flow of people, typically has a daily seasonality (i.e. hourly patterns repeat daily to some degree, due to day and night), a weekly seasonality (due to the work schedule), and a yearly seasonality. This way already know what to look for.</li>
+</ol>
+</div>
+</div>
+<div id="loading-our-data" class="section level1">
+<h1>Loading our Data</h1>
+<p>In <a href="tspreprocessing.html">Part 1</a>, we already preprocessed our data, and stored it as a hash table. We can simply load that up:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>china &lt;-<span class="st"> </span><span class="kw">readRDS</span>(<span class="st">&quot;store/china.Rds&quot;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2"></a>beijing &lt;-<span class="st"> </span>china<span class="op">$</span>BeijingPM_</span></code></pre></div>
+<div id="initial-plot" class="section level2">
+<h2>Initial plot</h2>
+<p>Before we get into it, lets make a simple plot of our data:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">library</span>(ggplot2)</span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="kw">library</span>(forecast)</span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="kw">library</span>(ggthemes)</span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="kw">autoplot</span>(beijing<span class="op">$</span>PM_US) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="st">  </span><span class="kw">theme_hc</span>() <span class="op">+</span><span class="st"> </span><span class="kw">labs</span>(<span class="dt">y =</span> <span class="st">&quot;PM2.5&quot;</span>)</span></code></pre></div>
+<div class="figure">
+<img src="tsEDA_files/figure-html/unnamed-chunk-2-1.png" alt="Preprocessed and Unclean Time Series" width="672" />
+<p class="caption">
+Preprocessed and Unclean Time Series
+</p>
+</div>
+<p>The first thing we notice, immediately, is that we have <strong><em>negative</em></strong> values a few times. This is impossible. These are likely due to issues with A) the sensor (a high likelihood event), B) data input error (less likely, hopefully nobody input this by hand), or C) something weird happening with our spline interpolation (a definite possibility). Lets see how many of these points there are:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">library</span>(tidyverse)</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="kw">colnames</span>(beijing)</span></code></pre></div>
+<pre><code>#&gt;  [1] &quot;No&quot;              &quot;year&quot;            &quot;month&quot;          
+#&gt;  [4] &quot;day&quot;             &quot;hour&quot;            &quot;season&quot;         
+#&gt;  [7] &quot;PM_Dongsi&quot;       &quot;PM_Dongsihuan&quot;   &quot;PM_Nongzhanguan&quot;
+#&gt; [10] &quot;PM_US.Post&quot;      &quot;DEWP&quot;            &quot;HUMI&quot;           
+#&gt; [13] &quot;PRES&quot;            &quot;TEMP&quot;            &quot;cbwd&quot;           
+#&gt; [16] &quot;Iws&quot;             &quot;precipitation&quot;   &quot;Iprec&quot;</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>beijing <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(PM_US.Post <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="st">  </span>nrow<span class="op">/</span>(<span class="kw">nrow</span>(beijing)) <span class="op">*</span><span class="st"> </span><span class="dv">100</span></span></code></pre></div>
+<pre><code>#&gt; [1] 0.4183782</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">read.csv</span>(<span class="st">&quot;data/BeijingPM20100101_20151231.csv&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb7-2"><a href="#cb7-2"></a><span class="st">  </span><span class="kw">filter</span>(PM_US.Post <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="st">  </span>nrow<span class="op">/</span><span class="kw">nrow</span>(beijing) <span class="op">*</span><span class="st"> </span><span class="dv">100</span></span></code></pre></div>
+<pre><code>#&gt; [1] 0</code></pre>
+</div>
+<div id="tidying-up" class="section level2">
+<h2>Tidying up</h2>
+<p>So 0.4% of our points are negative, and and they are all due to our interpolation. This is an important thing to check. Luckily, there are very few and they are at a small value, so we can feel safe in takin their absolute value. We will also go ahead and clean away any extreme values in our time series. As we are forecasting trends, with large prediction intervals, if a point is twice as high as an already high point (and hitting 1000 PPM is exceptionally high), it will not improve our forecast of the pattern. Regardless of if the value is 400 or 1000, that is high enough to put out a critical air quality alert, and keeping the points at 1000 will only hurt our forecast. Along with this, it has been shown in numerous reports that these sensors have issues at high levels, and create errors just like this. A cursory autoplot confirms that these are not due to our interpolation but actual measured data. So, we will fix the negative values and shrink the exceptional ones so our whole series is on the same, useful scale:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">library</span>(pipeR)</span>
+<span id="cb9-2"><a href="#cb9-2"></a>uvar &lt;-<span class="st"> </span>beijing<span class="op">$</span>PM_US <span class="op">%&gt;&gt;%</span><span class="st"> </span></span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="st">  </span>abs <span class="op">%&gt;&gt;%</span><span class="st"> </span>tsclean</span>
+<span id="cb9-4"><a href="#cb9-4"></a></span>
+<span id="cb9-5"><a href="#cb9-5"></a><span class="co"># Save our work to the hash table</span></span>
+<span id="cb9-6"><a href="#cb9-6"></a>china[[<span class="st">&#39;uvar&#39;</span>]] &lt;-<span class="st"> </span>uvar</span></code></pre></div>
+</div>
+</div>
+<div id="first-steps-raw-data-scatterplot" class="section level1">
+<h1>First Steps: Raw Data Scatterplot</h1>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">autoplot</span>(uvar) <span class="op">+</span><span class="st"> </span><span class="kw">theme_hc</span>() <span class="op">+</span><span class="st"> </span><span class="kw">labs</span>(<span class="dt">y =</span> <span class="st">&quot;PM2.5&quot;</span>)</span></code></pre></div>
+<div class="figure">
+<img src="tsEDA_files/figure-html/unnamed-chunk-5-1.png" alt="Preprocessed and Cleaned Time Series" width="672" />
+<p class="caption">
+Preprocessed and Cleaned Time Series
+</p>
+</div>
+<p>There we go, now we finally have a time series we can work with. Lets go ahead and discuss what we can see in this plot. First, we can see with a great deal of certainty theres a long term seasonal pattern, potentially yearly. Lets try to zoom in a bit to see if we can find a weekly and daily pattern, just using the raw data:</p>
+<div id="scanning-for-daily-seasonality" class="section level2">
+<h2>Scanning for Daily Seasonality</h2>
+<p>We will first cut our time series and pick a random week or two of data, and then plot it, drawing lines at midnight every day.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>uvarShort &lt;-<span class="st"> </span><span class="kw">window</span>(uvar, </span>
+<span id="cb11-2"><a href="#cb11-2"></a>                    <span class="dt">start =</span> <span class="kw">c</span>(<span class="dv">4</span>), </span>
+<span id="cb11-3"><a href="#cb11-3"></a>                    <span class="dt">end =</span> <span class="kw">c</span>(<span class="dv">4</span>,<span class="dv">7</span><span class="op">*</span><span class="dv">48</span>))</span>
+<span id="cb11-4"><a href="#cb11-4"></a>uvarShort &lt;-<span class="st"> </span><span class="kw">ts</span>(uvarShort, <span class="dt">frequency =</span> <span class="dv">24</span>)</span>
+<span id="cb11-5"><a href="#cb11-5"></a><span class="kw">plot</span>(uvarShort, <span class="dt">ylab =</span> <span class="st">&quot;PM2.5&quot;</span>)</span>
+<span id="cb11-6"><a href="#cb11-6"></a><span class="kw">abline</span>(<span class="dt">v =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">14</span>, <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>)</span></code></pre></div>
+<div class="figure">
+<img src="tsEDA_files/figure-html/unnamed-chunk-6-1.png" alt="2 weeks of PM 2.5 measurements" width="672" />
+<p class="caption">
+2 weeks of PM 2.5 measurements
+</p>
+</div>
+<p>What is imortant to look at here is the pattern in between each day (red lines). We see here that there appears to be a peak in the nighttime hours, and a trough in the daytime hours. This pattern is not consistent in scale, but it is pretty consistent in occurence. We can take another look, with a <strong><em>season plot</em></strong>, where a time series is cut into periods, and each period is plotted repeatedly over each other. We will only look at 10 days here.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>uvarDays &lt;-<span class="st"> </span><span class="kw">ts</span>(uvar,</span>
+<span id="cb12-2"><a href="#cb12-2"></a>               <span class="dt">frequency =</span> <span class="dv">24</span>, </span>
+<span id="cb12-3"><a href="#cb12-3"></a>               <span class="dt">start =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">24</span><span class="op">*</span><span class="dv">70</span>), </span>
+<span id="cb12-4"><a href="#cb12-4"></a>               <span class="dt">end =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">24</span><span class="op">*</span><span class="dv">80</span>))</span>
+<span id="cb12-5"><a href="#cb12-5"></a><span class="kw">ggseasonplot</span>(uvarDays) <span class="op">+</span><span class="st">  </span><span class="kw">theme_hc</span>()  <span class="op">+</span><span class="st"> </span><span class="kw">scale_color_hc</span>()</span></code></pre></div>
+<div class="figure">
+<img src="tsEDA_files/figure-html/unnamed-chunk-7-1.png" alt="Season plot of hourly data over 10 days" width="672" />
+<p class="caption">
+Season plot of hourly data over 10 days
+</p>
+</div>
+<p>In this plot, we are looking at matching and trends lining up. What we see is clear evidence that during the morning and day time, PM 2.5 seems to dip, whereas at nighttime (especially 6 pm to like 4-5 am), we are getting a peak. This is another sign of daily seasonality.</p>
+</div>
+</div>
+<div id="resampling-a-time-series" class="section level1">
+<h1>Resampling a Time Series</h1>
+<p>In order to see the more long term trends in a time series, we are going to need to resample it, to a lower frequency. Otherwise, the data is simply too noisy for us to understand (overplotting). We are going to want to take daily, weekly, and quarterly samples in order to see different trends (just as hourly data helped us see the daily pattern, daily data will help us see a weekly pattern, weekly quarterly or monthly, and quarterly a yearly pattern, and so on). As we are going to do this multiple times, at different frequencies, instead of writing multiple functions by hand, lets write a function that outputs a function, so that we can quickly generate resampling functions on the fly. Before we can do that, lets discuss a plan of attack, and another useful R tool: <code>tapply</code>.</p>
+<div id="the-tapply-function" class="section level2">
+<h2>The <code>tapply</code> function</h2>
+<p>The tapply function is an incredibly powerful function that should be in everyones toolbelt, as when you need it, it can cut down the number of lines of code you need. <code>tapply</code> allow us to apply a function to subsets of a vector, using another vector as a subsetting tool. In our case, we will subset by the number of times our desired period divides our original time series. To do this we will use the <code>%/%</code> operator.</p>
+<div id="the-operator" class="section level3">
+<h3>The <code>%/%</code> Operator</h3>
+<p>This operator does sort of the opposite of the <code>%%</code> operator: instead of returning the remainder, it returns the number of times the RHS can divide the LHS. As an example, lets say we have 50 points, and want to group them with a period of four. We can then define our grouping vector as follows:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>x &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">50</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="co">#  [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26</span></span>
+<span id="cb13-3"><a href="#cb13-3"></a><span class="co"># [27] 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50</span></span>
+<span id="cb13-4"><a href="#cb13-4"></a>y &lt;-<span class="st"> </span>(x<span class="dv">-1</span>) <span class="op">%/%</span><span class="st"> </span><span class="dv">4</span></span>
+<span id="cb13-5"><a href="#cb13-5"></a>y</span></code></pre></div>
+<pre><code>#&gt;  [1]  0  0  0  0  1  1  1  1  2  2  2  2  3  3  3  3  4  4  4  4  5  5  5
+#&gt; [24]  5  6  6  6  6  7  7  7  7  8  8  8  8  9  9  9  9 10 10 10 10 11 11
+#&gt; [47] 11 11 12 12</code></pre>
+<p>We see the first 4 values, denoted by <code>0</code>, represent the first period of our series. The next 4 values, denoted by <code>1</code>, represent the second period. Note that to get our periods to work out nicely like this, we had to subtract 1 from the original vector. Now, let us resample:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>changeSamples &lt;-<span class="st"> </span><span class="cf">function</span>(period){</span>
+<span id="cb15-2"><a href="#cb15-2"></a>  <span class="cf">function</span>(vec) {</span>
+<span id="cb15-3"><a href="#cb15-3"></a>    result &lt;-<span class="st"> </span><span class="kw">unname</span>(<span class="kw">tapply</span>(vec,</span>
+<span id="cb15-4"><a href="#cb15-4"></a>                            (<span class="kw">seq_along</span>(vec)<span class="op">-</span><span class="dv">1</span>) <span class="op">%/%</span><span class="st"> </span>period, </span>
+<span id="cb15-5"><a href="#cb15-5"></a>                            mean))</span>
+<span id="cb15-6"><a href="#cb15-6"></a>    <span class="kw">return</span>(</span>
+<span id="cb15-7"><a href="#cb15-7"></a>           <span class="kw">ts</span>(result, <span class="dt">frequency =</span> (<span class="dv">8760</span><span class="op">/</span>period))</span>
+<span id="cb15-8"><a href="#cb15-8"></a>    )</span>
+<span id="cb15-9"><a href="#cb15-9"></a>  }</span>
+<span id="cb15-10"><a href="#cb15-10"></a>}</span></code></pre></div>
+<p>Next, using our resampling function, lets quickly write a daily, weekly, monthly, and quarterly resampler:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>toDays &lt;-<span class="st"> </span><span class="kw">changeSamples</span>(<span class="dv">24</span>)</span>
+<span id="cb16-2"><a href="#cb16-2"></a>toWeeks &lt;-<span class="st"> </span><span class="kw">changeSamples</span>(<span class="dv">24</span> <span class="op">*</span><span class="st"> </span><span class="dv">7</span>)</span>
+<span id="cb16-3"><a href="#cb16-3"></a>toMonths  &lt;-<span class="st"> </span><span class="kw">changeSamples</span>(<span class="dv">24</span> <span class="op">*</span><span class="st"> </span><span class="dv">7</span> <span class="op">*</span><span class="st"> </span><span class="dv">4</span>)</span>
+<span id="cb16-4"><a href="#cb16-4"></a>toQuarters &lt;-<span class="st"> </span><span class="kw">changeSamples</span>(<span class="dv">24</span> <span class="op">*</span><span class="st"> </span><span class="dv">365</span> <span class="op">/</span><span class="st"> </span><span class="dv">4</span>)</span></code></pre></div>
+</div>
+</div>
+<div id="working-with-lists-of-functions" class="section level2">
+<h2>Working with Lists of Functions</h2>
+<p>A lesser known R trick, when you have bunch of functions you want to run over a dataset, is to use a list of functions, and lapply them over the dataset:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>resamplers &lt;-<span class="st"> </span><span class="kw">list</span>(</span>
+<span id="cb17-2"><a href="#cb17-2"></a>                   <span class="dt">daily =</span>  toDays,</span>
+<span id="cb17-3"><a href="#cb17-3"></a>                   <span class="dt">weekly =</span> toWeeks,</span>
+<span id="cb17-4"><a href="#cb17-4"></a>                   <span class="dt">monthly =</span> toMonths,</span>
+<span id="cb17-5"><a href="#cb17-5"></a>                   <span class="dt">quarterly =</span> toQuarters</span>
+<span id="cb17-6"><a href="#cb17-6"></a>)</span>
+<span id="cb17-7"><a href="#cb17-7"></a></span>
+<span id="cb17-8"><a href="#cb17-8"></a>resamples &lt;-<span class="st"> </span><span class="kw">lapply</span>(resamplers, <span class="cf">function</span>(f) <span class="kw">f</span>(uvar))</span>
+<span id="cb17-9"><a href="#cb17-9"></a><span class="kw">data.frame</span>(<span class="kw">t</span>(<span class="kw">sapply</span>(resamples, frequency))) </span></code></pre></div>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["daily"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["weekly"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["monthly"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["quarterly"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"365","2":"52.14286","3":"13.03571","4":"4"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p>This monthly sampling is a little off, but otherwise this is a very useful set of data we now have, and we can go on with our EDA.</p>
+</div>
+</div>
+<div id="seasonal-plots-en-masse" class="section level1">
+<h1>Seasonal Plots En Masse</h1>
+<p>Instead of painstakingly writing code to make each plot, now that we are familiar with the general structure, I can suggest two ways of plotting our seasonal plots: a base R way with <code>lapply</code>, and a clean way with <code>walk</code>. I have strong opinions against purrr as a whole, however, walk, which applies a function to an object but only returns the functions “side effects” is incredibly useful. Lets show an example with our seasonal plot:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>themedSeason &lt;-<span class="st"> </span><span class="cf">function</span>(ts) {</span>
+<span id="cb18-2"><a href="#cb18-2"></a>  p &lt;-<span class="st"> </span><span class="kw">ggseasonplot</span>(ts) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb18-3"><a href="#cb18-3"></a><span class="st">    </span><span class="kw">scale_color_hc</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb18-4"><a href="#cb18-4"></a><span class="st">    </span><span class="kw">theme_hc</span>() </span>
+<span id="cb18-5"><a href="#cb18-5"></a>  <span class="kw">print</span>(p)</span>
+<span id="cb18-6"><a href="#cb18-6"></a>}</span>
+<span id="cb18-7"><a href="#cb18-7"></a></span>
+<span id="cb18-8"><a href="#cb18-8"></a><span class="kw">walk</span>(resamples, themedSeason)</span></code></pre></div>
+<p><img src="tsEDA_files/figure-html/unnamed-chunk-12-1.png" width="672" /><img src="tsEDA_files/figure-html/unnamed-chunk-12-2.png" width="672" /><img src="tsEDA_files/figure-html/unnamed-chunk-12-3.png" width="672" /><img src="tsEDA_files/figure-html/unnamed-chunk-12-4.png" width="672" /></p>
+<p>We instantly produced four well themed plots. Now, instead of this, we may want to plot them in a grid, and with that we can use another incredibly useful function <code>cowplot::plot_grid</code>:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>seasonPlots &lt;-<span class="st"> </span><span class="kw">lapply</span>(resamples, <span class="cf">function</span>(x) {</span>
+<span id="cb19-2"><a href="#cb19-2"></a>                        <span class="kw">ggseasonplot</span>(x) <span class="op">+</span><span class="st"> </span><span class="kw">scale_color_hc</span>() <span class="op">+</span><span class="st"> </span><span class="kw">theme_hc</span>()})</span>
+<span id="cb19-3"><a href="#cb19-3"></a>cowplot<span class="op">::</span><span class="kw">plot_grid</span>(<span class="dt">plotlist =</span> seasonPlots)</span></code></pre></div>
+<div class="figure">
+<img src="tsEDA_files/figure-html/unnamed-chunk-13-1.png" alt="Daily, Weekly, Monthly, and Quarterly Seasonal Plots" width="672" />
+<p class="caption">
+Daily, Weekly, Monthly, and Quarterly Seasonal Plots
+</p>
+</div>
+<div id="interpretation" class="section level2">
+<h2>Interpretation</h2>
+<blockquote>
+<p>What have we learned from these seasonal plots?</p>
+</blockquote>
+<p>Well, we havent learned everything, but we have learned one important thing: There is a clear yearly trend. Especially looking at the quarterly lot, but really in each plot (except the monthly plot, which is a mess), we see that the average PM2.5 content is more or less the same each year, as the shape of each year lines up.</p>
+</div>
+</div>
+<div id="detecting-a-weekly-trend" class="section level1">
+<h1>Detecting a Weekly Trend</h1>
+<p>To detect the weekly trend, lets revisit our base R plot with lines on each period trick. We will use our daily data, and take maybe 10 or so weeks (as at some point we start to overplot). These weeks were chosen completely at random:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>uvarWeeks &lt;-<span class="st"> </span><span class="kw">window</span>(resamples<span class="op">$</span>daily, </span>
+<span id="cb20-2"><a href="#cb20-2"></a>                    <span class="dt">start =</span> <span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">30</span><span class="op">*</span><span class="dv">7</span>), </span>
+<span id="cb20-3"><a href="#cb20-3"></a>                    <span class="dt">end =</span> <span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">40</span><span class="op">*</span><span class="dv">7</span>))</span>
+<span id="cb20-4"><a href="#cb20-4"></a>uvarWeeks &lt;-<span class="st"> </span><span class="kw">ts</span>(uvarWeeks, <span class="dt">frequency =</span> <span class="dv">7</span>)</span>
+<span id="cb20-5"><a href="#cb20-5"></a><span class="kw">plot</span>(uvarWeeks)</span>
+<span id="cb20-6"><a href="#cb20-6"></a><span class="kw">abline</span>(<span class="dt">v =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">26</span>, <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>)</span></code></pre></div>
+<p><img src="tsEDA_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p>This is a very clear example of a weekly seasonality, there is a peak in the middle of each week. This makes sense, as there is a lot more driving during the work week.</p>
+</div>
+<div id="acf" class="section level1">
+<h1>ACF</h1>
+<p>In time series, another very imortant tool is the ACF, and more specifically the ACF plot. What this shows, is how the current observation is correlated with the observation <span class="math inline">\(\ell\)</span> timesteps, or lags ago. Lets check it out on each sampling of our data:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="kw">acf</span>(uvar, <span class="dt">lag.max =</span> <span class="dv">8760</span>)</span></code></pre></div>
+<div class="figure">
+<img src="tsEDA_files/figure-html/unnamed-chunk-15-1.png" alt="ACF: Hourly Data" width="672" />
+<p class="caption">
+ACF: Hourly Data
+</p>
+</div>
+<p>This tells us a ton about the nature of our data. On short time scales (think hours), our data exhibits explosive growth. What this means is that the value at the present time is <strong><em>highly positively correlated</em></strong> with what occured recently. Looking at our previous plots, this behavior is readily visible. What is very interesting however, is the strong negative correlation region at about half a year. This means that values now are <strong><em>highly negatively correlated</em></strong> with what happened about 6 months ago. Referring back to our quarterly season plot, we can very clearly see this behavior. What this plot also tells us, with its extreme complexity and very high ACFs overall, is this data is going to be incredibly difficult to analyze through classical methods, as theres an inherently complex and likely multiseasonal autocorrelation structure.</p>
+<div id="acfs-at-other-sampling-rates" class="section level2">
+<h2>ACFs at other sampling rates:</h2>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb22-2"><a href="#cb22-2"></a><span class="kw">walk</span>(resamples, <span class="cf">function</span>(x) <span class="kw">acf</span>(x, <span class="dt">lag.max =</span> <span class="kw">frequency</span>(x)))</span></code></pre></div>
+<p><img src="tsEDA_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p>We see the same behavior demonstrated nicely here. There is a clear, strong, yearly seasonality, which will be quite a challenge for us to deal with, as there are other more subtle seasonalities which we were able to pick up on with our other plots.</p>
+</div>
+</div>
+<div id="the-parzen-window" class="section level1">
+<h1>The Parzen Window</h1>
+<p>The final plot which I use frequently is the <code>smoothed periodogram</code>, in this case specifically the parzen window. What it shows basically is at what frequencies a lot of our data seems to be. Lets start out with a parzen plot of our original data:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="kw">library</span>(tswge)</span>
+<span id="cb23-2"><a href="#cb23-2"></a>parzen &lt;-<span class="st"> </span><span class="kw">parzen.wge</span>(uvar)</span></code></pre></div>
+<div class="figure">
+<img src="tsEDA_files/figure-html/unnamed-chunk-17-1.png" alt="Parzen window of hourly data" width="672" />
+<p class="caption">
+Parzen window of hourly data
+</p>
+</div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a><span class="co"># List of 2</span></span>
+<span id="cb24-2"><a href="#cb24-2"></a><span class="co">#  $ freq  : num [1:26292] 1.90e-05 3.80e-05 5.71e-05 7.61e-05 9.51e-05 ...</span></span>
+<span id="cb24-3"><a href="#cb24-3"></a><span class="co">#  $ pzgram: num [1:26292] 17.2 17.2 17.2 17.2 17.2 ...</span></span>
+<span id="cb24-4"><a href="#cb24-4"></a><span class="co"># NULL</span></span></code></pre></div>
+<p>What does this mean? Well, first, we see the overall shape of the graph: it peaks on the left, and decays going to the right. This is indicative of strong low frequency patterns in the data. This also, on its own, indicates a lot of times a model with a clear trend (ARIMA). However, we know from our previous EDA that there is not much of an up or down trend here, so this peak at zero could be indiciative of a very long seasonal pattern, or a high order AR component. These other peaks all along the time series are typically evidence of an ARIMA model with seasonality (such as the classic airline data). Again, this data does not appear to have any integrated (ARIMA) order or root on the unit circle (If you dont know what this means, stay tuned for next time). So this in our case could be a sign of a long seasonality, combined with some shorter seasonalities. Lets one more sample plot to confirm the presence of a yearly seasonality:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a>quarters &lt;-<span class="st"> </span>resamples<span class="op">$</span>quarterly</span>
+<span id="cb25-2"><a href="#cb25-2"></a>parzenq &lt;-<span class="st"> </span><span class="kw">parzen.wge</span>(quarters)</span></code></pre></div>
+<p><img src="tsEDA_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p>We see a peak at 0.25, indiciative of a period of 4 observations, or in this case quarters. This means again we have a yearly trend in our series</p>
+</div>
+<div id="conclusions" class="section level1">
+<h1>Conclusions</h1>
+<p>We have detected probably 3 seasonalities in our data: daily, weekly, and yearly. By resampling our data, we were able to eaily observe these patterns. Next, we need to think about what sort of models we want to use. Given the complexity of the data, and the presence of an exceptionally long (and multiple) seasonal patterns, we are likely going to have a hard time to find appropriate pure ARIMA and other classical models (which we will do next time). We will likely need to consider moving to more interesting fourier based models in the future.</p>
+<p>We do not see any evidence of a non-seasonal trend in our data, and as far as stationarity (constant mean, constant variance, constant autocorrelation structure), we have clearly violated it. Therefore, a model with a minimal of a seasonal ARIMA model is going to be required. We will next time explore classical univariate models, as well as determining model appropriacy. Stay tuned!</p>
+<div id="saving-our-work" class="section level2">
+<h2>Saving our work:</h2>
+<p>We updated our “china” hash table, so we are going to go ahead and update it on our disk too (to include this <code>uvar</code> object):</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a><span class="kw">saveRDS</span>(china, <span class="dt">file =</span> <span class="st">&#39;store/china.Rds&#39;</span>)</span></code></pre></div>
+<p>Thanks for reading!</p>
+</div>
+</div>
+<div id="navigation" class="section level1">
+<h1>Navigation</h1>
+<p><a href="DSblog.html">Part 1</a></p>
+<p><a href="classicalTs.html">Part 3</a></p>
+<p><a href="DSblog.html">Back to Navigation</a></p>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

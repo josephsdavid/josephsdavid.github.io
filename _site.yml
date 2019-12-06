@@ -1,12 +1,20 @@
 name: "David Does Data Science"
 navbar: 
         title: "David Does Data"
+        type: inverse
         left:
                 - text: "Home"
                   href: index.html
-                - text: "Nix for Data Science 1"
-                  href: nix.html
-                - text: "Time Series EDA"
-                  href: tsEDA.html
-                - text: "Time Series Cleaning"
-                  href: tspreprocessing.html
+                - text: "Nix"
+                  menu:
+                        - text: "Nix for Data Science 1"
+                          href: nix.html
+                - text: "Time Series"
+                  menu:
+                          - text: "Time Series EDA"
+                            href: tsEDA.html
+                          - text: "Time Series Cleaning"
+                            href: tspreprocessing.html
+        right:
+                - icon: https://image.flaticon.com/icons/svg/25/25231.svg
+                  href: https://github.com/josephsdavid
