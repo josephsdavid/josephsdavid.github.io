@@ -14,9 +14,11 @@ in
       rPackages.functional
       rPackages.tint
       rPackages.rmdformats
+      rPackages.pipeR
+      rPackages.forecast
       R
       rstudio
-#      rPackages.imputeTS
+      rPackages.imputeTS
       rPackages.data_table
       rPackages.tint
       rPackages.rmdformats

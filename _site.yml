@@ -1,0 +1,12 @@
+name: "David Does Data Science"
+navbar: 
+        title: "David Does Data"
+        left:
+                - text: "Home"
+                  href: index.html
+                - text: "Nix for Data Science 1"
+                  href: nix.html
+                - text: "Time Series EDA"
+                  href: tsEDA.html
+                - text: "Time Series Cleaning"
+                  href: tspreprocessing.html
