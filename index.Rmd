@@ -93,7 +93,7 @@ Work in progress
   * Time series analysis with LSTMs and WaveNet CNN architecture
   * (Hopefully) building a chess AI that uses reinforcement learning
 
-* Maintaining and growing my first large python library
+* Maintaining and growing my first [large python library](https://pypi.org/project/n2d/)
 
 
 # Things I have done

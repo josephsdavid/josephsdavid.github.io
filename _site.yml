@@ -1,4 +1,5 @@
 name: "David Does Data Science"
+output_dir: "."
 navbar: 
         title: "David Does Data"
         type: inverse
@@ -16,5 +17,7 @@ navbar:
                           - text: "Time Series Cleaning"
                             href: tspreprocessing.html
         right:
-                - icon: https://image.flaticon.com/icons/svg/25/25231.svg
+                - icon: fa-github
                   href: https://github.com/josephsdavid
+                - icon: ion-social-twitter
+                  href: https://twitter.com/Daved256

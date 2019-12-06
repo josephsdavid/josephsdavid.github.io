@@ -25,6 +25,9 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
 <script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+<link href="site_libs/ionicons-2.0.1/css/ionicons.min.css" rel="stylesheet" />
 
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -387,7 +390,13 @@ $(document).ready(function () {
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/josephsdavid">
-    <span class=" https://image.flaticon.com/icons/svg/25/25231.svg"></span>
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://twitter.com/Daved256">
+    <span class="ion ion-social-twitter"></span>
      
   </a>
 </li>
@@ -587,12 +596,12 @@ Spline Interpolation Between 8 points
 <span id="cb21-3"><a href="#cb21-3"></a>preprocess</span></code></pre></div>
 <pre><code>#&gt; function (...) 
 #&gt; Reduce(function(x, f) f(x), fs, ...)
-#&gt; &lt;bytecode: 0x6d35a30&gt;
-#&gt; &lt;environment: 0x6d35138&gt;</code></pre>
+#&gt; &lt;bytecode: 0x6a63880&gt;
+#&gt; &lt;environment: 0x6a60540&gt;</code></pre>
 <p>We now have a function that imports a directory of csv’s, converts the proper items to time series objects, spline interpolates the NAs, and converts to a hash table:</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>china &lt;-<span class="st"> </span><span class="kw">preprocess</span>(<span class="st">&quot;data/&quot;</span>)</span>
 <span id="cb23-2"><a href="#cb23-2"></a><span class="kw">str</span>(china)</span></code></pre></div>
-<pre><code>#&gt; &lt;environment: 0x6e99410&gt;</code></pre>
+<pre><code>#&gt; &lt;environment: 0x776f730&gt;</code></pre>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="kw">head</span>(china<span class="op">$</span>BeijingPM_, <span class="dv">100</span>)</span></code></pre></div>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
