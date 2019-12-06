@@ -1,4 +1,5 @@
 ---
+layout: post
 title: "David Does Data"
 output: html_document
 #  rmdformats::readthedown:

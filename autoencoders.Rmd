@@ -1,4 +1,5 @@
 ---
+layout: post
 title: "Understanding Autoencoders"
 author: "David Josephs"
 date: "`r Sys.Date()`"

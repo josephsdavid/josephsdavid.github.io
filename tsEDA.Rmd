@@ -1,4 +1,5 @@
 ---
+layout: post
 title: "Diving in: Exploring Time Series Data"
 author: "David Josephs"
 date: "`r Sys.Date()`"

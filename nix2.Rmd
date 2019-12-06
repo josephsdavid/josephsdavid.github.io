@@ -1,4 +1,5 @@
 ---
+layout: post
 title: "Practical Nix for Data Science: Part 2"
 author: "David Josephs"
 date: "`r Sys.Date()`"

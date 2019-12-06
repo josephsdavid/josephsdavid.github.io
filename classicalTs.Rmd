@@ -1,4 +1,5 @@
 ---
+layout: post
 title: "First Steps: Classical ARIMA Analysis"
 author: "David Josephs"
 date: "`r Sys.Date()`"

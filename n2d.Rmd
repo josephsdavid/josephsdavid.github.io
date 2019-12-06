@@ -1,4 +1,5 @@
 ---
+layout: post
 title: "(Not too) Deep Clustering"
 author: "David Josephs"
 date: "`r Sys.Date()`"
