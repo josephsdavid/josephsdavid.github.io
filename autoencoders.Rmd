@@ -2,11 +2,11 @@
 title: "Understanding Autoencoders"
 author: "David Josephs"
 date: "`r Sys.Date()`"
-output: 
-  rmdformats::readthedown:
-    css: custom.css
-    df_print: paged
-    cards: false
+output: html_document
+#  rmdformats::readthedown:
+#    css: custom.css
+#    df_print: paged
+#    cards: false
 ---
 
 [Back to Navigation](DSblog.html)

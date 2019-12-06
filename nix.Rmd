@@ -2,11 +2,13 @@
 title: "Building a Reproducible Data Science Environment with Nix"
 author: "David Josephs"
 date: "`r Sys.Date()`"
-output: 
-  rmdformats::readthedown:
-    css: custom.css
-    df_print: paged
-    cards: false
+output:  
+  html_document:
+    highlight: kate
+#  rmdformats::readthedown:
+#    css: custom.css
+#    df_print: paged
+#    cards: false
 ---
 
 [Back to Navigation](DSblog.html)

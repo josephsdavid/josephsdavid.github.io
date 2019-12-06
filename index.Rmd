@@ -1,11 +1,11 @@
 ---
 title: "David Josephs"
-output:
-  rmdformats::readthedown:
-    css: custom.css
-    highlight: kate
-    code_folding: show
-    thumbnails: true
+output: html_document
+#  rmdformats::readthedown:
+#    css: custom.css
+#    highlight: kate
+#    code_folding: show
+#    thumbnails: true
 ---
 
 

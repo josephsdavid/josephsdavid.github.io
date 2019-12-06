@@ -6,6 +6,7 @@ in
     buildInputs = with pkgs; [
       vscode
       rPackages.prettydoc
+      rPackages.formatR
       rPackages.tswge
       rPackages.vars
       rPackages.ggplot2

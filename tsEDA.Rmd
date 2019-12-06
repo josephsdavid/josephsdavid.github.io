@@ -3,10 +3,13 @@ title: "Diving in: Exploring Time Series Data"
 author: "David Josephs"
 date: "`r Sys.Date()`"
 output: 
-  rmdformats::readthedown:
-    css: custom.css
+  html_document:
     df_print: paged
-    cards: false
+    highlight: kate
+#  rmdformats::readthedown:
+#    css: custom.css
+    #df_print: paged
+#    cards: false
 ---
 
 

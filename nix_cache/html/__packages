@@ -2,3 +2,6 @@ base
 nvimcom
 rmarkdown
 tint
+colorout
+magrittr
+purrr
