@@ -244,7 +244,6 @@ The final plot which I use frequently is the `smoothed periodogram`, in this cas
 ```{r, fig.cap = "Parzen window of hourly data"}
 library(tswge)
 parzen <- parzen.wge(uvar)
-str(parzen)
 # List of 2
 #  $ freq  : num [1:26292] 1.90e-05 3.80e-05 5.71e-05 7.61e-05 9.51e-05 ...
 #  $ pzgram: num [1:26292] 17.2 17.2 17.2 17.2 17.2 ...
@@ -256,12 +255,6 @@ What does this mean? Well, first, we see the overall shape of the graph: it peak
 ```{r}
 quarters <- resamples$quarterly
 parzenq <- parzen.wge(quarters)
-str(parzenq)
-
-res <- lapply(resamples, function(x) data.frame(parzen.wge(x,plot = FALSE)))
-print(res)
-
-mapply(function(x,y) write.csv(x,y), res, sapply(names(res)), function(x) paste0(x,".csv"))
 ```
 
 We see a peak at 0.25, indiciative of a period of 4 observations, or in this case quarters. This means again we have a yearly trend in our series

@@ -10,7 +10,7 @@
 
 <meta name="author" content="David Josephs" />
 
-<meta name="date" content="2019-08-21" />
+<meta name="date" content="2019-12-06" />
 
 <title>Preprocessing Time Series Data</title>
 
@@ -2803,6 +2803,38 @@ background: black !important; }
 <body>
 
 
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">David Does Data</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="nix.html">Nix for Data Science 1</a>
+</li>
+<li>
+  <a href="tsEDA.html">Time Series EDA</a>
+</li>
+<li>
+  <a href="tspreprocessing.html">Time Series Cleaning</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
 <div id="content" data-toggle="wy-nav-shift">
 
 <!-- tabsets -->
@@ -2870,32 +2902,32 @@ $(document).ready(function () {
 <div id="batch-importing-csvs" class="section level1">
 <h1>Batch Importing CSVs</h1>
 <p>As our data is in the format of multiple CSVs, we must first write a function to batch imort CSVs. In this case, we want to grab all the files in the <code>data</code> directory. We will need an understanding of <code>lapply</code>, as well as basic regex, in order to import our files into a list. We will also need a file import function (any will do). In my case, I will use <code>data.table::fread</code>, in order to quickly read in the files. You can also use <code>vroom::vroom</code>, but i frequently have issues with the lazy evaluation it provides, and find it leads to unexpected slow points in my code.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">library</span>(data.table)  <span class="co"># fast tabular data structures</span></span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="kw">library</span>(pipeR)  <span class="co"># fast %&gt;&gt;% dumb %&gt;&gt;% pipes</span></span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="kw">library</span>(magrittr)  <span class="co"># slow %&gt;% smart %&gt;% pipes</span></span>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">library</span>(data.table) <span class="co"># fast tabular data structures</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="kw">library</span>(pipeR) <span class="co"># fast %&gt;&gt;% dumb %&gt;&gt;% pipes</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="kw">library</span>(magrittr) <span class="co"># slow %&gt;% smart %&gt;% pipes</span></span>
 <span id="cb2-4"><a href="#cb2-4"></a>import &lt;-<span class="st"> </span><span class="cf">function</span>(path) {</span>
-<span id="cb2-5"><a href="#cb2-5"></a>    <span class="co"># first we list the files in the directory</span></span>
-<span id="cb2-6"><a href="#cb2-6"></a>    files &lt;-<span class="st"> </span><span class="kw">list.files</span>(path)</span>
-<span id="cb2-7"><a href="#cb2-7"></a>    <span class="co"># next we search for csvs using grepl</span></span>
-<span id="cb2-8"><a href="#cb2-8"></a>    files &lt;-<span class="st"> </span>files[<span class="kw">grepl</span>(files, <span class="dt">pattern =</span> <span class="st">&quot;.csv&quot;</span>)]</span>
-<span id="cb2-9"><a href="#cb2-9"></a>    <span class="co"># next we append the path to the list of files: we use vapply because we</span></span>
-<span id="cb2-10"><a href="#cb2-10"></a>    <span class="co"># want vector output, and its incredibly fast (the fastest of the apply</span></span>
-<span id="cb2-11"><a href="#cb2-11"></a>    <span class="co"># family)</span></span>
-<span id="cb2-12"><a href="#cb2-12"></a>    filepaths &lt;-<span class="st"> </span><span class="kw">vapply</span>(files, <span class="cf">function</span>(x) <span class="kw">paste0</span>(path, x), <span class="kw">character</span>(<span class="dv">1</span>))</span>
-<span id="cb2-13"><a href="#cb2-13"></a>    <span class="co"># import the files as a list</span></span>
-<span id="cb2-14"><a href="#cb2-14"></a>    imports &lt;-<span class="st"> </span><span class="kw">lapply</span>(filepaths, fread)</span>
-<span id="cb2-15"><a href="#cb2-15"></a>    <span class="co"># next we set up the names of each import to the list</span></span>
-<span id="cb2-16"><a href="#cb2-16"></a>    filenames &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;.csv&quot;</span>, <span class="st">&quot;&quot;</span>, files)</span>
-<span id="cb2-17"><a href="#cb2-17"></a>    <span class="co"># and any numbers</span></span>
-<span id="cb2-18"><a href="#cb2-18"></a>    filenames &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;[[:digit:]]+&quot;</span>, <span class="st">&quot;&quot;</span>, filenames)</span>
-<span id="cb2-19"><a href="#cb2-19"></a>    <span class="kw">names</span>(imports) &lt;-<span class="st"> </span>filenames</span>
-<span id="cb2-20"><a href="#cb2-20"></a>    <span class="kw">return</span>(imports)</span>
+<span id="cb2-5"><a href="#cb2-5"></a>  <span class="co"># first we list the files in the directory</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a>  files  &lt;-<span class="st"> </span><span class="kw">list.files</span>(path)</span>
+<span id="cb2-7"><a href="#cb2-7"></a>  <span class="co"># next we search for csvs using grepl</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a>  files &lt;-<span class="st"> </span>files[<span class="kw">grepl</span>(files, <span class="dt">pattern =</span> <span class="st">&quot;.csv&quot;</span>)]</span>
+<span id="cb2-9"><a href="#cb2-9"></a>  <span class="co"># next we append the path to the list of files:</span></span>
+<span id="cb2-10"><a href="#cb2-10"></a>  <span class="co"># we use vapply because we want vector output, and its </span></span>
+<span id="cb2-11"><a href="#cb2-11"></a>  <span class="co"># incredibly fast (the fastest of the apply family)</span></span>
+<span id="cb2-12"><a href="#cb2-12"></a>  filepaths &lt;-<span class="st"> </span><span class="kw">vapply</span>(files, <span class="cf">function</span>(x) <span class="kw">paste0</span>(path, x), <span class="kw">character</span>(<span class="dv">1</span>))</span>
+<span id="cb2-13"><a href="#cb2-13"></a>  <span class="co"># import the files as a list</span></span>
+<span id="cb2-14"><a href="#cb2-14"></a>  imports &lt;-<span class="st"> </span><span class="kw">lapply</span>(filepaths, fread)</span>
+<span id="cb2-15"><a href="#cb2-15"></a>  <span class="co"># next we set up the names of each import to the list</span></span>
+<span id="cb2-16"><a href="#cb2-16"></a>  filenames &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;.csv&quot;</span>, <span class="st">&quot;&quot;</span>, files)</span>
+<span id="cb2-17"><a href="#cb2-17"></a>  <span class="co">#and any numbers</span></span>
+<span id="cb2-18"><a href="#cb2-18"></a>  filenames &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;[[:digit:]]+&quot;</span>, <span class="st">&quot;&quot;</span>, filenames)</span>
+<span id="cb2-19"><a href="#cb2-19"></a>  <span class="kw">names</span>(imports) &lt;-<span class="st"> </span>filenames</span>
+<span id="cb2-20"><a href="#cb2-20"></a>  <span class="kw">return</span>(imports)</span>
 <span id="cb2-21"><a href="#cb2-21"></a>}</span></code></pre></div>
 <div id="checking-for-missing-data" class="section level2">
 <h2>Checking for Missing Data</h2>
 <p><span class="newthought">The next important step</span> is to check for missing data, so we know wether or not we have to import it. We can do this quickly with <code>rapply</code>, which recursively applies a function to the deepest itemset of each item in a nested list:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>naPerc &lt;-<span class="st"> </span><span class="cf">function</span>(xs) {</span>
-<span id="cb3-2"><a href="#cb3-2"></a>    <span class="kw">rapply</span>(xs, <span class="cf">function</span>(x) <span class="dv">100</span> <span class="op">*</span><span class="st"> </span><span class="kw">sum</span>(<span class="kw">is.na</span>(x)<span class="op">/</span><span class="kw">length</span>(x)), <span class="dt">how =</span> <span class="st">&quot;list&quot;</span>)</span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>naPerc &lt;-<span class="st"> </span><span class="cf">function</span>(xs) { </span>
+<span id="cb3-2"><a href="#cb3-2"></a>  <span class="kw">rapply</span>(xs, <span class="cf">function</span>(x) <span class="dv">100</span> <span class="op">*</span><span class="st"> </span><span class="kw">sum</span>(<span class="kw">is.na</span>(x) <span class="op">/</span><span class="st"> </span><span class="kw">length</span>(x)), <span class="dt">how =</span> <span class="st">&quot;list&quot;</span>)</span>
 <span id="cb3-3"><a href="#cb3-3"></a>}</span>
 <span id="cb3-4"><a href="#cb3-4"></a></span>
 <span id="cb3-5"><a href="#cb3-5"></a><span class="kw">import</span>(<span class="st">&quot;data/&quot;</span>) <span class="op">%&gt;&gt;%</span><span class="st"> </span>naPerc <span class="op">%&gt;%</span><span class="st"> </span>.[[<span class="dv">1</span>]] <span class="op">%&gt;&gt;%</span><span class="st"> </span>data.frame <span class="op">%&gt;%</span><span class="st"> </span>.[<span class="op">-</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">6</span>)]</span></code></pre></div>
@@ -2941,33 +2973,40 @@ Spline Interpolation Between 8 points
 <span id="cb4-2"><a href="#cb4-2"></a>    <span class="kw">ts</span>(v, <span class="dt">frequency =</span> <span class="dv">365</span> <span class="op">*</span><span class="st"> </span><span class="dv">24</span>)</span>
 <span id="cb4-3"><a href="#cb4-3"></a>}</span></code></pre></div>
 <p>Then, we will write a function that works over the whole nested data frame. In our case, we also need to not convert some of our columns into time series format, such as the categorical variables and variables describing the date</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>noConvert &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;No&quot;</span>, <span class="st">&quot;year&quot;</span>, <span class="st">&quot;month&quot;</span>, <span class="st">&quot;day&quot;</span>, <span class="st">&quot;hour&quot;</span>, <span class="st">&quot;season&quot;</span>, <span class="st">&quot;cbwd&quot;</span>)</span>
-<span id="cb5-2"><a href="#cb5-2"></a>dfToTs &lt;-<span class="st"> </span><span class="cf">function</span>(df, <span class="dt">ignore =</span> noConvert) {</span>
-<span id="cb5-3"><a href="#cb5-3"></a>    dfNames &lt;-<span class="st"> </span><span class="kw">colnames</span>(df)</span>
-<span id="cb5-4"><a href="#cb5-4"></a>    result &lt;-<span class="st"> </span>(df)</span>
-<span id="cb5-5"><a href="#cb5-5"></a>    <span class="cf">for</span> (name <span class="cf">in</span> dfNames) {</span>
-<span id="cb5-6"><a href="#cb5-6"></a>        <span class="cf">if</span> (name <span class="op">%in%</span><span class="st"> </span>ignore) {</span>
-<span id="cb5-7"><a href="#cb5-7"></a>            result[[name]] &lt;-<span class="st"> </span>result[[name]]</span>
-<span id="cb5-8"><a href="#cb5-8"></a>        } <span class="cf">else</span> {</span>
-<span id="cb5-9"><a href="#cb5-9"></a>            result[[name]] &lt;-<span class="st"> </span><span class="kw">toTs</span>(result[[name]])</span>
-<span id="cb5-10"><a href="#cb5-10"></a>        }</span>
-<span id="cb5-11"><a href="#cb5-11"></a>    }</span>
-<span id="cb5-12"><a href="#cb5-12"></a>    <span class="co"># return the created list</span></span>
-<span id="cb5-13"><a href="#cb5-13"></a>    <span class="kw">return</span>(result)  <span class="co"># its a list dont be tricked</span></span>
-<span id="cb5-14"><a href="#cb5-14"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>noConvert &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;No&quot;</span>, </span>
+<span id="cb5-2"><a href="#cb5-2"></a>             <span class="st">&quot;year&quot;</span>, </span>
+<span id="cb5-3"><a href="#cb5-3"></a>             <span class="st">&quot;month&quot;</span>, </span>
+<span id="cb5-4"><a href="#cb5-4"></a>             <span class="st">&quot;day&quot;</span>, </span>
+<span id="cb5-5"><a href="#cb5-5"></a>             <span class="st">&quot;hour&quot;</span>, </span>
+<span id="cb5-6"><a href="#cb5-6"></a>             <span class="st">&quot;season&quot;</span>, </span>
+<span id="cb5-7"><a href="#cb5-7"></a>             <span class="st">&quot;cbwd&quot;</span>)</span>
+<span id="cb5-8"><a href="#cb5-8"></a>dfToTs &lt;-<span class="st"> </span><span class="cf">function</span>(df, <span class="dt">ignore =</span> noConvert){</span>
+<span id="cb5-9"><a href="#cb5-9"></a>  dfNames &lt;-<span class="st"> </span><span class="kw">colnames</span>(df)</span>
+<span id="cb5-10"><a href="#cb5-10"></a>  result &lt;-<span class="st"> </span>(df)</span>
+<span id="cb5-11"><a href="#cb5-11"></a>  <span class="cf">for</span> (name <span class="cf">in</span> dfNames) {</span>
+<span id="cb5-12"><a href="#cb5-12"></a>    <span class="cf">if</span> (name <span class="op">%in%</span><span class="st"> </span>ignore) {</span>
+<span id="cb5-13"><a href="#cb5-13"></a>      result[[name]] &lt;-<span class="st"> </span>result[[name]]</span>
+<span id="cb5-14"><a href="#cb5-14"></a>    } <span class="cf">else</span> {</span>
+<span id="cb5-15"><a href="#cb5-15"></a>      result[[name]] &lt;-<span class="st"> </span><span class="kw">toTs</span>(result[[name]])</span>
+<span id="cb5-16"><a href="#cb5-16"></a>    }</span>
+<span id="cb5-17"><a href="#cb5-17"></a>  }</span>
+<span id="cb5-18"><a href="#cb5-18"></a>  <span class="co"># return the created list</span></span>
+<span id="cb5-19"><a href="#cb5-19"></a>  <span class="kw">return</span>(result)  <span class="co"># its a list dont be tricked</span></span>
+<span id="cb5-20"><a href="#cb5-20"></a>}</span></code></pre></div>
 <p>Then we scale it up</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>allToTs &lt;-<span class="st"> </span><span class="cf">function</span>(xs) {</span>
-<span id="cb6-2"><a href="#cb6-2"></a>    <span class="kw">lapply</span>(xs, dfToTs)</span>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>allToTs &lt;-<span class="st"> </span><span class="cf">function</span>(xs){</span>
+<span id="cb6-2"><a href="#cb6-2"></a>  <span class="kw">lapply</span>(xs, dfToTs)</span>
 <span id="cb6-3"><a href="#cb6-3"></a>}</span>
 <span id="cb6-4"><a href="#cb6-4"></a></span>
-<span id="cb6-5"><a href="#cb6-5"></a><span class="co"># To check import(&#39;data/&#39;) %&gt;&gt;% allToTs %&gt;&gt;% str</span></span></code></pre></div>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="co"># To check </span></span>
+<span id="cb6-6"><a href="#cb6-6"></a><span class="co"># import(&quot;data/&quot;) %&gt;&gt;% allToTs %&gt;&gt;% str</span></span></code></pre></div>
 <p>Now that we have the proper data types, we can interpolate our NA’s</p>
 </div>
 </div>
 <div id="interpolating-nas-over-a-data-structure-using-the-try-type-pattern" class="section level2">
 <h2>Interpolating NAs Over a Data Structure using the Try-Type Pattern</h2>
 <p>Instead of dealing with a function that uses column names, we can use the basic error checking pattern in R to quickly impute only time series data. The pattern is (in pseudo code) as follows: <code>x &lt;- try(expression); if(is.myClass(x) do something, else do something else)</code>. As an example:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>x &lt;-<span class="st"> </span><span class="kw">try</span>(<span class="kw">sum</span>(<span class="kw">c</span>(<span class="st">&quot;cat&quot;</span>, <span class="st">&quot;dog&quot;</span>, <span class="st">&quot;mouse&quot;</span>)))</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>x  &lt;-<span class="st"> </span><span class="kw">try</span>(<span class="kw">sum</span>(<span class="kw">c</span>(<span class="st">&quot;cat&quot;</span>,<span class="st">&quot;dog&quot;</span>, <span class="st">&quot;mouse&quot;</span>)))</span></code></pre></div>
 <pre><code>#&gt; Error in sum(c(&quot;cat&quot;, &quot;dog&quot;, &quot;mouse&quot;)) : 
 #&gt;   invalid &#39;type&#39; (character) of argument</code></pre>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>x</span></code></pre></div>
@@ -2985,18 +3024,22 @@ Spline Interpolation Between 8 points
 <pre><code>#&gt; [1] &quot;integer&quot;</code></pre>
 <p>We see that the class of the object changes depending on whether or not our code fails. For our problem, that would be (in the case of a vector)</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="kw">library</span>(imputeTS)</span>
-<span id="cb17-2"><a href="#cb17-2"></a>tryImpute &lt;-<span class="st"> </span><span class="cf">function</span>(vec) {</span>
-<span id="cb17-3"><a href="#cb17-3"></a>    result &lt;-<span class="st"> </span><span class="kw">try</span>(<span class="kw">na.interpolation</span>(vec, <span class="st">&quot;spline&quot;</span>))</span>
-<span id="cb17-4"><a href="#cb17-4"></a>    <span class="kw">ifelse</span>(<span class="kw">is.ts</span>(result), <span class="kw">return</span>(result), <span class="kw">return</span>(vec))</span>
-<span id="cb17-5"><a href="#cb17-5"></a>}</span></code></pre></div>
+<span id="cb17-2"><a href="#cb17-2"></a>tryImpute &lt;-<span class="st"> </span><span class="cf">function</span>(vec){</span>
+<span id="cb17-3"><a href="#cb17-3"></a>  result &lt;-<span class="st"> </span><span class="kw">try</span>(<span class="kw">na.interpolation</span>(vec, <span class="st">&quot;spline&quot;</span>))</span>
+<span id="cb17-4"><a href="#cb17-4"></a>  <span class="kw">ifelse</span>(</span>
+<span id="cb17-5"><a href="#cb17-5"></a>         <span class="kw">is.ts</span>(result),</span>
+<span id="cb17-6"><a href="#cb17-6"></a>         <span class="kw">return</span>(result),</span>
+<span id="cb17-7"><a href="#cb17-7"></a>         <span class="kw">return</span>(vec)</span>
+<span id="cb17-8"><a href="#cb17-8"></a>  )</span>
+<span id="cb17-9"><a href="#cb17-9"></a>}</span></code></pre></div>
 <p>If our imputation works, we return the result of it, otherwise we return the original vector. Our next step is to run it over an entire data frame, preferably in parallel, so it can be fast:</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="kw">library</span>(parallel)</span>
 <span id="cb18-2"><a href="#cb18-2"></a>cores &lt;-<span class="st"> </span><span class="kw">detectCores</span>() <span class="op">-</span><span class="st"> </span><span class="dv">1</span></span>
 <span id="cb18-3"><a href="#cb18-3"></a><span class="co">## [1] 11</span></span>
 <span id="cb18-4"><a href="#cb18-4"></a></span>
-<span id="cb18-5"><a href="#cb18-5"></a>imputeDf &lt;-<span class="st"> </span><span class="cf">function</span>(df) {</span>
-<span id="cb18-6"><a href="#cb18-6"></a>    result &lt;-<span class="st"> </span><span class="kw">mclapply</span>(df, tryImpute, <span class="dt">mc.cores =</span> <span class="dv">11</span>)</span>
-<span id="cb18-7"><a href="#cb18-7"></a>    <span class="kw">return</span>(<span class="kw">as.data.frame</span>(result))</span>
+<span id="cb18-5"><a href="#cb18-5"></a>imputeDf &lt;-<span class="st"> </span><span class="cf">function</span>(df){</span>
+<span id="cb18-6"><a href="#cb18-6"></a>  result &lt;-<span class="st"> </span><span class="kw">mclapply</span>(df, tryImpute, <span class="dt">mc.cores =</span> <span class="dv">11</span>)</span>
+<span id="cb18-7"><a href="#cb18-7"></a>  <span class="kw">return</span>(<span class="kw">as.data.frame</span>(result))</span>
 <span id="cb18-8"><a href="#cb18-8"></a>}</span>
 <span id="cb18-9"><a href="#cb18-9"></a></span>
 <span id="cb18-10"><a href="#cb18-10"></a><span class="kw">import</span>(<span class="st">&quot;data/&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>allToTs <span class="op">%&gt;%</span><span class="st"> </span>.[[<span class="dv">1</span>]] <span class="op">%&gt;%</span><span class="st"> </span>imputeDf <span class="op">%&gt;%</span><span class="st"> </span>head</span></code></pre></div>
@@ -3006,18 +3049,18 @@ Spline Interpolation Between 8 points
   </script>
 </div>
 <p>It works. Now lets follow our pattern and run that over the entire list:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>imputeAll &lt;-<span class="st"> </span><span class="cf">function</span>(xs) {</span>
-<span id="cb19-2"><a href="#cb19-2"></a>    <span class="kw">lapply</span>(xs, imputeDf)</span>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>imputeAll &lt;-<span class="st"> </span><span class="cf">function</span>(xs){</span>
+<span id="cb19-2"><a href="#cb19-2"></a>  <span class="kw">lapply</span>(xs, imputeDf)</span>
 <span id="cb19-3"><a href="#cb19-3"></a>}</span>
 <span id="cb19-4"><a href="#cb19-4"></a></span>
-<span id="cb19-5"><a href="#cb19-5"></a><span class="co">## str(imputeAll(allToTs(import(&#39;data/&#39;))))</span></span></code></pre></div>
+<span id="cb19-5"><a href="#cb19-5"></a><span class="co">## str(imputeAll(allToTs(import(&quot;data/&quot;))))</span></span></code></pre></div>
 </div>
 </div>
 <div id="converting-to-a-convenient-data-structure" class="section level1">
 <h1>Converting to a Convenient Data Structure</h1>
 <p>As we will be passing this information into a lot of other documents and scripts, and growing and manipulating it frequently, we would like to put it into a convenient data structure, that is scalable, extensible, and fast. That structure is an associative array, or a hash table, the swiss army knife data structure of data science. We will use it to store <em>all</em> models created, variations of our dataset, and anything else, and pass this between files. For analysis on the speed and power of the hash table, please refer to <a href="https://blog.dominodatalab.com/a-quick-benchmark-of-hashtable-implementations-in-r/">this link</a>.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>toHash &lt;-<span class="st"> </span><span class="cf">function</span>(xs) {</span>
-<span id="cb20-2"><a href="#cb20-2"></a>    <span class="kw">list2env</span>(<span class="dt">x =</span> xs, <span class="dt">hash =</span> <span class="ot">TRUE</span>, <span class="dt">envir =</span> <span class="ot">NULL</span>)</span>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>toHash &lt;-<span class="st"> </span><span class="cf">function</span>(xs){</span>
+<span id="cb20-2"><a href="#cb20-2"></a>  <span class="kw">list2env</span>(<span class="dt">x =</span> xs, <span class="dt">hash =</span> <span class="ot">TRUE</span>, <span class="dt">envir =</span> <span class="ot">NULL</span>)</span>
 <span id="cb20-3"><a href="#cb20-3"></a>}</span></code></pre></div>
 </div>
 <div id="chaining-it-all-together" class="section level1">
@@ -3028,12 +3071,12 @@ Spline Interpolation Between 8 points
 <span id="cb21-3"><a href="#cb21-3"></a>preprocess</span></code></pre></div>
 <pre><code>#&gt; function (...) 
 #&gt; Reduce(function(x, f) f(x), fs, ...)
-#&gt; &lt;bytecode: 0xbf68df0&gt;
-#&gt; &lt;environment: 0xbf6ff78&gt;</code></pre>
+#&gt; &lt;bytecode: 0xcb81b58&gt;
+#&gt; &lt;environment: 0xcb85090&gt;</code></pre>
 <p>We now have a function that imports a directory of csv’s, converts the proper items to time series objects, spline interpolates the NAs, and converts to a hash table:</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>china &lt;-<span class="st"> </span><span class="kw">preprocess</span>(<span class="st">&quot;data/&quot;</span>)</span>
 <span id="cb23-2"><a href="#cb23-2"></a><span class="kw">str</span>(china)</span></code></pre></div>
-<pre><code>#&gt; &lt;environment: 0xad9da58&gt;</code></pre>
+<pre><code>#&gt; &lt;environment: 0x99da728&gt;</code></pre>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="kw">head</span>(china<span class="op">$</span>BeijingPM_, <span class="dv">100</span>)</span></code></pre></div>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
@@ -3059,7 +3102,7 @@ Spline Interpolation Between 8 points
 
 <div id="postamble" data-toggle="wy-nav-shift" class="status">
 <p class="author"><span class="glyphicon glyphicon-user"></span> David Josephs</p>
-<p class="date"><span class="glyphicon glyphicon-calendar"></span> 2019-08-21</p>
+<p class="date"><span class="glyphicon glyphicon-calendar"></span> 2019-12-06</p>
 </div>
 
 
