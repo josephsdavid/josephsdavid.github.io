@@ -18,7 +18,6 @@ knitr::include_graphics("images/me.png")
 
 ```
 
-
 I am a:
 
 * Aspiring data scientist
@@ -73,8 +72,6 @@ Work in progress
 * Keras
 
 * American cheese
-
-* Association rule mining
 
 * My dog
 
