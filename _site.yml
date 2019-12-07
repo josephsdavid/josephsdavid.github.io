@@ -10,9 +10,11 @@ navbar:
                   menu:
                         - text: "Nix for Data Science 1"
                           href: nix.html
+                        - text: "Nox for Data Science 2: COMING SOON"
+                          href: advancedNix.html
                 - text: "IML"
                   menu:
-                          - text: "Interpretable Machine Learning: Part 1"
+                          - text: "Interpretable Machine Learning: Part 1 COMING SOON"
                             href: iml.html
                 - text: "Time Series"
                   menu:
