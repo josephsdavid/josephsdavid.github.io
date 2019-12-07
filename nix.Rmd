@@ -7,9 +7,7 @@ date: "`r Sys.Date()`"
 #    df_print: paged
 #    cards: false
 ---
-[Back to Navigation](DSblog.html)
 
-[Part 1.5](advancedNix.html)
 
 
 ```{r setup, include = F}
