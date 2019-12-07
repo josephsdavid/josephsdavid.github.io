@@ -1,5 +1,4 @@
 ---
-layout: post
 title: "Understanding Autoencoders"
 author: "David Josephs"
 date: "`r Sys.Date()`"
@@ -9,5 +8,4 @@ output: html_document
 #    df_print: paged
 #    cards: false
 ---
-
 [Back to Navigation](DSblog.html)

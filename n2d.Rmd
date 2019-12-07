@@ -1,5 +1,4 @@
 ---
-layout: post
 title: "(Not too) Deep Clustering"
 author: "David Josephs"
 date: "`r Sys.Date()`"
@@ -9,5 +8,4 @@ output: html_document
 #    df_print: paged
 #    cards: false
 ---
-
 Clustering is hard. When clustering, you have to not only worry about guessing the proper number of clusters, how to deal with outliers, overlapping data, sensitivity to noise, etc. Along with that, you have to wonder whether or not your clusters are meaningful at all, make sure you dont have redundant features, and generally construct features in order to get your clusters to work properly. This is a ton of work, and often requires domain knowledge or a lot of trial and error.

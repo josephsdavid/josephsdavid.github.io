@@ -1,5 +1,4 @@
 ---
-layout: post
 title: "Building a Reproducible Data Science Environment with Nix"
 author: "David Josephs"
 date: "`r Sys.Date()`"
@@ -11,7 +10,6 @@ output:
 #    df_print: paged
 #    cards: false
 ---
-
 [Back to Navigation](DSblog.html)
 
 

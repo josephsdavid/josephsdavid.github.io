@@ -1,5 +1,4 @@
 ---
-layout: post
 title: "David Does Data"
 output: html_document
 #  rmdformats::readthedown:
@@ -8,7 +7,6 @@ output: html_document
 #    code_folding: show
 #    thumbnails: true
 ---
-
 # Welcome
 
 Hello and welcome to my data science blog! I am thrilled you are here. The goal of this blog is to share in depth, high quality material that I feel the data science community needs more of. If you have any ideas for further posts, questions, complaints, or just want to chat, [send me an email!](mailto:josephsd@smu.edu)
