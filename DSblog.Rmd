@@ -1,6 +1,5 @@
 ---
 title: "David Does Data"
-output: html_document
 #  rmdformats::readthedown:
 #    css: custom.css
 #    highlight: kate

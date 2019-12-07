@@ -2,10 +2,6 @@
 title: "Preprocessing Time Series Data"
 author: "David Josephs"
 date: "`r Sys.Date()`"
-output: 
-  html_document:
-    df_print: paged
-    highlight: kate
 #  rmdformats::readthedown:
 #    css: custom.css
 #    df_print: paged

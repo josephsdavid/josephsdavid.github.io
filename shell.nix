@@ -33,6 +33,8 @@ in
       rPackages.lattice
       rPackages.microbenchmark
       rPackages.tidyverse
+      rPackages.iml
+      rPackages.vip
       rPackages.devtools
       rPackages.pander
       rPackages.Rcpp

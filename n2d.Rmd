@@ -2,10 +2,10 @@
 title: "(Not too) Deep Clustering"
 author: "David Josephs"
 date: "`r Sys.Date()`"
-output: html_document
-#  rmdformats::readthedown:
-#    css: custom.css
-#    df_print: paged
-#    cards: false
 ---
-Clustering is hard. When clustering, you have to not only worry about guessing the proper number of clusters, how to deal with outliers, overlapping data, sensitivity to noise, etc. Along with that, you have to wonder whether or not your clusters are meaningful at all, make sure you dont have redundant features, and generally construct features in order to get your clusters to work properly. This is a ton of work, and often requires domain knowledge or a lot of trial and error.
+
+# Clustering is Hard
+Let's be honest, clustering is hard. It requires a tremendous amount of feature engineering, often domain knowledge, and in my opinion guesswork. Not only do you have to do all the normal work associated with machine learning (FE, preprocessing, tuning, model selection), but you also have to deal with the lack of labels, and the fact that you don't even know how many groups you are supposed to put the data in, and have an ever growing amount of metrics (which you likely rarely use) to assess this.
+For these reasons, lately research has turned to deep clustering. One of the great benefits of deep learning in general is that it does not really require any feature engineering, you simply get the data in the right shape for your network, and then get going.
+
+# Deep Clustering

@@ -1,0 +1,49 @@
+---
+title: "Interpretable Machine Learning Part 1"
+author: "David Josephs"
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include = F}
+knitr::opts_chunk$set(dev = "svg")
+```
+
+In this blog post, we are going to talk about a few tools
+
+
+# Permutation Importance: Math and Intuition
+
+Everyone loves tree based models. Gradient boosting, random forests, and friends are wonderful, flexible tools. One of the other benefits of these models, because of their tree-ness, is that we are able to actually see how "important" each variable is in the decisions the model is making. This is also one of many many reasons why we love linear models, we can actually see and quantify the strength of a feature in our model. However, why must we limit ourselves to just linear and tree based models?
+
+Lets try and think of a new approach to get variable importance. When I was first really getting into ML, I remember asking one of my professors the question: "How much time do you spend on feature engineering?". I will never forget his answer, he told me: "Feature engineering [is] the most crucial part to improve both accuracy and model generation. If you have an unneccessary feature in the model, you are in essence fitting noise.". This has stuck with me for a long time, and it is a useful thing to keep in mind while discussing permutation importance. 
+
+If unneccessary features just provide noise which decreases model accuracy and generalization, what happens if we replace a good feature with noise? Our model should be inherently worse, no? This is the key idea of permutation importance.
+
+> If I replace a feature with noise, how much worse does the model perform?
+
+
+This is the key idea of permutation based variable importance. All we are going to do to calculate this is three simple steps:
+
+1. Calculate prediction loss
+
+2. Replace a feature with noise
+
+3. Recalculate prediction loss
+
+4. Compare
+
+
+***COMING SOON***
+
+
+## Formalization
+
+
+## Code Implementation {.tabset .tabset-fade .tabset-pills}
+
+### In Python
+
+### In R
+
+
+

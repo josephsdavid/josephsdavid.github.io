@@ -14,7 +14,7 @@
 
 <meta name="date" content="2019-12-07" />
 
-<title>Understanding Autoencoders</title>
+<title>Interpretable Machine Learning Part 1</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -326,14 +326,43 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Understanding Autoencoders</h1>
+<h1 class="title toc-ignore">Interpretable Machine Learning Part 1</h1>
 <h4 class="author">David Josephs</h4>
 <h4 class="date">2019-12-07</h4>
 
 </div>
 
 
-<p><a href="DSblog.html">Back to Navigation</a></p>
+<p>In this blog post, we are going to talk about a few tools</p>
+<div id="permutation-importance-math-and-intuition" class="section level1">
+<h1>Permutation Importance: Math and Intuition</h1>
+<p>Everyone loves tree based models. Gradient boosting, random forests, and friends are wonderful, flexible tools. One of the other benefits of these models, because of their tree-ness, is that we are able to actually see how “important” each variable is in the decisions the model is making. This is also one of many many reasons why we love linear models, we can actually see and quantify the strength of a feature in our model. However, why must we limit ourselves to just linear and tree based models?</p>
+<p>Lets try and think of a new approach to get variable importance. When I was first really getting into ML, I remember asking one of my professors the question: “How much time do you spend on feature engineering?”. I will never forget his answer, he told me: “Feature engineering [is] the most crucial part to improve both accuracy and model generation. If you have an unneccessary feature in the model, you are in essence fitting noise.”. This has stuck with me for a long time, and it is a useful thing to keep in mind while discussing permutation importance.</p>
+<p>If unneccessary features just provide noise which decreases model accuracy and generalization, what happens if we replace a good feature with noise? Our model should be inherently worse, no? This is the key idea of permutation importance.</p>
+<blockquote>
+<p>If I replace a feature with noise, how much worse does the model perform?</p>
+</blockquote>
+<p>This is the key idea of permutation based variable importance. All we are going to do to calculate this is three simple steps:</p>
+<ol style="list-style-type: decimal">
+<li><p>Calculate prediction loss</p></li>
+<li><p>Replace a feature with noise</p></li>
+<li><p>Recalculate prediction loss</p></li>
+<li><p>Compare</p></li>
+</ol>
+<p><strong><em>COMING SOON</em></strong></p>
+<div id="formalization" class="section level2">
+<h2>Formalization</h2>
+</div>
+<div id="code-implementation" class="section level2 tabset tabset-fade tabset-pills">
+<h2>Code Implementation</h2>
+<div id="in-python" class="section level3">
+<h3>In Python</h3>
+</div>
+<div id="in-r" class="section level3">
+<h3>In R</h3>
+</div>
+</div>
+</div>
 
 
 

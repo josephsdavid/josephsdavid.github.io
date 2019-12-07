@@ -10,6 +10,10 @@ navbar:
                   menu:
                         - text: "Nix for Data Science 1"
                           href: nix.html
+                - text: "IML"
+                  menu:
+                          - text: "Interpretable Machine Learning: Part 1"
+                            href: iml.html
                 - text: "Time Series"
                   menu:
                           - text: "Time Series EDA"
@@ -21,3 +25,9 @@ navbar:
                   href: https://github.com/josephsdavid
                 - icon: ion-social-twitter
                   href: https://twitter.com/Daved256
+
+output:
+  html_document:
+    theme: darkly
+    highlight: kate
+    df_print: paged
