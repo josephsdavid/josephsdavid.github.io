@@ -399,7 +399,7 @@ We can define the partial dependence as the expected value of our prediction fun
 $$\mathrm{PDP}(z_s) = E \left[ \hat f (x_s, x_c) \mid x_c  \right]$$
 
 $$ = \int \hat f (x_s, x_c) \mathbb{P}_c(x_c) dx_c$$
-Where $\mathbb{P}_c$ is the marginal distribution of $x_c$, $\int p(x)dz_s$.
+Where $\mathbb{P}_c$ is the marginal distribution of $x_c$, $\int p(x)dx_s$.
 
 We can then formulate this for a finite set of $n$ features using the Monte Carlo method:
 
