@@ -557,12 +557,12 @@ VIP_{\mathrm{perm}}(x_s) = \frac{\mathcal{L}*}{\mathcal{L}}
 #&gt;                       verbose=0, warm_start=False)</code></pre>
 <p>Lets check out as a baseline truth which features are important in the random forest, and the strength of the predictors in our linear regression:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a>pprint(<span class="bu">dict</span>(<span class="bu">zip</span>(X_train.columns, rf.feature_importances_)))</span></code></pre></div>
-<pre><code>#&gt; {&#39;Age&#39;: 0.013119682112048461,
-#&gt;  &#39;Tonnage&#39;: 0.3949729008182226,
-#&gt;  &#39;cabins&#39;: 0.41853212519072114,
-#&gt;  &#39;length&#39;: 0.06650122787981155,
-#&gt;  &#39;passenger_density&#39;: 0.014998475530267374,
-#&gt;  &#39;passengers&#39;: 0.09187558846892888}</code></pre>
+<pre><code>#&gt; {&#39;Age&#39;: 0.026203782104570972,
+#&gt;  &#39;Tonnage&#39;: 0.37251090682611,
+#&gt;  &#39;cabins&#39;: 0.44653747928298465,
+#&gt;  &#39;length&#39;: 0.08355371052706724,
+#&gt;  &#39;passenger_density&#39;: 0.011470489426666914,
+#&gt;  &#39;passengers&#39;: 0.05972363183260027}</code></pre>
 <div class="sourceCode" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a>pprint({X_train.columns[i]: lm.coef_[:,i] <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(lm.coef_.shape[<span class="dv">1</span>])})</span></code></pre></div>
 <pre><code>#&gt; {&#39;Age&#39;: array([-0.01321228]),
 #&gt;  &#39;Tonnage&#39;: array([0.00316145]),
@@ -610,23 +610,23 @@ VIP_{\mathrm{perm}}(x_s) = \frac{\mathcal{L}*}{\mathcal{L}}
 <span id="cb10-8"><a href="#cb10-8"></a>    imps[get_name(m)] <span class="op">=</span> permutation_importance(m, X_test, y_test, loss_mse, <span class="va">True</span>,  X_train, y_train, n_rounds <span class="op">=</span> <span class="dv">5</span>)</span>
 <span id="cb10-9"><a href="#cb10-9"></a>pprint(imps)</span></code></pre></div>
 <pre><code>#&gt; {&#39;knn&#39;:         Age    Tonnage  passengers    length    cabins  passenger_density  baseline
-#&gt; 0  0.904846  21.227473    1.095418  0.991048  1.047782           1.201898  1.437909
-#&gt; 1  0.933409  20.076817    1.239120  1.005116  0.964745           1.319825  1.307646
-#&gt; 2  0.857731  20.391907    1.368085  1.014068  0.966126           1.395717  1.298623
-#&gt; 3  0.957669  19.791686    1.284885  1.005116  0.982118           1.344682  1.305520
-#&gt; 4  0.894280  12.471207    1.339701  1.005519  1.013681           1.426535  1.311211,
+#&gt; 0  0.967961  21.318475    1.284214  1.014068  0.984051           1.432869  1.311947
+#&gt; 1  0.899108  24.441675    1.469628  1.005584  1.003080           1.603181  1.321028
+#&gt; 2  0.871553  25.712129    1.313745  1.013088  0.925754           1.230653  1.316490
+#&gt; 3  0.888182  17.370427    1.292723  1.005181  0.985905           1.296537  1.314021
+#&gt; 4  0.968248  19.120470    1.304140  1.013730  1.007610           1.314022  1.310162,
 #&gt;  &#39;lm&#39;:         Age   Tonnage  passengers    length     cabins  passenger_density  baseline
-#&gt; 0  0.985331  1.079901    7.840429  4.393997  64.807813           1.112839  0.970219
-#&gt; 1  0.960415  1.015112    7.038711  4.349526  79.508573           1.150089  0.983449
-#&gt; 2  1.026558  1.089876    6.646655  4.719806  69.885430           1.087388  1.013224
-#&gt; 3  1.061575  1.083981    6.487603  3.496625  79.700783           1.125177  1.018032
-#&gt; 4  1.112396  0.992705    7.151765  4.868272  77.002066           1.037946  1.012768,
+#&gt; 0  1.030987  1.062090    7.667455  5.362304  53.059809           1.070324  0.999472
+#&gt; 1  1.058623  1.095049    7.211575  4.917501  68.211224           1.047848  0.988056
+#&gt; 2  1.028567  1.132672    5.888666  4.284097  67.539068           1.037555  1.034140
+#&gt; 3  1.003454  0.995042    7.907602  4.500715  79.322602           1.058735  1.001641
+#&gt; 4  1.088367  1.080869    9.017287  4.561144  58.347838           1.047503  0.991976,
 #&gt;  &#39;rf&#39;:         Age    Tonnage  passengers    length     cabins  passenger_density  baseline
-#&gt; 0  1.156308  14.579041    2.390810  3.266574  11.728786           1.651785  1.529226
-#&gt; 1  1.129262  13.828749    2.682880  2.908450  14.950558           1.352273  1.944743
-#&gt; 2  1.161423  11.956569    2.165861  1.992307  20.783301           1.433651  1.141467
-#&gt; 3  1.162300  11.425421    2.301585  1.679158  18.302634           1.384981  1.817001
-#&gt; 4  1.197191  14.610470    1.644158  2.539609  18.335109           1.603873  1.587114}</code></pre>
+#&gt; 0  1.124659  11.444262    2.493812  2.264077  18.956223           1.340020  1.520315
+#&gt; 1  1.203078  10.192604    1.516493  1.645620  23.307711           1.531013  1.044650
+#&gt; 2  1.148317  15.760076    1.826205  2.011212  24.021290           1.301052  1.739487
+#&gt; 3  1.125891  16.101219    1.946038  2.404578  23.947087           1.330123  1.414827
+#&gt; 4  1.177000  14.626767    2.132309  2.108950  21.075226           1.440789  1.163994}</code></pre>
 <p>This output is a bit hard to read, so lets go ahead and write a helper function which averages the importances, and plots them nicely!</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1"></a>plt.style.use(<span class="st">&quot;ggplot&quot;</span>)</span>
 <span id="cb12-2"><a href="#cb12-2"></a><span class="kw">def</span> plot_perm_imp(df, ax <span class="op">=</span> <span class="va">None</span>, color <span class="op">=</span> <span class="st">&#39;blue&#39;</span>):</span>
@@ -815,27 +815,27 @@ Permutation Importances for linear regression, knn, and a random forest
 <tbody>
 <tr class="odd">
 <td align="center"><strong>Age</strong></td>
-<td align="center">80.33</td>
+<td align="center">67.66</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>Tonnage</strong></td>
-<td align="center">362.7</td>
+<td align="center">405.4</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>passengers</strong></td>
-<td align="center">271.5</td>
+<td align="center">259.4</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>length</strong></td>
-<td align="center">267.6</td>
+<td align="center">283.3</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>cabins</strong></td>
-<td align="center">373.6</td>
+<td align="center">350.8</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>passenger_density</strong></td>
-<td align="center">23.57</td>
+<td align="center">25.78</td>
 </tr>
 </tbody>
 </table>
@@ -853,40 +853,31 @@ Permutation Importances for linear regression, knn, and a random forest
 <span id="cb16-10"><a href="#cb16-10"></a>  <span class="kw">loss</span>(y, <span class="kw">predict</span>(model, x))</span>
 <span id="cb16-11"><a href="#cb16-11"></a>}</span>
 <span id="cb16-12"><a href="#cb16-12"></a></span>
-<span id="cb16-13"><a href="#cb16-13"></a>models[[<span class="dv">1</span>]]</span></code></pre></div>
-<pre><code>#&gt; function(df) {
-#&gt;   lm(crew ~ ., data = df)
-#&gt; }</code></pre>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="kw">mean</span>((<span class="kw">predict</span>(trained_models[[<span class="dv">1</span>]], X_test) <span class="op">-</span><span class="st"> </span>y_test[[<span class="dv">1</span>]])<span class="op">^</span><span class="dv">2</span>)</span></code></pre></div>
-<pre><code>#&gt; [1] 0.3811438</code></pre>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="kw">loss_mse</span>(y_test, <span class="kw">predict</span>(trained_models[[<span class="dv">1</span>]], X_test))</span></code></pre></div>
-<pre><code>#&gt; Warning in mean.default(square_error): argument is not numeric or logical:
-#&gt; returning NA</code></pre>
-<pre><code>#&gt; [1] NA</code></pre>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="co"># permute a single column</span></span>
-<span id="cb23-2"><a href="#cb23-2"></a>permute_column &lt;-<span class="st"> </span><span class="cf">function</span>(df, col) {</span>
-<span id="cb23-3"><a href="#cb23-3"></a>  df[[col]] &lt;-<span class="st"> </span>df[[col]][<span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(df))]</span>
-<span id="cb23-4"><a href="#cb23-4"></a>  <span class="kw">return</span>(df)</span>
-<span id="cb23-5"><a href="#cb23-5"></a>}</span>
-<span id="cb23-6"><a href="#cb23-6"></a></span>
-<span id="cb23-7"><a href="#cb23-7"></a></span>
-<span id="cb23-8"><a href="#cb23-8"></a>permutation_importance &lt;-<span class="st"> </span><span class="cf">function</span>(model, x, y, loss, <span class="dt">x_train =</span> <span class="ot">NA</span>, <span class="dt">y_train =</span> <span class="ot">NA</span>, <span class="dt">n_rounds =</span> <span class="dv">5</span>) {</span>
-<span id="cb23-9"><a href="#cb23-9"></a>  baseline &lt;-<span class="st"> </span><span class="kw">get_loss</span>(model, x, y[[<span class="dv">1</span>]], loss)</span>
-<span id="cb23-10"><a href="#cb23-10"></a>  explan &lt;-<span class="st"> </span><span class="kw">names</span>(x)</span>
-<span id="cb23-11"><a href="#cb23-11"></a>  single_round_imp &lt;-<span class="st"> </span><span class="cf">function</span>(df) {</span>
-<span id="cb23-12"><a href="#cb23-12"></a>    dfs &lt;-<span class="st"> </span><span class="kw">lapply</span>(explan, <span class="cf">function</span>(i) <span class="kw">permute_column</span>(x, i))</span>
-<span id="cb23-13"><a href="#cb23-13"></a>    <span class="kw">return</span>(<span class="kw">vapply</span>(dfs, <span class="cf">function</span>(i) <span class="kw">get_loss</span>(model, i, y[[<span class="dv">1</span>]], loss), <span class="kw">numeric</span>(<span class="dv">1</span>)))</span>
-<span id="cb23-14"><a href="#cb23-14"></a>  }</span>
-<span id="cb23-15"><a href="#cb23-15"></a>  res &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="dv">1</span><span class="op">:</span>n_rounds, <span class="cf">function</span>(x) <span class="kw">single_round_imp</span>(df))</span>
-<span id="cb23-16"><a href="#cb23-16"></a>  res &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">do.call</span>(rbind, res))</span>
-<span id="cb23-17"><a href="#cb23-17"></a>  res &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">lapply</span>(res, <span class="cf">function</span>(x) x<span class="op">/</span>baseline))</span>
-<span id="cb23-18"><a href="#cb23-18"></a>  <span class="kw">names</span>(res) &lt;-<span class="st"> </span><span class="kw">names</span>(x)</span>
-<span id="cb23-19"><a href="#cb23-19"></a>  <span class="kw">return</span>(<span class="kw">as.data.frame</span>(<span class="kw">lapply</span>(res, mean)))</span>
-<span id="cb23-20"><a href="#cb23-20"></a>}</span>
-<span id="cb23-21"><a href="#cb23-21"></a></span>
-<span id="cb23-22"><a href="#cb23-22"></a><span class="co"># we can do this in a second because R is speedy </span></span>
-<span id="cb23-23"><a href="#cb23-23"></a>perm_vips &lt;-<span class="st"> </span><span class="kw">lapply</span>(trained_models, <span class="cf">function</span>(x) <span class="kw">permutation_importance</span>(x, X_test, y_test, loss_mse, <span class="dt">n_rounds =</span> <span class="dv">30</span>))</span>
-<span id="cb23-24"><a href="#cb23-24"></a>pander<span class="op">::</span><span class="kw">pander</span>(perm_vips)</span></code></pre></div>
+<span id="cb16-13"><a href="#cb16-13"></a></span>
+<span id="cb16-14"><a href="#cb16-14"></a><span class="co"># permute a single column</span></span>
+<span id="cb16-15"><a href="#cb16-15"></a>permute_column &lt;-<span class="st"> </span><span class="cf">function</span>(df, col) {</span>
+<span id="cb16-16"><a href="#cb16-16"></a>  df[[col]] &lt;-<span class="st"> </span>df[[col]][<span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(df))]</span>
+<span id="cb16-17"><a href="#cb16-17"></a>  <span class="kw">return</span>(df)</span>
+<span id="cb16-18"><a href="#cb16-18"></a>}</span>
+<span id="cb16-19"><a href="#cb16-19"></a></span>
+<span id="cb16-20"><a href="#cb16-20"></a></span>
+<span id="cb16-21"><a href="#cb16-21"></a>permutation_importance &lt;-<span class="st"> </span><span class="cf">function</span>(model, x, y, loss, <span class="dt">x_train =</span> <span class="ot">NA</span>, <span class="dt">y_train =</span> <span class="ot">NA</span>, <span class="dt">n_rounds =</span> <span class="dv">5</span>) {</span>
+<span id="cb16-22"><a href="#cb16-22"></a>  baseline &lt;-<span class="st"> </span><span class="kw">get_loss</span>(model, x, y[[<span class="dv">1</span>]], loss)</span>
+<span id="cb16-23"><a href="#cb16-23"></a>  explan &lt;-<span class="st"> </span><span class="kw">names</span>(x)</span>
+<span id="cb16-24"><a href="#cb16-24"></a>  single_round_imp &lt;-<span class="st"> </span><span class="cf">function</span>(df) {</span>
+<span id="cb16-25"><a href="#cb16-25"></a>    dfs &lt;-<span class="st"> </span><span class="kw">lapply</span>(explan, <span class="cf">function</span>(i) <span class="kw">permute_column</span>(x, i))</span>
+<span id="cb16-26"><a href="#cb16-26"></a>    <span class="kw">return</span>(<span class="kw">vapply</span>(dfs, <span class="cf">function</span>(i) <span class="kw">get_loss</span>(model, i, y[[<span class="dv">1</span>]], loss), <span class="kw">numeric</span>(<span class="dv">1</span>)))</span>
+<span id="cb16-27"><a href="#cb16-27"></a>  }</span>
+<span id="cb16-28"><a href="#cb16-28"></a>  res &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="dv">1</span><span class="op">:</span>n_rounds, <span class="cf">function</span>(x) <span class="kw">single_round_imp</span>(df))</span>
+<span id="cb16-29"><a href="#cb16-29"></a>  res &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">do.call</span>(rbind, res))</span>
+<span id="cb16-30"><a href="#cb16-30"></a>  res &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">lapply</span>(res, <span class="cf">function</span>(x) x<span class="op">/</span>baseline))</span>
+<span id="cb16-31"><a href="#cb16-31"></a>  <span class="kw">names</span>(res) &lt;-<span class="st"> </span><span class="kw">names</span>(x)</span>
+<span id="cb16-32"><a href="#cb16-32"></a>  <span class="kw">return</span>(<span class="kw">as.data.frame</span>(<span class="kw">lapply</span>(res, mean)))</span>
+<span id="cb16-33"><a href="#cb16-33"></a>}</span>
+<span id="cb16-34"><a href="#cb16-34"></a></span>
+<span id="cb16-35"><a href="#cb16-35"></a><span class="co"># we can do this in a second because R is speedy </span></span>
+<span id="cb16-36"><a href="#cb16-36"></a>perm_vips &lt;-<span class="st"> </span><span class="kw">lapply</span>(trained_models, <span class="cf">function</span>(x) <span class="kw">permutation_importance</span>(x, X_test, y_test, loss_mse, <span class="dt">n_rounds =</span> <span class="dv">30</span>))</span>
+<span id="cb16-37"><a href="#cb16-37"></a>pander<span class="op">::</span><span class="kw">pander</span>(perm_vips)</span></code></pre></div>
 <ul>
 <li><p><strong>lm</strong>:</p>
 <table style="width:96%;">
@@ -910,12 +901,12 @@ Permutation Importances for linear regression, knn, and a random forest
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">1.033</td>
-<td align="center">1.048</td>
-<td align="center">7.264</td>
-<td align="center">4.344</td>
-<td align="center">68.92</td>
-<td align="center">1.076</td>
+<td align="center">1.034</td>
+<td align="center">1.062</td>
+<td align="center">7.389</td>
+<td align="center">4.273</td>
+<td align="center">69.88</td>
+<td align="center">1.088</td>
 </tr>
 </tbody>
 </table></li>
@@ -941,12 +932,12 @@ Permutation Importances for linear regression, knn, and a random forest
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">1.247</td>
-<td align="center">1.854</td>
-<td align="center">2.101</td>
-<td align="center">3.125</td>
-<td align="center">2.807</td>
-<td align="center">1.258</td>
+<td align="center">1.281</td>
+<td align="center">1.724</td>
+<td align="center">1.964</td>
+<td align="center">3.068</td>
+<td align="center">2.846</td>
+<td align="center">1.261</td>
 </tr>
 </tbody>
 </table></li>
@@ -972,30 +963,30 @@ Permutation Importances for linear regression, knn, and a random forest
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">1.094</td>
-<td align="center">5.539</td>
-<td align="center">4.138</td>
-<td align="center">3.888</td>
-<td align="center">7.491</td>
-<td align="center">1.393</td>
+<td align="center">1.133</td>
+<td align="center">7.749</td>
+<td align="center">4.13</td>
+<td align="center">4.182</td>
+<td align="center">7.958</td>
+<td align="center">1.55</td>
 </tr>
 </tbody>
 </table></li>
 </ul>
 <!-- end of list -->
 <p>So, it looks like our importances are quite similar to the importances calculated by the models explicitly, so not a bad job! Lets go ahead and produce a nice plot!</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a><span class="kw">library</span>(tidyverse)</span>
-<span id="cb24-2"><a href="#cb24-2"></a>vip_flat &lt;-<span class="st"> </span><span class="kw">lapply</span>(perm_vips, gather)</span>
-<span id="cb24-3"><a href="#cb24-3"></a></span>
-<span id="cb24-4"><a href="#cb24-4"></a><span class="co"># Finally an appropriate use of superassignment!!</span></span>
-<span id="cb24-5"><a href="#cb24-5"></a><span class="kw">lapply</span>(<span class="kw">names</span>(vip_flat), <span class="cf">function</span>(x) {</span>
-<span id="cb24-6"><a href="#cb24-6"></a>  vip_flat[[x]][[<span class="st">&quot;model&quot;</span>]] &lt;&lt;-<span class="st"> </span>x</span>
-<span id="cb24-7"><a href="#cb24-7"></a>})  <span class="op">%&gt;%</span><span class="st"> </span>invisible</span>
-<span id="cb24-8"><a href="#cb24-8"></a></span>
-<span id="cb24-9"><a href="#cb24-9"></a><span class="kw">do.call</span>( rbind, vip_flat) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame <span class="op">%&gt;%</span></span>
-<span id="cb24-10"><a href="#cb24-10"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> key, <span class="dt">y =</span> value, <span class="dt">fill =</span> model)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_bar</span>(<span class="dt">stat =</span> <span class="st">&quot;identity&quot;</span>) <span class="op">+</span></span>
-<span id="cb24-11"><a href="#cb24-11"></a><span class="st">  </span><span class="kw">facet_grid</span>(model <span class="op">~</span><span class="st"> </span>., <span class="dt">scales =</span> <span class="st">&quot;free&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">coord_flip</span>() <span class="op">+</span><span class="st"> </span>ggthemes<span class="op">::</span><span class="kw">theme_fivethirtyeight</span>() <span class="op">+</span><span class="st"> </span></span>
-<span id="cb24-12"><a href="#cb24-12"></a><span class="st">  </span>ggthemes<span class="op">::</span><span class="kw">scale_fill_fivethirtyeight</span>() <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">&quot;Permutation Importance&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="kw">library</span>(tidyverse)</span>
+<span id="cb17-2"><a href="#cb17-2"></a>vip_flat &lt;-<span class="st"> </span><span class="kw">lapply</span>(perm_vips, gather)</span>
+<span id="cb17-3"><a href="#cb17-3"></a></span>
+<span id="cb17-4"><a href="#cb17-4"></a><span class="co"># Finally an appropriate use of superassignment!!</span></span>
+<span id="cb17-5"><a href="#cb17-5"></a><span class="kw">lapply</span>(<span class="kw">names</span>(vip_flat), <span class="cf">function</span>(x) {</span>
+<span id="cb17-6"><a href="#cb17-6"></a>  vip_flat[[x]][[<span class="st">&quot;model&quot;</span>]] &lt;&lt;-<span class="st"> </span>x</span>
+<span id="cb17-7"><a href="#cb17-7"></a>})  <span class="op">%&gt;%</span><span class="st"> </span>invisible</span>
+<span id="cb17-8"><a href="#cb17-8"></a></span>
+<span id="cb17-9"><a href="#cb17-9"></a><span class="kw">do.call</span>( rbind, vip_flat) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame <span class="op">%&gt;%</span></span>
+<span id="cb17-10"><a href="#cb17-10"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> key, <span class="dt">y =</span> value, <span class="dt">fill =</span> model)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_bar</span>(<span class="dt">stat =</span> <span class="st">&quot;identity&quot;</span>) <span class="op">+</span></span>
+<span id="cb17-11"><a href="#cb17-11"></a><span class="st">  </span><span class="kw">facet_grid</span>(model <span class="op">~</span><span class="st"> </span>., <span class="dt">scales =</span> <span class="st">&quot;free&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">coord_flip</span>() <span class="op">+</span><span class="st"> </span>ggthemes<span class="op">::</span><span class="kw">theme_fivethirtyeight</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb17-12"><a href="#cb17-12"></a><span class="st">  </span>ggthemes<span class="op">::</span><span class="kw">scale_fill_fivethirtyeight</span>() <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">&quot;Permutation Importance&quot;</span>)</span></code></pre></div>
 <p><img src="iml_files/figure-html/unnamed-chunk-11-1.svg" width="672" style="display: block; margin: auto;" /></p>
 <p>Looks like it worked alright!! Especially for random forest, we nicely identified the two most important features, however with little granularity. With our linear model, it is a little less clear, but we do see that the same three most important features carry through! However, we have no real granularity or idea the scale of the effect of the variable. We also carry a risk with permutation importance and correlated variables in general: we are using often unrealistic observations. For example, we may be looking a tiny boats (in length) which weigh the same as the largest boats (they would sink!!) with our permutations. This leads to often unreliable output with many permutation based tools, which we will also explore in this post.</p>
 </div>

@@ -314,9 +314,6 @@ get_loss <- function(model, x, y, loss) {
   loss(y, predict(model, x))
 }
 
-models[[1]]
-mean((predict(trained_models[[1]], X_test) - y_test[[1]])^2)
-loss_mse(y_test, predict(trained_models[[1]], X_test))
 
 # permute a single column
 permute_column <- function(df, col) {
