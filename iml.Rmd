@@ -8,14 +8,16 @@ output:
     highlight: breezedark
     df_print: paged
     toc: true
+    toc_float: 
+      collapsed: false
 
 ---
 
 
-
 <style>
-div.blue pre { background-color:lightblue; }
+div.blue pre { background-color:#d8ecf2; }
 div.blue pre.r { background-color:black; }
+div.blue pre.python { background-color:black; }
 </style>
 
 ```{r setup, include = F}
@@ -142,6 +144,7 @@ Now we are all set up to implement permutation importance in python and in R
 
 First, lets set up three models to test: A linear model, a neural network, and a random forest:
 
+<div class = "blue">
 ```{python}
 lm = LinearRegression()
 knn = KNeighborsRegressor(13) 
@@ -249,11 +252,12 @@ plt.show()
 ```
 
 Looks like it worked alright!! Especially for random forest, we nicely identified the two most important features, however with little granularity. With our linear model, it is a little less clear, but we do see that the same three most important features carry through! However, we have no real granularity or idea the scale of the effect of the variable. We also carry a risk with permutation importance and correlated variables in general: we are using often unrealistic observations. For example, we may be looking a tiny boats (in length) which weigh the same as the largest boats (they would sink!!) with our permutations. This leads to often unreliable output with many permutation based tools, which we will also explore in this post.
+</div>
 
 ### In R
 
 First, lets set up three models to test: A linear model, a knn model, and a random forest:
-
+<div class="blue">
 ```{R}
 
 library(randomForest)
@@ -357,10 +361,214 @@ do.call( rbind, vip_flat) %>% as.data.frame %>%
   facet_grid(model ~ ., scales = "free") + coord_flip() + ggthemes::theme_fivethirtyeight() + 
   ggthemes::scale_fill_fivethirtyeight() + ggtitle("Permutation Importance")
 ```
-
+</div>
 
 
 
 
 
 Looks like it worked alright!! Especially for random forest, we nicely identified the two most important features, however with little granularity. With our linear model, it is a little less clear, but we do see that the same three most important features carry through! However, we have no real granularity or idea the scale of the effect of the variable. We also carry a risk with permutation importance and correlated variables in general: we are using often unrealistic observations. For example, we may be looking a tiny boats (in length) which weigh the same as the largest boats (they would sink!!) with our permutations. This leads to often unreliable output with many permutation based tools, which we will also explore in this post.
+
+
+# Partial Dependence
+
+Let's try and think of a annother way to quantify the effect of a variable. We previously answered the question: "How much worse will my prediction be, given a feature has been replaced with noise?". Now, lets ask a new question: 
+> What will my prediction be, in general, when a feature is at a specific value?
+
+This is Partial Dependence in a nutshell. Stemming off from this, we can make the claim:
+
+> If a feature is more important, the prediction will vary more with that feature than others.
+
+
+This is exactly the claim made (and supported) in [this excellent paper](https://arxiv.org/abs/1805.04755). Thus in this section, we will calculate two things: Partial Dependence, and Partial Dependence Importance. Partial Dependence, at a high level, is calculated like this:
+
+  1. Take your original data, copy it
+  2. Replace the feature of interest with the value of the first observation of the feature of interest.
+  3. Calculate new prediction vector
+  4. Average that
+  5. Repeat for all observations
+
+And then we can just take more or less the standard deviation of these curves to estimate importance (its a bit different for categorical variables, see the paper).
+
+## Formalization
+
+Consider again $x = (x_s, x_c)$
+
+We can define the partial dependence as the expected value of our prediction function, $\hat f$, given $x_c$:
+
+$$\mathrm{PDP}(z_s) = E \left[ \hat f (x_s, x_c) \mid x_c  \right]$$
+
+$$ = \int \hat f (x_s, x_c) \mathbb{P}_c(x_c) dx_c$$
+Where $\mathbb{P}_c$ is the marginal distribution of $x_c$, $\int p(x)dz_s$.
+
+We can then formulate this for a finite set of $n$ features using the Monte Carlo method:
+
+$$\widetilde {\mathrm{PDP}} (x_s) = \frac{1}{n} \sum_{i=1}^{i=k} \hat f (x_s, x_c^{(i)})$$
+
+where $x_c^{(i)}$ is a distinct observation(row) of $x_c$
+
+## Code Implementation { .tabset .tabset-pills}
+
+### In Python
+
+First, lets define a function to calculate the partial dependence of a prediction on a single variable:
+
+```{python}
+def pdp_var(model, x, var):
+    explan = sorted(x[var])
+    preds = []
+    for i in range(0, len(explan)):
+        X_tmp = x.copy()
+        # pandas is dumb
+        val = np.asarray(explan)[i]
+        X_tmp[var] = val
+        preds.append(model.predict(X_tmp))
+    preds = np.asarray(preds).reshape(len(x), len(explan))
+    pv = preds.mean(axis = 0)
+    return(explan, pv)
+```
+
+Next, lets scale that up to work over an entire data frame!
+
+```{python}
+def pdp_df(model, x):
+    # return a dict of data frames
+    res = {}
+    for c in x.columns:
+        d = pd.DataFrame()
+        d["Value"], d["Average Prediction"] = pdp_var(model, x, c)
+        res[c] = d
+    return(res)
+```
+
+Lets now show the partial dependence for just our random forest!
+
+```{python}
+
+rf_pdp = pdp_df(rf, X_test)
+
+plt.style.use("seaborn-whitegrid")
+fig = plt.figure(figsize = (10, 10))
+for k in range(0,len(rf_pdp.keys())):
+    ax = fig.add_subplot(2,3, k+1)
+    #c = cm.Paired(i/len(imps.keys()), 1)
+    c = sns.color_palette("hls", k+1)[k]
+    df = rf_pdp[list(rf_pdp.keys())[k]]
+    sns.lineplot(x = "Value", y = "Average Prediction", ax = ax, color = c, data = df)
+    ax.set_title(list(rf_pdp.keys())[k])
+plt.subplots_adjust(wspace = 0.5, hspace = 0.5)
+plt.show()
+```
+
+Remember, we said that the variability in partial dependence is equivalent to the importance of a variable. Lets go ahead and write that up too!
+
+```{python}
+def pdp_importance(model, x):
+    pdpdf = pdp_df(model, x)
+    v = {k:np.std(pdpdf[k]["Average Prediction"]) for k in pdpdf.keys()}
+    return(v)
+
+
+pdp_imps = {get_name(m):pdp_importance(m, X_test) for m in models}
+
+def plot_pdp_imp(d, ax = None, color = "blue"):
+    df = pd.DataFrame()
+    df["Variable"] = d.keys()
+    df["Importance"] = d.values()
+    df.sort_values("Importance").plot(kind = "barh", x = "Variable", y = "Importance", width = 0.8, ax = ax, color = c)
+
+fig = plt.figure(figsize = (10,10))
+for i in range(len(pdp_imps.keys())):
+    ax = fig.add_subplot(len(list(pdp_imps.keys())),1, i+1)
+    #c = cm.Paired(i/len(imps.keys()), 1)
+    c = sns.color_palette("hls", i+1)[i]
+    plot_pdp_imp(pdp_imps[list(pdp_imps.keys())[i]], ax = ax, color = c)
+    ax.set_title(list(pdp_imps.keys())[i])
+plt.show()
+```
+
+
+
+### In R
+
+First, lets define a function to calculate the partial dependence of a prediction on a single variable:
+
+```{r}
+
+pdp_var <- function(model, x, var){
+  x_sorted <- x[order(x[[var]], decreasing = TRUE),]
+  # predefine matrix!
+  out <- matrix(nrow = nrow(x), ncol = nrow(x))
+  for (i in 1:nrow(x)) {
+    tmp_df <- x_sorted
+    tmp_df[[var]] <- tmp_df[[var]][i]
+    out[i,] <- predict(model, tmp_df)
+  }
+  res <- colMeans(out)
+  return(data.frame("value" = x_sorted[[var]], "avg_pred" = res))
+}
+```
+
+Next lets scale that up over the entire data frame!
+
+```{r}
+pdp_df <- function(model, x) {
+pdps <- lapply(colnames(x), function(n) {
+    res <- pdp_var(model, x, n)
+    res$variable <- n
+    return(res)
+  })
+  return(pdps)
+}
+
+(rf_pdp <- do.call(rbind, pdp_df(trained_models[[3]], X_test)))
+```
+
+Finally, lets plot these pdps!
+
+```{r, fig.width = 10, fig.height = 10}
+library(ggthemes)
+rf_pdp %>% ggplot(aes(color = variable, y =  avg_pred, x = value)) + 
+  geom_line(size = 1.5) +
+  facet_wrap(variable ~ ., scales = "free") +
+  theme_fivethirtyeight() + scale_color_hc()
+```
+
+Remember, we said that the variability in partial dependence is equivalent to the importance of a variable. Lets go ahead and write that up too! We are going to do a lot of `lapply`, as we are dealing with a list of lists of dataframes, and trying to quickly get that to a tidy format for ggplot
+
+```{r}
+# return the pdp lists for all trained models
+pdps <- lapply(trained_models, function(m) pdp_df(m, X_test))
+
+# calculate the the standard deviation for average predictions
+sd_pdp <- function(df) {
+  imp <- as.numeric(sd(df$avg_pred))
+  return(data.frame("importance" = imp, "variable" = df$variable[2]))
+}
+
+# we have a list of lists of data frames, so things are going to get a little weird
+# We need to apply our function at depth of two, hence the double lapply
+pdp_imps <- lapply(pdps, function(x) lapply(x, sd_pdp))
+
+# next we need to clean up all the items of our lists are tidy data frames/matrices
+pdp_imps <- lapply(pdp_imps, function(x) do.call(rbind, x))
+
+# finally before we can plot, we add a character vector indicating model type
+pdp_imps <- lapply(names(pdp_imps), function(x) {
+  pdp_imps[[x]]$model <- x
+  return(pdp_imps[[x]])
+  }
+)
+
+# then we turn it all into a nice data frame
+pdp_imps <- do.call(rbind, pdp_imps)
+
+pdp_imps%>%  ggplot(aes(x = variable, y = importance, fill = model)) + geom_bar(stat = "identity") +
+  facet_grid(model ~ ., scales = "free") + coord_flip() + ggthemes::theme_fivethirtyeight() + 
+  ggthemes::scale_fill_fivethirtyeight() + ggtitle("Partial Dependence Importance")
+```
+
+
+## Discussion
+
+Something is off!!!
