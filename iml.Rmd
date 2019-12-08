@@ -2,10 +2,27 @@
 title: "Interpretable Machine Learning Part 1"
 author: "David Josephs"
 date: "`r Sys.Date()`"
+output:
+  html_document:
+    theme: darkly
+    highlight: breezedark
+    df_print: paged
+    toc: true
+
 ---
 
+
+
+<style>
+div.blue pre { background-color:lightblue; }
+div.blue pre.r { background-color:black; }
+</style>
+
 ```{r setup, include = F}
-knitr::opts_chunk$set(dev = "svg")
+knitr::opts_chunk$set(dev = "svg", message = F)
+knitr::opts_chunk$set(background = "#D3D3D3")
+library(reticulate)
+knitr::opts_chunk$set(comment = "#>")
 ```
 
 In this blog post, we are going to talk about a few tools
@@ -33,17 +50,320 @@ This is the key idea of permutation based variable importance. All we are going 
 4. Compare
 
 
-***COMING SOON***
-
-
 ## Formalization
 
+Lets formulate permutation importance mathematically now! First, lets define our data as the set $x$, with $m$ observations and $n$ features. Next, lets consider two sets within $x$: $x_s$ and $x_c$. $x_s$ represents the feature(s) we are interested in, and $x_c$ represents the complement of $x_s$ (in english, everything else). Thus:
 
-## Code Implementation {.tabset .tabset-fade .tabset-pills}
+$$x = (x_s, x_c)$$
+
+Lets first define the original loss with the original features as $\mathcal{L}$,
+
+$$
+\mathcal{L} = \mathrm{loss}\left(x_s, x_c \right) 
+$$
+
+Next, we need to replace $x_s$ with noise. To do that, we want to sample the *marginal distribtion* of $x_s$. This means we want to sample the distribution of $x_s$ *independent of other features*. With a reasonably sized dataset, we can just do a permutation of $x_s$ for more or less the same result. We will denote the permutation of $x_s$ as $x_s^*$. Next, lets define the loss, $\mathcal{L}*$ of the permuted feature:
+$$
+\mathcal{L}* = \mathrm{loss}\left(x_s^*, x_c \right)
+$$
+
+Finally, we can calculate the variable importance of $x_s$:
+
+$$
+VIP_{\mathrm{perm}}(x_s) = \frac{\mathcal{L}*}{\mathcal{L}}
+$$
+
+There we go! Its that simple! An addendum to this suggested by Jeremy Howard of fast.ai: Add a feature of pure noise and see how important that is, for reference.
+
+## Code Implementation { .tabset .tabset-pills}
+
+For our data, we will use the dataset discussed in [Benjamin Tayo's amazing blog post](https://medium.com/towards-artificial-intelligence/training-a-machine-learning-model-on-a-dataset-with-highly-correlated-features-debddf5b2e34). We use this dataset because it presents a large challenge to us, with highly correlated features. This will show some of the pitfalls of some of our techniques. 
+
+The goal with this dataset is to predict the number of crew members which will be on a cruise ship, given some paramters describing the ship. I believe the independent variables are fairly self explanatory.
+First, lets read the data into python and do a train test split:
+
+```{python}
+import seaborn as sns
+from sklearn.linear_model import LinearRegression
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.datasets import load_boston, fetch_california_housing
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from sklearn.metrics import mean_squared_error as loss_mse
+import math
+import statistics as stats
+import matplotlib.cm as cm
+from pprint import pprint
+
+# so this is readable:
+import warnings
+from sklearn.exceptions import DataConversionWarning, ConvergenceWarning
+warnings.filterwarnings(action='ignore', category=DataConversionWarning)
+warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.simplefilter(action='ignore', category=ConvergenceWarning)
+cruise = pd.read_csv("https://github.com/bot13956/ML_Model_for_Predicting_Ships_Crew_Size/raw/master/cruise_ship_info.csv")
+
+
+X = cruise.loc[:, cruise.columns != "crew"]
+X = X.loc[:, X.columns != "Ship_name"]
+X = X.loc[:, X.columns != "Cruise_line"]
+y = cruise.loc[:, cruise.columns == "crew"]
+
+
+def split(df, p_train = 0.75, random_state = 0):
+    train = df.sample(frac = p_train, random_state = random_state)
+    test = df.drop(train.index)
+    return(train, test)
+
+(X_train, X_test), (y_train, y_test) = (split(x) for x in [X, y])
+```
+
+Next, lets use the amazing `reticulate` package to pass these exact data frames into R:
+
+```{r}
+X <- py$X
+y <- py$y
+X_train <- py$X_train
+X_test <- py$X_test
+y_train <- py$y_train
+y_test <- py$y_test
+X
+```
+
+Now we are all set up to implement permutation importance in python and in R 
+
+<br><br><br>
+(***Click tabs below to change language!***)
+
 
 ### In Python
 
+First, lets set up three models to test: A linear model, a neural network, and a random forest:
+
+```{python}
+lm = LinearRegression()
+knn = KNeighborsRegressor(13) 
+rf = RandomForestRegressor(n_estimators = 100)
+
+models = [lm, knn, rf]
+
+for m in models:
+  m.fit(X_train, y_train)
+```
+
+Lets check out as a baseline truth which features are important in the random forest, and the strength of the predictors in our linear regression:
+
+```{python}
+pprint(dict(zip(X_train.columns, rf.feature_importances_)))
+pprint({X_train.columns[i]: lm.coef_[:,i] for i in range(lm.coef_.shape[1])})
+```
+
+Looks like tonnage and cabins are the most important variables for the random forest, and cabins, length, and passengers for linear regression.
+
+Next, lets create a function for permutation importance! This should be pretty easy to do, I have added in a few extra components for thoroughness, but the code is not hard:
+
+
+```{python}
+def permutation_importance(model, x, y, loss, base = False, x_train = None, y_train = None, kind = "prop", n_rounds = 5):
+    explan = x.columns
+    baseline = loss(y, model.predict(x))
+    res = {k:[] for k in explan}
+    if (base is True):
+        res["baseline"] = []
+    for n in range(0, n_rounds):
+        for i in range(0, len(explan)):
+            col = explan[i]
+            x_temp = x.copy()
+            x_temp[col] =  np.random.permutation(x_temp[col])
+            if (kind is not "prop"):
+                res[col].append(loss(y, model.predict(x_temp)) -  baseline)
+            else:
+                res[col].append(loss(y, model.predict(x_temp)) /  baseline)
+        if (base is True):
+            x_temp = x.copy()
+            x_train2 = x_train.copy()
+            x_temp["baseline"] = np.clip(np.random.normal(size = len(x_temp)), -1., 1.)
+            x_train2["baseline"] = np.clip(np.random.normal(size = len(x_train2)), -1., 1.)
+            mod2 = type(model)()
+            mod2.fit(x_train2, y_train)
+            if (kind is not "prop"):
+                res["baseline"].append(loss(y, mod2.predict(x_temp)) -  baseline)
+            else:
+                res["baseline"].append(loss(y, mod2.predict(x_temp)) /  baseline)
+    return(pd.DataFrame.from_dict(res))
+```
+
+Lets also define a helper function to help us do this for all our models, and then go ahead and calculate the importances!
+
+```{python}
+# convert object name to string!
+def get_name(obj):
+    name =[x for x in globals() if globals()[x] is obj][0]
+    return(name)
+
+imps = {}
+for m in models:
+    imps[get_name(m)] = permutation_importance(m, X_test, y_test, loss_mse, True,  X_train, y_train, n_rounds = 5)
+pprint(imps)
+```
+
+This output is a bit hard to read, so lets go ahead and write a helper function which averages the importances, and plots them nicely!
+
+```{python, fig.align = "center", fig.cap = "Permutation Importances for linear regression, knn, and a random forest"}
+plt.style.use("ggplot")
+def plot_perm_imp(df, ax = None, color = 'blue'):
+    # mean the columns and put it back into a data frame
+    df1 = (df.apply(stats.mean, 0, result_type = "broadcast")).drop(df.index[1:])
+    # create a new data frame excluding baseline, so we can do something special with it
+    df_temp = df1.loc[:, df.columns != 'baseline']
+    # melt and sort it for plotting
+    df2 = df_temp.melt(var_name = 'variable', value_name = 'importance')
+    df2 = df2.sort_values(by = "importance")
+    # plot it nicely
+    df2.plot(kind = 'barh', x = 'variable', y = 'importance', width = 0.8, ax = ax, color = color)
+    # draw a bar and an arrow to baseline
+    for n in df1.columns:
+        if n is "baseline":
+            plt.axvline(x = df1[n][0])
+            plt.annotate('baseline',
+                         xy = (df1[n][0], 1),
+                         xytext = (df1[n][0] + 0.4, 3),
+                         arrowprops = dict(facecolor = 'black',
+                                           shrink = 0.05),
+                         bbox = dict(boxstyle = "square", fc = (1,1,1)))
+
+
+# plot the importance dict!
+fig = plt.figure(figsize=(10,10))
+for i in range(len(imps.keys())):
+    ax = fig.add_subplot(len(list(imps.keys())),1, i+1)
+    c = sns.color_palette("hls", i+1)[i]
+    plot_perm_imp(imps[list(imps.keys())[i]], ax = ax, color = c)
+    ax.set_title(list(imps.keys())[i])
+    for tick in ax.yaxis.get_major_ticks():
+      tick.label.set_fontsize("x-small")
+      tick.label.set_rotation(45)
+plt.show()
+```
+
+Looks like it worked alright!! Especially for random forest, we nicely identified the two most important features, however with little granularity. With our linear model, it is a little less clear, but we do see that the same three most important features carry through! However, we have no real granularity or idea the scale of the effect of the variable. We also carry a risk with permutation importance and correlated variables in general: we are using often unrealistic observations. For example, we may be looking a tiny boats (in length) which weigh the same as the largest boats (they would sink!!) with our permutations. This leads to often unreliable output with many permutation based tools, which we will also explore in this post.
+
 ### In R
 
+First, lets set up three models to test: A linear model, a knn model, and a random forest:
+
+```{R}
+
+library(randomForest)
+library(kknn)
+
+# set up models with parameters
+rf <- function(df) {
+  return(randomForest(crew ~ ., data = df, ntree = 100))
+}
+
+# knn in R is annoying so we will need to a consistent api ourselves:
+
+knn <- function(df) {
+  res <- list()
+  res$train <- df
+  res$k <- 13
+  res <- structure(res, class = "knn")
+}
+
+predict.knn <- function(obj, newdata) {
+  out <-  kknn(crew ~ ., train = obj$train, test = newdata, k = 13)
+  return(as.numeric(out$fitted.values))
+}
+
+linear_model <- function(df) {
+  lm(crew ~ ., data = df)
+}
+
+models <- list("lm" = linear_model,"knn"= knn,"rf"= rf)
+
+t_train <- cbind(X_train, y_train)
+
+trained_models <- lapply(models, function(f) f(t_train))
+```
+
+Lets check out as a baseline truth which features are important in the random forest, and the strength of the predictors in our linear regression:
+
+```{R, results = 'asis'}
+pander::pander(summary(trained_models[["lm"]]))
+pander::pander(importance(trained_models$rf))
+```
 
 
+Looks like tonnage and cabins are the most important variables for the random forest, and cabins, length, and passengers for linear regression.
+
+Next, lets create a function for permutation importance! This should be pretty easy to do, I have added in a few extra components for thoroughness, but the code is not hard:
+
+```{R}
+# loss function
+loss_mse <- function(truth, preds) {
+  error <- truth - preds
+  square_error <- error^2
+  return(mean(square_error))
+}
+
+# get baseline loss
+get_loss <- function(model, x, y, loss) {
+  loss(y, predict(model, x))
+}
+
+models[[1]]
+mean((predict(trained_models[[1]], X_test) - y_test[[1]])^2)
+loss_mse(y_test, predict(trained_models[[1]], X_test))
+
+# permute a single column
+permute_column <- function(df, col) {
+  df[[col]] <- df[[col]][sample(1:nrow(df))]
+  return(df)
+}
+
+
+permutation_importance <- function(model, x, y, loss, x_train = NA, y_train = NA, n_rounds = 5) {
+  baseline <- get_loss(model, x, y[[1]], loss)
+  explan <- names(x)
+  single_round_imp <- function(df) {
+    dfs <- lapply(explan, function(i) permute_column(x, i))
+    return(vapply(dfs, function(i) get_loss(model, i, y[[1]], loss), numeric(1)))
+  }
+  res <- lapply(1:n_rounds, function(x) single_round_imp(df))
+  res <- as.data.frame(do.call(rbind, res))
+  res <- as.data.frame(lapply(res, function(x) x/baseline))
+  names(res) <- names(x)
+  return(as.data.frame(lapply(res, mean)))
+}
+
+# we can do this in a second because R is speedy 
+perm_vips <- lapply(trained_models, function(x) permutation_importance(x, X_test, y_test, loss_mse, n_rounds = 30))
+pander::pander(perm_vips)
+``` 
+
+So, it looks like our importances are quite similar to the importances calculated by the models explicitly, so not a bad job! Lets go ahead and produce a nice plot!
+
+```{R, fig.align = "center", message = F, warn = F}
+library(tidyverse)
+vip_flat <- lapply(perm_vips, gather)
+
+# Finally an appropriate use of superassignment!!
+lapply(names(vip_flat), function(x) {
+  vip_flat[[x]][["model"]] <<- x
+})  %>% invisible
+
+do.call( rbind, vip_flat) %>% as.data.frame %>%
+  ggplot(aes(x = key, y = value, fill = model)) + geom_bar(stat = "identity") +
+  facet_grid(model ~ ., scales = "free") + coord_flip() + ggthemes::theme_fivethirtyeight() + 
+  ggthemes::scale_fill_fivethirtyeight() + ggtitle("Permutation Importance")
+```
+
+
+
+
+
+
+Looks like it worked alright!! Especially for random forest, we nicely identified the two most important features, however with little granularity. With our linear model, it is a little less clear, but we do see that the same three most important features carry through! However, we have no real granularity or idea the scale of the effect of the variable. We also carry a risk with permutation importance and correlated variables in general: we are using often unrealistic observations. For example, we may be looking a tiny boats (in length) which weigh the same as the largest boats (they would sink!!) with our permutations. This leads to often unreliable output with many permutation based tools, which we will also explore in this post.

@@ -31,5 +31,5 @@ navbar:
 output:
   html_document:
     theme: darkly
-    highlight: kate
+    highlight: breezedark
     df_print: paged

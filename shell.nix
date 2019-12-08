@@ -8,6 +8,7 @@ in
       rPackages.prettydoc
       rPackages.formatR
       rPackages.tswge
+      rPackages.neuralnet
       rPackages.vars
       rPackages.ggplot2
       rPackages.ggthemes
@@ -44,6 +45,22 @@ in
       rPackages.vars
       rPackages.RcppArmadillo
       rPackages.urca
+      rPackages.reticulate
+      rPackages.kknn
+      rPackages.ranger
+      rPackages.gbm
+      rPackages.gganimate
+      rPackages.transformr
+      rPackages.randomForest
+      rPackages.ggthemes
+      python37
+      python37Packages.pandas
+      python37Packages.numpy
+      python37Packages.scikitlearn
+      python37Packages.scipy
+      python37Packages.matplotlib
+      python37Packages.seaborn
+      python37Packages.pprintpp
       hugo
     ];
     shellHook = ''

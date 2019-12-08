@@ -12,7 +12,7 @@
 
 <meta name="author" content="David Josephs" />
 
-<meta name="date" content="2019-12-07" />
+<meta name="date" content="2019-12-08" />
 
 <title>Interpretable Machine Learning Part 1</title>
 
@@ -30,6 +30,101 @@
 <link href="site_libs/ionicons-2.0.1/css/ionicons.min.css" rel="stylesheet" />
 
 
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    background-color: #232629;
+    color: #7a7c7d;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #7a7c7d;  padding-left: 4px; }
+div.sourceCode
+  { color: #cfcfc2; background-color: #232629; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span. { color: #cfcfc2; } /* Normal */
+code span.al { color: #95da4c; } /* Alert */
+code span.an { color: #3f8058; } /* Annotation */
+code span.at { color: #2980b9; } /* Attribute */
+code span.bn { color: #f67400; } /* BaseN */
+code span.bu { color: #7f8c8d; } /* BuiltIn */
+code span.cf { color: #fdbc4b; } /* ControlFlow */
+code span.ch { color: #3daee9; } /* Char */
+code span.cn { color: #27aeae; } /* Constant */
+code span.co { color: #7a7c7d; } /* Comment */
+code span.cv { color: #7f8c8d; } /* CommentVar */
+code span.do { color: #a43340; } /* Documentation */
+code span.dt { color: #2980b9; } /* DataType */
+code span.dv { color: #f67400; } /* DecVal */
+code span.er { color: #da4453; } /* Error */
+code span.ex { color: #0099ff; } /* Extension */
+code span.fl { color: #f67400; } /* Float */
+code span.fu { color: #8e44ad; } /* Function */
+code span.im { color: #27ae60; } /* Import */
+code span.in { color: #c45b00; } /* Information */
+code span.kw { color: #cfcfc2; } /* Keyword */
+code span.op { color: #cfcfc2; } /* Operator */
+code span.ot { color: #27ae60; } /* Other */
+code span.pp { color: #27ae60; } /* Preprocessor */
+code span.re { color: #2980b9; } /* RegionMarker */
+code span.sc { color: #3daee9; } /* SpecialChar */
+code span.ss { color: #da4453; } /* SpecialString */
+code span.st { color: #f44f4f; } /* String */
+code span.va { color: #27aeae; } /* Variable */
+code span.vs { color: #da4453; } /* VerbatimString */
+code span.wa { color: #da4453; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
 
 
 <style type="text/css">
@@ -331,11 +426,26 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Interpretable Machine Learning Part 1</h1>
 <h4 class="author">David Josephs</h4>
-<h4 class="date">2019-12-07</h4>
+<h4 class="date">2019-12-08</h4>
 
 </div>
 
+<div id="TOC">
+<ul>
+<li><a href="#permutation-importance-math-and-intuition">Permutation Importance: Math and Intuition</a><ul>
+<li><a href="#formalization">Formalization</a></li>
+<li><a href="#code-implementation">Code Implementation</a><ul>
+<li><a href="#in-python">In Python</a></li>
+<li><a href="#in-r">In R</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
 
+<style>
+div.blue pre { background-color:lightblue; }
+div.blue pre.r { background-color:black; }
+</style>
 <p>In this blog post, we are going to talk about a few tools</p>
 <div id="permutation-importance-math-and-intuition" class="section level1">
 <h1>Permutation Importance: Math and Intuition</h1>
@@ -352,17 +462,542 @@ $(document).ready(function () {
 <li><p>Recalculate prediction loss</p></li>
 <li><p>Compare</p></li>
 </ol>
-<p><strong><em>COMING SOON</em></strong></p>
 <div id="formalization" class="section level2">
 <h2>Formalization</h2>
+<p>Lets formulate permutation importance mathematically now! First, lets define our data as the set <span class="math inline">\(x\)</span>, with <span class="math inline">\(m\)</span> observations and <span class="math inline">\(n\)</span> features. Next, lets consider two sets within <span class="math inline">\(x\)</span>: <span class="math inline">\(x_s\)</span> and <span class="math inline">\(x_c\)</span>. <span class="math inline">\(x_s\)</span> represents the feature(s) we are interested in, and <span class="math inline">\(x_c\)</span> represents the complement of <span class="math inline">\(x_s\)</span> (in english, everything else). Thus:</p>
+<p><span class="math display">\[x = (x_s, x_c)\]</span></p>
+<p>Lets first define the original loss with the original features as <span class="math inline">\(\mathcal{L}\)</span>,</p>
+<p><span class="math display">\[
+\mathcal{L} = \mathrm{loss}\left(x_s, x_c \right) 
+\]</span></p>
+<p>Next, we need to replace <span class="math inline">\(x_s\)</span> with noise. To do that, we want to sample the <em>marginal distribtion</em> of <span class="math inline">\(x_s\)</span>. This means we want to sample the distribution of <span class="math inline">\(x_s\)</span> <em>independent of other features</em>. With a reasonably sized dataset, we can just do a permutation of <span class="math inline">\(x_s\)</span> for more or less the same result. We will denote the permutation of <span class="math inline">\(x_s\)</span> as <span class="math inline">\(x_s^*\)</span>. Next, lets define the loss, <span class="math inline">\(\mathcal{L}*\)</span> of the permuted feature: <span class="math display">\[
+\mathcal{L}* = \mathrm{loss}\left(x_s^*, x_c \right)
+\]</span></p>
+<p>Finally, we can calculate the variable importance of <span class="math inline">\(x_s\)</span>:</p>
+<p><span class="math display">\[
+VIP_{\mathrm{perm}}(x_s) = \frac{\mathcal{L}*}{\mathcal{L}}
+\]</span></p>
+<p>There we go! Its that simple! An addendum to this suggested by Jeremy Howard of fast.ai: Add a feature of pure noise and see how important that is, for reference.</p>
 </div>
-<div id="code-implementation" class="section level2 tabset tabset-fade tabset-pills">
+<div id="code-implementation" class="section level2 tabset tabset-pills">
 <h2>Code Implementation</h2>
+<p>For our data, we will use the dataset discussed in <a href="https://medium.com/towards-artificial-intelligence/training-a-machine-learning-model-on-a-dataset-with-highly-correlated-features-debddf5b2e34">Benjamin Tayo’s amazing blog post</a>. We use this dataset because it presents a large challenge to us, with highly correlated features. This will show some of the pitfalls of some of our techniques.</p>
+<p>The goal with this dataset is to predict the number of crew members which will be on a cruise ship, given some paramters describing the ship. I believe the independent variables are fairly self explanatory. First, lets read the data into python and do a train test split:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="im">from</span> sklearn.neighbors <span class="im">import</span> KNeighborsRegressor</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> RandomForestRegressor</span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> load_boston, fetch_california_housing</span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-8"><a href="#cb1-8"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_squared_error <span class="im">as</span> loss_mse</span>
+<span id="cb1-10"><a href="#cb1-10"></a><span class="im">import</span> math</span>
+<span id="cb1-11"><a href="#cb1-11"></a><span class="im">import</span> statistics <span class="im">as</span> stats</span>
+<span id="cb1-12"><a href="#cb1-12"></a><span class="im">import</span> matplotlib.cm <span class="im">as</span> cm</span>
+<span id="cb1-13"><a href="#cb1-13"></a><span class="im">from</span> pprint <span class="im">import</span> pprint</span>
+<span id="cb1-14"><a href="#cb1-14"></a></span>
+<span id="cb1-15"><a href="#cb1-15"></a><span class="co"># so this is readable:</span></span>
+<span id="cb1-16"><a href="#cb1-16"></a><span class="im">import</span> warnings</span>
+<span id="cb1-17"><a href="#cb1-17"></a><span class="im">from</span> sklearn.exceptions <span class="im">import</span> DataConversionWarning, ConvergenceWarning</span>
+<span id="cb1-18"><a href="#cb1-18"></a>warnings.filterwarnings(action<span class="op">=</span><span class="st">&#39;ignore&#39;</span>, category<span class="op">=</span>DataConversionWarning)</span>
+<span id="cb1-19"><a href="#cb1-19"></a>warnings.simplefilter(action<span class="op">=</span><span class="st">&#39;ignore&#39;</span>, category<span class="op">=</span><span class="pp">FutureWarning</span>)</span>
+<span id="cb1-20"><a href="#cb1-20"></a>warnings.simplefilter(action<span class="op">=</span><span class="st">&#39;ignore&#39;</span>, category<span class="op">=</span>ConvergenceWarning)</span>
+<span id="cb1-21"><a href="#cb1-21"></a>cruise <span class="op">=</span> pd.read_csv(<span class="st">&quot;https://github.com/bot13956/ML_Model_for_Predicting_Ships_Crew_Size/raw/master/cruise_ship_info.csv&quot;</span>)</span>
+<span id="cb1-22"><a href="#cb1-22"></a></span>
+<span id="cb1-23"><a href="#cb1-23"></a></span>
+<span id="cb1-24"><a href="#cb1-24"></a>X <span class="op">=</span> cruise.loc[:, cruise.columns <span class="op">!=</span> <span class="st">&quot;crew&quot;</span>]</span>
+<span id="cb1-25"><a href="#cb1-25"></a>X <span class="op">=</span> X.loc[:, X.columns <span class="op">!=</span> <span class="st">&quot;Ship_name&quot;</span>]</span>
+<span id="cb1-26"><a href="#cb1-26"></a>X <span class="op">=</span> X.loc[:, X.columns <span class="op">!=</span> <span class="st">&quot;Cruise_line&quot;</span>]</span>
+<span id="cb1-27"><a href="#cb1-27"></a>y <span class="op">=</span> cruise.loc[:, cruise.columns <span class="op">==</span> <span class="st">&quot;crew&quot;</span>]</span>
+<span id="cb1-28"><a href="#cb1-28"></a></span>
+<span id="cb1-29"><a href="#cb1-29"></a></span>
+<span id="cb1-30"><a href="#cb1-30"></a><span class="kw">def</span> split(df, p_train <span class="op">=</span> <span class="fl">0.75</span>, random_state <span class="op">=</span> <span class="dv">0</span>):</span>
+<span id="cb1-31"><a href="#cb1-31"></a>    train <span class="op">=</span> df.sample(frac <span class="op">=</span> p_train, random_state <span class="op">=</span> random_state)</span>
+<span id="cb1-32"><a href="#cb1-32"></a>    test <span class="op">=</span> df.drop(train.index)</span>
+<span id="cb1-33"><a href="#cb1-33"></a>    <span class="cf">return</span>(train, test)</span>
+<span id="cb1-34"><a href="#cb1-34"></a></span>
+<span id="cb1-35"><a href="#cb1-35"></a>(X_train, X_test), (y_train, y_test) <span class="op">=</span> (split(x) <span class="cf">for</span> x <span class="kw">in</span> [X, y])</span></code></pre></div>
+<p>Next, lets use the amazing <code>reticulate</code> package to pass these exact data frames into R:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>X &lt;-<span class="st"> </span>py<span class="op">$</span>X</span>
+<span id="cb2-2"><a href="#cb2-2"></a>y &lt;-<span class="st"> </span>py<span class="op">$</span>y</span>
+<span id="cb2-3"><a href="#cb2-3"></a>X_train &lt;-<span class="st"> </span>py<span class="op">$</span>X_train</span>
+<span id="cb2-4"><a href="#cb2-4"></a>X_test &lt;-<span class="st"> </span>py<span class="op">$</span>X_test</span>
+<span id="cb2-5"><a href="#cb2-5"></a>y_train &lt;-<span class="st"> </span>py<span class="op">$</span>y_train</span>
+<span id="cb2-6"><a href="#cb2-6"></a>y_test &lt;-<span class="st"> </span>py<span class="op">$</span>y_test</span>
+<span id="cb2-7"><a href="#cb2-7"></a>X</span></code></pre></div>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["Age"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Tonnage"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["passengers"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["length"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["cabins"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["passenger_density"],"name":[6],"type":["dbl"],"align":["right"]}],"data":[{"1":"6","2":"30.277","3":"6.94","4":"5.94","5":"3.55","6":"42.64"},{"1":"6","2":"30.277","3":"6.94","4":"5.94","5":"3.55","6":"42.64"},{"1":"26","2":"47.262","3":"14.86","4":"7.22","5":"7.43","6":"31.80"},{"1":"11","2":"110.000","3":"29.74","4":"9.53","5":"14.88","6":"36.99"},{"1":"17","2":"101.353","3":"26.42","4":"8.92","5":"13.21","6":"38.36"},{"1":"22","2":"70.367","3":"20.52","4":"8.55","5":"10.20","6":"34.29"},{"1":"15","2":"70.367","3":"20.52","4":"8.55","5":"10.20","6":"34.29"},{"1":"23","2":"70.367","3":"20.56","4":"8.55","5":"10.22","6":"34.23"},{"1":"19","2":"70.367","3":"20.52","4":"8.55","5":"10.20","6":"34.29"},{"1":"6","2":"110.239","3":"37.00","4":"9.51","5":"14.87","6":"29.79"},{"1":"10","2":"110.000","3":"29.74","4":"9.51","5":"14.87","6":"36.99"},{"1":"28","2":"46.052","3":"14.52","4":"7.27","5":"7.26","6":"31.72"},{"1":"18","2":"70.367","3":"20.52","4":"8.55","5":"10.20","6":"34.29"},{"1":"17","2":"70.367","3":"20.52","4":"8.55","5":"10.20","6":"34.29"},{"1":"11","2":"86.000","3":"21.24","4":"9.63","5":"10.62","6":"40.49"},{"1":"8","2":"110.000","3":"29.74","4":"9.51","5":"14.87","6":"36.99"},{"1":"9","2":"88.500","3":"21.24","4":"9.63","5":"10.62","6":"41.67"},{"1":"15","2":"70.367","3":"20.52","4":"8.55","5":"10.20","6":"34.29"},{"1":"12","2":"88.500","3":"21.24","4":"9.63","5":"11.62","6":"41.67"},{"1":"20","2":"70.367","3":"20.52","4":"8.55","5":"10.20","6":"34.29"},{"1":"12","2":"88.500","3":"21.24","4":"9.63","5":"10.56","6":"41.67"},{"1":"14","2":"101.509","3":"27.58","4":"8.93","5":"13.21","6":"36.81"},{"1":"9","2":"110.000","3":"29.74","4":"9.52","5":"14.87","6":"36.99"},{"1":"13","2":"101.509","3":"27.58","4":"8.93","5":"13.79","6":"36.81"},{"1":"18","2":"70.606","3":"17.70","4":"8.15","5":"8.75","6":"39.89"},{"1":"11","2":"91.000","3":"20.32","4":"9.65","5":"9.75","6":"44.78"},{"1":"17","2":"77.713","3":"18.90","4":"8.66","5":"9.35","6":"41.12"},{"1":"12","2":"91.000","3":"20.32","4":"9.65","5":"9.75","6":"44.78"},{"1":"16","2":"77.713","3":"18.82","4":"8.66","5":"9.35","6":"41.29"},{"1":"13","2":"91.000","3":"20.32","4":"9.65","5":"9.75","6":"44.78"},{"1":"5","2":"122.000","3":"28.50","4":"10.33","5":"6.87","6":"34.57"},{"1":"12","2":"91.000","3":"20.32","4":"9.65","5":"9.75","6":"44.78"},{"1":"12","2":"2.329","3":"0.94","4":"2.96","5":"0.45","6":"24.78"},{"1":"21","2":"47.225","3":"13.66","4":"6.82","5":"6.87","6":"34.57"},{"1":"21","2":"28.430","3":"8.08","4":"6.16","5":"4.10","6":"35.19"},{"1":"13","2":"85.619","3":"21.14","4":"9.57","5":"10.56","6":"40.50"},{"1":"22","2":"52.926","3":"13.02","4":"7.18","5":"6.54","6":"40.65"},{"1":"27","2":"53.872","3":"14.94","4":"7.98","5":"7.67","6":"36.06"},{"1":"10","2":"105.000","3":"27.20","4":"8.90","5":"13.56","6":"38.60"},{"1":"9","2":"105.000","3":"27.20","4":"8.90","5":"13.56","6":"38.60"},{"1":"23","2":"25.000","3":"7.76","4":"6.22","5":"3.86","6":"32.22"},{"1":"10","2":"86.000","3":"21.14","4":"9.60","5":"10.56","6":"40.68"},{"1":"20","2":"53.049","3":"13.44","4":"7.22","5":"6.78","6":"39.47"},{"1":"6","2":"112.000","3":"38.00","4":"9.51","5":"15.00","6":"29.47"},{"1":"17","2":"75.166","3":"19.28","4":"8.28","5":"9.64","6":"38.99"},{"1":"10","2":"68.000","3":"10.80","4":"7.90","5":"5.50","6":"62.96"},{"1":"18","2":"51.004","3":"9.40","4":"7.81","5":"4.80","6":"54.26"},{"1":"44","2":"70.327","3":"17.91","4":"9.63","5":"9.50","6":"39.27"},{"1":"10","2":"151.400","3":"26.20","4":"11.32","5":"11.34","6":"57.79"},{"1":"6","2":"90.000","3":"20.00","4":"9.64","5":"10.29","6":"45.00"},{"1":"15","2":"83.338","3":"17.50","4":"9.64","5":"8.75","6":"47.62"},{"1":"14","2":"83.000","3":"17.50","4":"9.64","5":"8.75","6":"47.43"},{"1":"13","2":"61.000","3":"13.80","4":"7.80","5":"6.88","6":"44.20"},{"1":"5","2":"86.000","3":"21.04","4":"9.36","5":"10.22","6":"40.87"},{"1":"20","2":"55.451","3":"12.64","4":"7.19","5":"6.32","6":"43.87"},{"1":"29","2":"33.920","3":"12.14","4":"7.04","5":"6.07","6":"27.94"},{"1":"10","2":"81.769","3":"18.48","4":"9.59","5":"9.24","6":"44.25"},{"1":"25","2":"38.000","3":"7.49","4":"6.74","5":"3.96","6":"50.73"},{"1":"16","2":"59.652","3":"13.20","4":"7.77","5":"6.60","6":"45.19"},{"1":"19","2":"55.451","3":"12.66","4":"7.19","5":"6.33","6":"43.80"},{"1":"20","2":"55.451","3":"12.66","4":"7.19","5":"6.33","6":"43.80"},{"1":"17","2":"55.451","3":"12.66","4":"7.19","5":"6.33","6":"43.80"},{"1":"14","2":"63.000","3":"14.40","4":"7.77","5":"7.20","6":"43.75"},{"1":"27","2":"53.872","3":"14.94","4":"7.98","5":"7.47","6":"36.06"},{"1":"13","2":"63.000","3":"14.40","4":"7.77","5":"7.20","6":"43.75"},{"1":"11","2":"85.000","3":"18.48","4":"9.51","5":"9.24","6":"46.00"},{"1":"12","2":"58.600","3":"15.66","4":"8.24","5":"7.83","6":"37.42"},{"1":"5","2":"133.500","3":"39.59","4":"10.93","5":"16.37","6":"33.72"},{"1":"10","2":"58.825","3":"15.60","4":"8.23","5":"7.65","6":"37.71"},{"1":"31","2":"35.143","3":"12.50","4":"6.69","5":"5.32","6":"28.11"},{"1":"7","2":"89.600","3":"25.50","4":"9.61","5":"12.75","6":"35.14"},{"1":"9","2":"59.058","3":"17.00","4":"7.63","5":"8.50","6":"34.74"},{"1":"36","2":"16.852","3":"9.52","4":"5.41","5":"3.83","6":"17.70"},{"1":"11","2":"58.600","3":"15.66","4":"8.23","5":"7.83","6":"37.42"},{"1":"25","2":"34.250","3":"10.52","4":"6.15","5":"5.26","6":"32.56"},{"1":"11","2":"90.000","3":"22.40","4":"9.65","5":"11.20","6":"40.18"},{"1":"21","2":"50.760","3":"17.48","4":"7.54","5":"8.74","6":"29.04"},{"1":"6","2":"93.000","3":"23.94","4":"9.65","5":"11.97","6":"38.85"},{"1":"8","2":"91.000","3":"22.44","4":"9.65","5":"11.22","6":"40.55"},{"1":"21","2":"38.000","3":"10.56","4":"5.67","5":"5.28","6":"35.98"},{"1":"14","2":"77.104","3":"20.02","4":"8.53","5":"10.01","6":"38.51"},{"1":"9","2":"81.000","3":"21.44","4":"9.21","5":"10.72","6":"37.78"},{"1":"25","2":"42.000","3":"15.04","4":"7.08","5":"7.52","6":"27.93"},{"1":"15","2":"75.338","3":"19.56","4":"8.79","5":"9.83","6":"38.52"},{"1":"40","2":"28.000","3":"11.50","4":"6.74","5":"4.00","6":"24.35"},{"1":"12","2":"77.104","3":"20.02","4":"8.53","5":"10.01","6":"38.51"},{"1":"20","2":"50.760","3":"17.48","4":"7.54","5":"8.74","6":"29.04"},{"1":"15","2":"30.277","3":"6.84","4":"5.94","5":"3.42","6":"44.26"},{"1":"13","2":"30.277","3":"6.84","4":"5.94","5":"3.42","6":"44.26"},{"1":"15","2":"30.277","3":"6.84","4":"5.94","5":"3.42","6":"44.26"},{"1":"48","2":"22.080","3":"8.26","4":"5.78","5":"4.25","6":"26.73"},{"1":"9","2":"85.000","3":"19.68","4":"9.35","5":"9.84","6":"43.19"},{"1":"29","2":"45.000","3":"11.78","4":"7.54","5":"5.30","6":"38.20"},{"1":"13","2":"76.000","3":"18.74","4":"8.86","5":"9.39","6":"40.55"},{"1":"10","2":"77.000","3":"20.16","4":"8.56","5":"9.75","6":"38.19"},{"1":"18","2":"69.153","3":"18.82","4":"8.53","5":"9.14","6":"36.74"},{"1":"5","2":"115.000","3":"35.74","4":"9.00","5":"15.32","6":"32.18"},{"1":"9","2":"116.000","3":"26.00","4":"9.51","5":"13.00","6":"44.62"},{"1":"11","2":"91.627","3":"19.74","4":"9.64","5":"9.87","6":"46.42"},{"1":"7","2":"116.000","3":"31.00","4":"9.51","5":"15.57","6":"37.42"},{"1":"16","2":"77.499","3":"19.50","4":"8.56","5":"10.50","6":"39.74"},{"1":"9","2":"113.000","3":"26.74","4":"9.51","5":"13.37","6":"42.26"},{"1":"6","2":"113.000","3":"37.82","4":"9.51","5":"15.57","6":"29.88"},{"1":"12","2":"108.865","3":"27.58","4":"9.51","5":"13.00","6":"39.47"},{"1":"15","2":"108.806","3":"26.00","4":"9.51","5":"13.00","6":"41.85"},{"1":"10","2":"91.627","3":"19.74","4":"9.64","5":"9.87","6":"46.42"},{"1":"14","2":"30.277","3":"6.86","4":"5.93","5":"3.44","6":"44.14"},{"1":"22","2":"69.845","3":"15.90","4":"8.03","5":"7.95","6":"43.93"},{"1":"29","2":"44.348","3":"12.00","4":"7.54","5":"6.00","6":"36.96"},{"1":"9","2":"113.000","3":"26.74","4":"9.51","5":"13.37","6":"42.26"},{"1":"8","2":"77.499","3":"19.50","4":"8.56","5":"9.75","6":"39.74"},{"1":"11","2":"108.977","3":"26.02","4":"9.51","5":"13.01","6":"41.88"},{"1":"18","2":"77.499","3":"19.50","4":"8.56","5":"9.75","6":"39.74"},{"1":"14","2":"30.277","3":"6.88","4":"5.93","5":"3.44","6":"44.01"},{"1":"27","2":"12.500","3":"3.94","4":"4.36","5":"0.88","6":"31.73"},{"1":"12","2":"50.000","3":"7.00","4":"7.09","5":"3.54","6":"71.43"},{"1":"14","2":"33.000","3":"4.90","4":"5.60","5":"2.45","6":"67.35"},{"1":"16","2":"19.200","3":"3.20","4":"5.13","5":"1.60","6":"60.00"},{"1":"10","2":"46.000","3":"7.00","4":"6.70","5":"1.82","6":"65.71"},{"1":"12","2":"138.000","3":"31.14","4":"10.20","5":"15.57","6":"44.32"},{"1":"11","2":"90.090","3":"25.01","4":"9.62","5":"10.50","6":"36.02"},{"1":"23","2":"48.563","3":"20.20","4":"6.92","5":"8.00","6":"24.04"},{"1":"16","2":"74.137","3":"19.50","4":"9.16","5":"9.75","6":"38.02"},{"1":"13","2":"138.000","3":"31.14","4":"10.20","5":"15.57","6":"44.32"},{"1":"7","2":"158.000","3":"43.70","4":"11.12","5":"18.00","6":"36.16"},{"1":"17","2":"74.137","3":"19.50","4":"9.16","5":"9.75","6":"38.02"},{"1":"5","2":"160.000","3":"36.34","4":"11.12","5":"18.17","6":"44.03"},{"1":"9","2":"90.090","3":"25.01","4":"9.62","5":"10.94","6":"36.02"},{"1":"18","2":"70.000","3":"18.00","4":"8.67","5":"9.00","6":"38.89"},{"1":"6","2":"158.000","3":"43.70","4":"11.25","5":"18.00","6":"36.16"},{"1":"21","2":"73.941","3":"27.44","4":"8.80","5":"11.75","6":"26.95"},{"1":"10","2":"138.000","3":"31.14","4":"10.20","5":"15.57","6":"44.32"},{"1":"22","2":"73.941","3":"27.44","4":"8.80","5":"11.77","6":"30.94"},{"1":"11","2":"138.000","3":"31.14","4":"10.20","5":"15.57","6":"44.32"},{"1":"4","2":"220.000","3":"54.00","4":"11.82","5":"27.00","6":"40.74"},{"1":"12","2":"90.090","3":"25.01","4":"9.62","5":"10.50","6":"36.02"},{"1":"16","2":"78.491","3":"24.35","4":"9.15","5":"10.00","6":"32.23"},{"1":"10","2":"90.090","3":"25.01","4":"9.62","5":"10.50","6":"36.02"},{"1":"25","2":"73.192","3":"28.52","4":"8.80","5":"11.38","6":"25.66"},{"1":"17","2":"70.000","3":"20.76","4":"8.67","5":"9.02","6":"33.72"},{"1":"15","2":"78.491","3":"24.35","4":"9.15","5":"10.00","6":"32.23"},{"1":"14","2":"138.000","3":"31.14","4":"10.20","5":"15.57","6":"44.32"},{"1":"21","2":"10.000","3":"2.08","4":"4.40","5":"1.04","6":"48.08"},{"1":"27","2":"10.000","3":"2.08","4":"4.40","5":"1.04","6":"48.08"},{"1":"24","2":"10.000","3":"2.08","4":"4.40","5":"1.04","6":"48.08"},{"1":"19","2":"16.800","3":"2.96","4":"5.14","5":"1.48","6":"56.76"},{"1":"13","2":"25.000","3":"3.82","4":"5.97","5":"1.94","6":"65.45"},{"1":"12","2":"25.000","3":"3.88","4":"5.97","5":"1.94","6":"64.43"},{"1":"19","2":"16.800","3":"2.96","4":"5.14","5":"1.48","6":"56.76"},{"1":"22","2":"3.341","3":"0.66","4":"2.80","5":"0.33","6":"50.62"},{"1":"21","2":"19.093","3":"8.00","4":"5.37","5":"4.00","6":"23.87"},{"1":"12","2":"42.000","3":"14.80","4":"7.13","5":"7.40","6":"28.38"},{"1":"24","2":"40.053","3":"12.87","4":"5.79","5":"7.76","6":"31.12"},{"1":"22","2":"3.341","3":"0.66","4":"2.79","5":"0.33","6":"50.62"},{"1":"14","2":"76.800","3":"19.60","4":"8.79","5":"9.67","6":"39.18"},{"1":"25","2":"5.350","3":"1.58","4":"4.40","5":"0.74","6":"33.86"},{"1":"27","2":"5.350","3":"1.67","4":"4.40","5":"0.74","6":"32.04"},{"1":"23","2":"14.745","3":"3.08","4":"6.17","5":"1.56","6":"47.87"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p>Now we are all set up to implement permutation importance in python and in R</p>
+<p><br><br><br> (<strong><em>Click tabs below to change language!</em></strong>)</p>
 <div id="in-python" class="section level3">
 <h3>In Python</h3>
+<p>First, lets set up three models to test: A linear model, a neural network, and a random forest:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a>lm <span class="op">=</span> LinearRegression()</span>
+<span id="cb3-2"><a href="#cb3-2"></a>knn <span class="op">=</span> KNeighborsRegressor(<span class="dv">13</span>) </span>
+<span id="cb3-3"><a href="#cb3-3"></a>rf <span class="op">=</span> RandomForestRegressor(n_estimators <span class="op">=</span> <span class="dv">100</span>)</span>
+<span id="cb3-4"><a href="#cb3-4"></a></span>
+<span id="cb3-5"><a href="#cb3-5"></a>models <span class="op">=</span> [lm, knn, rf]</span>
+<span id="cb3-6"><a href="#cb3-6"></a></span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="cf">for</span> m <span class="kw">in</span> models:</span>
+<span id="cb3-8"><a href="#cb3-8"></a>  m.fit(X_train, y_train)</span></code></pre></div>
+<pre><code>#&gt; LinearRegression(copy_X=True, fit_intercept=True, n_jobs=None, normalize=False)
+#&gt; KNeighborsRegressor(algorithm=&#39;auto&#39;, leaf_size=30, metric=&#39;minkowski&#39;,
+#&gt;                     metric_params=None, n_jobs=None, n_neighbors=13, p=2,
+#&gt;                     weights=&#39;uniform&#39;)
+#&gt; RandomForestRegressor(bootstrap=True, criterion=&#39;mse&#39;, max_depth=None,
+#&gt;                       max_features=&#39;auto&#39;, max_leaf_nodes=None,
+#&gt;                       min_impurity_decrease=0.0, min_impurity_split=None,
+#&gt;                       min_samples_leaf=1, min_samples_split=2,
+#&gt;                       min_weight_fraction_leaf=0.0, n_estimators=100,
+#&gt;                       n_jobs=None, oob_score=False, random_state=None,
+#&gt;                       verbose=0, warm_start=False)</code></pre>
+<p>Lets check out as a baseline truth which features are important in the random forest, and the strength of the predictors in our linear regression:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a>pprint(<span class="bu">dict</span>(<span class="bu">zip</span>(X_train.columns, rf.feature_importances_)))</span></code></pre></div>
+<pre><code>#&gt; {&#39;Age&#39;: 0.013119682112048461,
+#&gt;  &#39;Tonnage&#39;: 0.3949729008182226,
+#&gt;  &#39;cabins&#39;: 0.41853212519072114,
+#&gt;  &#39;length&#39;: 0.06650122787981155,
+#&gt;  &#39;passenger_density&#39;: 0.014998475530267374,
+#&gt;  &#39;passengers&#39;: 0.09187558846892888}</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a>pprint({X_train.columns[i]: lm.coef_[:,i] <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(lm.coef_.shape[<span class="dv">1</span>])})</span></code></pre></div>
+<pre><code>#&gt; {&#39;Age&#39;: array([-0.01321228]),
+#&gt;  &#39;Tonnage&#39;: array([0.00316145]),
+#&gt;  &#39;cabins&#39;: array([0.79858261]),
+#&gt;  &#39;length&#39;: array([0.39111394]),
+#&gt;  &#39;passenger_density&#39;: array([0.01037499]),
+#&gt;  &#39;passengers&#39;: array([-0.1045376])}</code></pre>
+<p>Looks like tonnage and cabins are the most important variables for the random forest, and cabins, length, and passengers for linear regression.</p>
+<p>Next, lets create a function for permutation importance! This should be pretty easy to do, I have added in a few extra components for thoroughness, but the code is not hard:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">def</span> permutation_importance(model, x, y, loss, base <span class="op">=</span> <span class="va">False</span>, x_train <span class="op">=</span> <span class="va">None</span>, y_train <span class="op">=</span> <span class="va">None</span>, kind <span class="op">=</span> <span class="st">&quot;prop&quot;</span>, n_rounds <span class="op">=</span> <span class="dv">5</span>):</span>
+<span id="cb9-2"><a href="#cb9-2"></a>    explan <span class="op">=</span> x.columns</span>
+<span id="cb9-3"><a href="#cb9-3"></a>    baseline <span class="op">=</span> loss(y, model.predict(x))</span>
+<span id="cb9-4"><a href="#cb9-4"></a>    res <span class="op">=</span> {k:[] <span class="cf">for</span> k <span class="kw">in</span> explan}</span>
+<span id="cb9-5"><a href="#cb9-5"></a>    <span class="cf">if</span> (base <span class="kw">is</span> <span class="va">True</span>):</span>
+<span id="cb9-6"><a href="#cb9-6"></a>        res[<span class="st">&quot;baseline&quot;</span>] <span class="op">=</span> []</span>
+<span id="cb9-7"><a href="#cb9-7"></a>    <span class="cf">for</span> n <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, n_rounds):</span>
+<span id="cb9-8"><a href="#cb9-8"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="bu">len</span>(explan)):</span>
+<span id="cb9-9"><a href="#cb9-9"></a>            col <span class="op">=</span> explan[i]</span>
+<span id="cb9-10"><a href="#cb9-10"></a>            x_temp <span class="op">=</span> x.copy()</span>
+<span id="cb9-11"><a href="#cb9-11"></a>            x_temp[col] <span class="op">=</span>  np.random.permutation(x_temp[col])</span>
+<span id="cb9-12"><a href="#cb9-12"></a>            <span class="cf">if</span> (kind <span class="kw">is</span> <span class="kw">not</span> <span class="st">&quot;prop&quot;</span>):</span>
+<span id="cb9-13"><a href="#cb9-13"></a>                res[col].append(loss(y, model.predict(x_temp)) <span class="op">-</span>  baseline)</span>
+<span id="cb9-14"><a href="#cb9-14"></a>            <span class="cf">else</span>:</span>
+<span id="cb9-15"><a href="#cb9-15"></a>                res[col].append(loss(y, model.predict(x_temp)) <span class="op">/</span>  baseline)</span>
+<span id="cb9-16"><a href="#cb9-16"></a>        <span class="cf">if</span> (base <span class="kw">is</span> <span class="va">True</span>):</span>
+<span id="cb9-17"><a href="#cb9-17"></a>            x_temp <span class="op">=</span> x.copy()</span>
+<span id="cb9-18"><a href="#cb9-18"></a>            x_train2 <span class="op">=</span> x_train.copy()</span>
+<span id="cb9-19"><a href="#cb9-19"></a>            x_temp[<span class="st">&quot;baseline&quot;</span>] <span class="op">=</span> np.clip(np.random.normal(size <span class="op">=</span> <span class="bu">len</span>(x_temp)), <span class="fl">-1.</span>, <span class="fl">1.</span>)</span>
+<span id="cb9-20"><a href="#cb9-20"></a>            x_train2[<span class="st">&quot;baseline&quot;</span>] <span class="op">=</span> np.clip(np.random.normal(size <span class="op">=</span> <span class="bu">len</span>(x_train2)), <span class="fl">-1.</span>, <span class="fl">1.</span>)</span>
+<span id="cb9-21"><a href="#cb9-21"></a>            mod2 <span class="op">=</span> <span class="bu">type</span>(model)()</span>
+<span id="cb9-22"><a href="#cb9-22"></a>            mod2.fit(x_train2, y_train)</span>
+<span id="cb9-23"><a href="#cb9-23"></a>            <span class="cf">if</span> (kind <span class="kw">is</span> <span class="kw">not</span> <span class="st">&quot;prop&quot;</span>):</span>
+<span id="cb9-24"><a href="#cb9-24"></a>                res[<span class="st">&quot;baseline&quot;</span>].append(loss(y, mod2.predict(x_temp)) <span class="op">-</span>  baseline)</span>
+<span id="cb9-25"><a href="#cb9-25"></a>            <span class="cf">else</span>:</span>
+<span id="cb9-26"><a href="#cb9-26"></a>                res[<span class="st">&quot;baseline&quot;</span>].append(loss(y, mod2.predict(x_temp)) <span class="op">/</span>  baseline)</span>
+<span id="cb9-27"><a href="#cb9-27"></a>    <span class="cf">return</span>(pd.DataFrame.from_dict(res))</span></code></pre></div>
+<p>Lets also define a helper function to help us do this for all our models, and then go ahead and calculate the importances!</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># convert object name to string!</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="kw">def</span> get_name(obj):</span>
+<span id="cb10-3"><a href="#cb10-3"></a>    name <span class="op">=</span>[x <span class="cf">for</span> x <span class="kw">in</span> <span class="bu">globals</span>() <span class="cf">if</span> <span class="bu">globals</span>()[x] <span class="kw">is</span> obj][<span class="dv">0</span>]</span>
+<span id="cb10-4"><a href="#cb10-4"></a>    <span class="cf">return</span>(name)</span>
+<span id="cb10-5"><a href="#cb10-5"></a></span>
+<span id="cb10-6"><a href="#cb10-6"></a>imps <span class="op">=</span> {}</span>
+<span id="cb10-7"><a href="#cb10-7"></a><span class="cf">for</span> m <span class="kw">in</span> models:</span>
+<span id="cb10-8"><a href="#cb10-8"></a>    imps[get_name(m)] <span class="op">=</span> permutation_importance(m, X_test, y_test, loss_mse, <span class="va">True</span>,  X_train, y_train, n_rounds <span class="op">=</span> <span class="dv">5</span>)</span>
+<span id="cb10-9"><a href="#cb10-9"></a>pprint(imps)</span></code></pre></div>
+<pre><code>#&gt; {&#39;knn&#39;:         Age    Tonnage  passengers    length    cabins  passenger_density  baseline
+#&gt; 0  0.904846  21.227473    1.095418  0.991048  1.047782           1.201898  1.437909
+#&gt; 1  0.933409  20.076817    1.239120  1.005116  0.964745           1.319825  1.307646
+#&gt; 2  0.857731  20.391907    1.368085  1.014068  0.966126           1.395717  1.298623
+#&gt; 3  0.957669  19.791686    1.284885  1.005116  0.982118           1.344682  1.305520
+#&gt; 4  0.894280  12.471207    1.339701  1.005519  1.013681           1.426535  1.311211,
+#&gt;  &#39;lm&#39;:         Age   Tonnage  passengers    length     cabins  passenger_density  baseline
+#&gt; 0  0.985331  1.079901    7.840429  4.393997  64.807813           1.112839  0.970219
+#&gt; 1  0.960415  1.015112    7.038711  4.349526  79.508573           1.150089  0.983449
+#&gt; 2  1.026558  1.089876    6.646655  4.719806  69.885430           1.087388  1.013224
+#&gt; 3  1.061575  1.083981    6.487603  3.496625  79.700783           1.125177  1.018032
+#&gt; 4  1.112396  0.992705    7.151765  4.868272  77.002066           1.037946  1.012768,
+#&gt;  &#39;rf&#39;:         Age    Tonnage  passengers    length     cabins  passenger_density  baseline
+#&gt; 0  1.156308  14.579041    2.390810  3.266574  11.728786           1.651785  1.529226
+#&gt; 1  1.129262  13.828749    2.682880  2.908450  14.950558           1.352273  1.944743
+#&gt; 2  1.161423  11.956569    2.165861  1.992307  20.783301           1.433651  1.141467
+#&gt; 3  1.162300  11.425421    2.301585  1.679158  18.302634           1.384981  1.817001
+#&gt; 4  1.197191  14.610470    1.644158  2.539609  18.335109           1.603873  1.587114}</code></pre>
+<p>This output is a bit hard to read, so lets go ahead and write a helper function which averages the importances, and plots them nicely!</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1"></a>plt.style.use(<span class="st">&quot;ggplot&quot;</span>)</span>
+<span id="cb12-2"><a href="#cb12-2"></a><span class="kw">def</span> plot_perm_imp(df, ax <span class="op">=</span> <span class="va">None</span>, color <span class="op">=</span> <span class="st">&#39;blue&#39;</span>):</span>
+<span id="cb12-3"><a href="#cb12-3"></a>    <span class="co"># mean the columns and put it back into a data frame</span></span>
+<span id="cb12-4"><a href="#cb12-4"></a>    df1 <span class="op">=</span> (df.<span class="bu">apply</span>(stats.mean, <span class="dv">0</span>, result_type <span class="op">=</span> <span class="st">&quot;broadcast&quot;</span>)).drop(df.index[<span class="dv">1</span>:])</span>
+<span id="cb12-5"><a href="#cb12-5"></a>    <span class="co"># create a new data frame excluding baseline, so we can do something special with it</span></span>
+<span id="cb12-6"><a href="#cb12-6"></a>    df_temp <span class="op">=</span> df1.loc[:, df.columns <span class="op">!=</span> <span class="st">&#39;baseline&#39;</span>]</span>
+<span id="cb12-7"><a href="#cb12-7"></a>    <span class="co"># melt and sort it for plotting</span></span>
+<span id="cb12-8"><a href="#cb12-8"></a>    df2 <span class="op">=</span> df_temp.melt(var_name <span class="op">=</span> <span class="st">&#39;variable&#39;</span>, value_name <span class="op">=</span> <span class="st">&#39;importance&#39;</span>)</span>
+<span id="cb12-9"><a href="#cb12-9"></a>    df2 <span class="op">=</span> df2.sort_values(by <span class="op">=</span> <span class="st">&quot;importance&quot;</span>)</span>
+<span id="cb12-10"><a href="#cb12-10"></a>    <span class="co"># plot it nicely</span></span>
+<span id="cb12-11"><a href="#cb12-11"></a>    df2.plot(kind <span class="op">=</span> <span class="st">&#39;barh&#39;</span>, x <span class="op">=</span> <span class="st">&#39;variable&#39;</span>, y <span class="op">=</span> <span class="st">&#39;importance&#39;</span>, width <span class="op">=</span> <span class="fl">0.8</span>, ax <span class="op">=</span> ax, color <span class="op">=</span> color)</span>
+<span id="cb12-12"><a href="#cb12-12"></a>    <span class="co"># draw a bar and an arrow to baseline</span></span>
+<span id="cb12-13"><a href="#cb12-13"></a>    <span class="cf">for</span> n <span class="kw">in</span> df1.columns:</span>
+<span id="cb12-14"><a href="#cb12-14"></a>        <span class="cf">if</span> n <span class="kw">is</span> <span class="st">&quot;baseline&quot;</span>:</span>
+<span id="cb12-15"><a href="#cb12-15"></a>            plt.axvline(x <span class="op">=</span> df1[n][<span class="dv">0</span>])</span>
+<span id="cb12-16"><a href="#cb12-16"></a>            plt.annotate(<span class="st">&#39;baseline&#39;</span>,</span>
+<span id="cb12-17"><a href="#cb12-17"></a>                         xy <span class="op">=</span> (df1[n][<span class="dv">0</span>], <span class="dv">1</span>),</span>
+<span id="cb12-18"><a href="#cb12-18"></a>                         xytext <span class="op">=</span> (df1[n][<span class="dv">0</span>] <span class="op">+</span> <span class="fl">0.4</span>, <span class="dv">3</span>),</span>
+<span id="cb12-19"><a href="#cb12-19"></a>                         arrowprops <span class="op">=</span> <span class="bu">dict</span>(facecolor <span class="op">=</span> <span class="st">&#39;black&#39;</span>,</span>
+<span id="cb12-20"><a href="#cb12-20"></a>                                           shrink <span class="op">=</span> <span class="fl">0.05</span>),</span>
+<span id="cb12-21"><a href="#cb12-21"></a>                         bbox <span class="op">=</span> <span class="bu">dict</span>(boxstyle <span class="op">=</span> <span class="st">&quot;square&quot;</span>, fc <span class="op">=</span> (<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>)))</span>
+<span id="cb12-22"><a href="#cb12-22"></a></span>
+<span id="cb12-23"><a href="#cb12-23"></a></span>
+<span id="cb12-24"><a href="#cb12-24"></a><span class="co"># plot the importance dict!</span></span>
+<span id="cb12-25"><a href="#cb12-25"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">10</span>))</span>
+<span id="cb12-26"><a href="#cb12-26"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(imps.keys())):</span>
+<span id="cb12-27"><a href="#cb12-27"></a>    ax <span class="op">=</span> fig.add_subplot(<span class="bu">len</span>(<span class="bu">list</span>(imps.keys())),<span class="dv">1</span>, i<span class="op">+</span><span class="dv">1</span>)</span>
+<span id="cb12-28"><a href="#cb12-28"></a>    c <span class="op">=</span> sns.color_palette(<span class="st">&quot;hls&quot;</span>, i<span class="op">+</span><span class="dv">1</span>)[i]</span>
+<span id="cb12-29"><a href="#cb12-29"></a>    plot_perm_imp(imps[<span class="bu">list</span>(imps.keys())[i]], ax <span class="op">=</span> ax, color <span class="op">=</span> c)</span>
+<span id="cb12-30"><a href="#cb12-30"></a>    ax.set_title(<span class="bu">list</span>(imps.keys())[i])</span>
+<span id="cb12-31"><a href="#cb12-31"></a>    <span class="cf">for</span> tick <span class="kw">in</span> ax.yaxis.get_major_ticks():</span>
+<span id="cb12-32"><a href="#cb12-32"></a>      tick.label.set_fontsize(<span class="st">&quot;x-small&quot;</span>)</span>
+<span id="cb12-33"><a href="#cb12-33"></a>      tick.label.set_rotation(<span class="dv">45</span>)</span>
+<span id="cb12-34"><a href="#cb12-34"></a>plt.show()</span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="iml_files/figure-html/unnamed-chunk-7-1.svg" alt="Permutation Importances for linear regression, knn, and a random forest"  />
+<p class="caption">
+Permutation Importances for linear regression, knn, and a random forest
+</p>
+</div>
+<p>Looks like it worked alright!! Especially for random forest, we nicely identified the two most important features, however with little granularity. With our linear model, it is a little less clear, but we do see that the same three most important features carry through! However, we have no real granularity or idea the scale of the effect of the variable. We also carry a risk with permutation importance and correlated variables in general: we are using often unrealistic observations. For example, we may be looking a tiny boats (in length) which weigh the same as the largest boats (they would sink!!) with our permutations. This leads to often unreliable output with many permutation based tools, which we will also explore in this post.</p>
 </div>
 <div id="in-r" class="section level3">
 <h3>In R</h3>
+<p>First, lets set up three models to test: A linear model, a knn model, and a random forest:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="kw">library</span>(randomForest)</span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="kw">library</span>(kknn)</span>
+<span id="cb13-3"><a href="#cb13-3"></a></span>
+<span id="cb13-4"><a href="#cb13-4"></a><span class="co"># set up models with parameters</span></span>
+<span id="cb13-5"><a href="#cb13-5"></a>rf &lt;-<span class="st"> </span><span class="cf">function</span>(df) {</span>
+<span id="cb13-6"><a href="#cb13-6"></a>  <span class="kw">return</span>(<span class="kw">randomForest</span>(crew <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> df, <span class="dt">ntree =</span> <span class="dv">100</span>))</span>
+<span id="cb13-7"><a href="#cb13-7"></a>}</span>
+<span id="cb13-8"><a href="#cb13-8"></a></span>
+<span id="cb13-9"><a href="#cb13-9"></a><span class="co"># knn in R is annoying so we will need to a consistent api ourselves:</span></span>
+<span id="cb13-10"><a href="#cb13-10"></a></span>
+<span id="cb13-11"><a href="#cb13-11"></a>knn &lt;-<span class="st"> </span><span class="cf">function</span>(df) {</span>
+<span id="cb13-12"><a href="#cb13-12"></a>  res &lt;-<span class="st"> </span><span class="kw">list</span>()</span>
+<span id="cb13-13"><a href="#cb13-13"></a>  res<span class="op">$</span>train &lt;-<span class="st"> </span>df</span>
+<span id="cb13-14"><a href="#cb13-14"></a>  res<span class="op">$</span>k &lt;-<span class="st"> </span><span class="dv">13</span></span>
+<span id="cb13-15"><a href="#cb13-15"></a>  res &lt;-<span class="st"> </span><span class="kw">structure</span>(res, <span class="dt">class =</span> <span class="st">&quot;knn&quot;</span>)</span>
+<span id="cb13-16"><a href="#cb13-16"></a>}</span>
+<span id="cb13-17"><a href="#cb13-17"></a></span>
+<span id="cb13-18"><a href="#cb13-18"></a>predict.knn &lt;-<span class="st"> </span><span class="cf">function</span>(obj, newdata) {</span>
+<span id="cb13-19"><a href="#cb13-19"></a>  out &lt;-<span class="st">  </span><span class="kw">kknn</span>(crew <span class="op">~</span><span class="st"> </span>., <span class="dt">train =</span> obj<span class="op">$</span>train, <span class="dt">test =</span> newdata, <span class="dt">k =</span> <span class="dv">13</span>)</span>
+<span id="cb13-20"><a href="#cb13-20"></a>  <span class="kw">return</span>(<span class="kw">as.numeric</span>(out<span class="op">$</span>fitted.values))</span>
+<span id="cb13-21"><a href="#cb13-21"></a>}</span>
+<span id="cb13-22"><a href="#cb13-22"></a></span>
+<span id="cb13-23"><a href="#cb13-23"></a>linear_model &lt;-<span class="st"> </span><span class="cf">function</span>(df) {</span>
+<span id="cb13-24"><a href="#cb13-24"></a>  <span class="kw">lm</span>(crew <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> df)</span>
+<span id="cb13-25"><a href="#cb13-25"></a>}</span>
+<span id="cb13-26"><a href="#cb13-26"></a></span>
+<span id="cb13-27"><a href="#cb13-27"></a>models &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="st">&quot;lm&quot;</span> =<span class="st"> </span>linear_model,<span class="st">&quot;knn&quot;</span>=<span class="st"> </span>knn,<span class="st">&quot;rf&quot;</span>=<span class="st"> </span>rf)</span>
+<span id="cb13-28"><a href="#cb13-28"></a></span>
+<span id="cb13-29"><a href="#cb13-29"></a>t_train &lt;-<span class="st"> </span><span class="kw">cbind</span>(X_train, y_train)</span>
+<span id="cb13-30"><a href="#cb13-30"></a></span>
+<span id="cb13-31"><a href="#cb13-31"></a>trained_models &lt;-<span class="st"> </span><span class="kw">lapply</span>(models, <span class="cf">function</span>(f) <span class="kw">f</span>(t_train))</span></code></pre></div>
+<p>Lets check out as a baseline truth which features are important in the random forest, and the strength of the predictors in our linear regression:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>pander<span class="op">::</span><span class="kw">pander</span>(<span class="kw">summary</span>(trained_models[[<span class="st">&quot;lm&quot;</span>]]))</span></code></pre></div>
+<table style="width:96%;">
+<colgroup>
+<col width="33%" />
+<col width="15%" />
+<col width="18%" />
+<col width="13%" />
+<col width="15%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">Estimate</th>
+<th align="center">Std. Error</th>
+<th align="center">t value</th>
+<th align="center">Pr(&gt;|t|)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>(Intercept)</strong></td>
+<td align="center">-0.9349</td>
+<td align="center">1.878</td>
+<td align="center">-0.4977</td>
+<td align="center">0.6197</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>Age</strong></td>
+<td align="center">-0.01321</td>
+<td align="center">0.02083</td>
+<td align="center">-0.6343</td>
+<td align="center">0.5272</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>Tonnage</strong></td>
+<td align="center">0.003161</td>
+<td align="center">0.01692</td>
+<td align="center">0.1868</td>
+<td align="center">0.8522</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>passengers</strong></td>
+<td align="center">-0.1045</td>
+<td align="center">0.06831</td>
+<td align="center">-1.53</td>
+<td align="center">0.1288</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>length</strong></td>
+<td align="center">0.3911</td>
+<td align="center">0.1624</td>
+<td align="center">2.409</td>
+<td align="center">0.01765</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>cabins</strong></td>
+<td align="center">0.7986</td>
+<td align="center">0.1058</td>
+<td align="center">7.545</td>
+<td align="center">1.34e-11</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>passenger_density</strong></td>
+<td align="center">0.01037</td>
+<td align="center">0.02618</td>
+<td align="center">0.3963</td>
+<td align="center">0.6927</td>
+</tr>
+</tbody>
+</table>
+<table style="width:86%;">
+<caption>Fitting linear model: crew ~ .</caption>
+<colgroup>
+<col width="20%" />
+<col width="30%" />
+<col width="11%" />
+<col width="23%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Observations</th>
+<th align="center">Residual Std. Error</th>
+<th align="center"><span class="math inline">\(R^2\)</span></th>
+<th align="center">Adjusted <span class="math inline">\(R^2\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">118</td>
+<td align="center">1.089</td>
+<td align="center">0.906</td>
+<td align="center">0.9009</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>pander<span class="op">::</span><span class="kw">pander</span>(<span class="kw">importance</span>(trained_models<span class="op">$</span>rf))</span></code></pre></div>
+<table style="width:56%;">
+<colgroup>
+<col width="33%" />
+<col width="22%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">IncNodePurity</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>Age</strong></td>
+<td align="center">80.33</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>Tonnage</strong></td>
+<td align="center">362.7</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>passengers</strong></td>
+<td align="center">271.5</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>length</strong></td>
+<td align="center">267.6</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>cabins</strong></td>
+<td align="center">373.6</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>passenger_density</strong></td>
+<td align="center">23.57</td>
+</tr>
+</tbody>
+</table>
+<p>Looks like tonnage and cabins are the most important variables for the random forest, and cabins, length, and passengers for linear regression.</p>
+<p>Next, lets create a function for permutation importance! This should be pretty easy to do, I have added in a few extra components for thoroughness, but the code is not hard:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="co"># loss function</span></span>
+<span id="cb16-2"><a href="#cb16-2"></a>loss_mse &lt;-<span class="st"> </span><span class="cf">function</span>(truth, preds) {</span>
+<span id="cb16-3"><a href="#cb16-3"></a>  error &lt;-<span class="st"> </span>truth <span class="op">-</span><span class="st"> </span>preds</span>
+<span id="cb16-4"><a href="#cb16-4"></a>  square_error &lt;-<span class="st"> </span>error<span class="op">^</span><span class="dv">2</span></span>
+<span id="cb16-5"><a href="#cb16-5"></a>  <span class="kw">return</span>(<span class="kw">mean</span>(square_error))</span>
+<span id="cb16-6"><a href="#cb16-6"></a>}</span>
+<span id="cb16-7"><a href="#cb16-7"></a></span>
+<span id="cb16-8"><a href="#cb16-8"></a><span class="co"># get baseline loss</span></span>
+<span id="cb16-9"><a href="#cb16-9"></a>get_loss &lt;-<span class="st"> </span><span class="cf">function</span>(model, x, y, loss) {</span>
+<span id="cb16-10"><a href="#cb16-10"></a>  <span class="kw">loss</span>(y, <span class="kw">predict</span>(model, x))</span>
+<span id="cb16-11"><a href="#cb16-11"></a>}</span>
+<span id="cb16-12"><a href="#cb16-12"></a></span>
+<span id="cb16-13"><a href="#cb16-13"></a>models[[<span class="dv">1</span>]]</span></code></pre></div>
+<pre><code>#&gt; function(df) {
+#&gt;   lm(crew ~ ., data = df)
+#&gt; }</code></pre>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="kw">mean</span>((<span class="kw">predict</span>(trained_models[[<span class="dv">1</span>]], X_test) <span class="op">-</span><span class="st"> </span>y_test[[<span class="dv">1</span>]])<span class="op">^</span><span class="dv">2</span>)</span></code></pre></div>
+<pre><code>#&gt; [1] 0.3811438</code></pre>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="kw">loss_mse</span>(y_test, <span class="kw">predict</span>(trained_models[[<span class="dv">1</span>]], X_test))</span></code></pre></div>
+<pre><code>#&gt; Warning in mean.default(square_error): argument is not numeric or logical:
+#&gt; returning NA</code></pre>
+<pre><code>#&gt; [1] NA</code></pre>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="co"># permute a single column</span></span>
+<span id="cb23-2"><a href="#cb23-2"></a>permute_column &lt;-<span class="st"> </span><span class="cf">function</span>(df, col) {</span>
+<span id="cb23-3"><a href="#cb23-3"></a>  df[[col]] &lt;-<span class="st"> </span>df[[col]][<span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(df))]</span>
+<span id="cb23-4"><a href="#cb23-4"></a>  <span class="kw">return</span>(df)</span>
+<span id="cb23-5"><a href="#cb23-5"></a>}</span>
+<span id="cb23-6"><a href="#cb23-6"></a></span>
+<span id="cb23-7"><a href="#cb23-7"></a></span>
+<span id="cb23-8"><a href="#cb23-8"></a>permutation_importance &lt;-<span class="st"> </span><span class="cf">function</span>(model, x, y, loss, <span class="dt">x_train =</span> <span class="ot">NA</span>, <span class="dt">y_train =</span> <span class="ot">NA</span>, <span class="dt">n_rounds =</span> <span class="dv">5</span>) {</span>
+<span id="cb23-9"><a href="#cb23-9"></a>  baseline &lt;-<span class="st"> </span><span class="kw">get_loss</span>(model, x, y[[<span class="dv">1</span>]], loss)</span>
+<span id="cb23-10"><a href="#cb23-10"></a>  explan &lt;-<span class="st"> </span><span class="kw">names</span>(x)</span>
+<span id="cb23-11"><a href="#cb23-11"></a>  single_round_imp &lt;-<span class="st"> </span><span class="cf">function</span>(df) {</span>
+<span id="cb23-12"><a href="#cb23-12"></a>    dfs &lt;-<span class="st"> </span><span class="kw">lapply</span>(explan, <span class="cf">function</span>(i) <span class="kw">permute_column</span>(x, i))</span>
+<span id="cb23-13"><a href="#cb23-13"></a>    <span class="kw">return</span>(<span class="kw">vapply</span>(dfs, <span class="cf">function</span>(i) <span class="kw">get_loss</span>(model, i, y[[<span class="dv">1</span>]], loss), <span class="kw">numeric</span>(<span class="dv">1</span>)))</span>
+<span id="cb23-14"><a href="#cb23-14"></a>  }</span>
+<span id="cb23-15"><a href="#cb23-15"></a>  res &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="dv">1</span><span class="op">:</span>n_rounds, <span class="cf">function</span>(x) <span class="kw">single_round_imp</span>(df))</span>
+<span id="cb23-16"><a href="#cb23-16"></a>  res &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">do.call</span>(rbind, res))</span>
+<span id="cb23-17"><a href="#cb23-17"></a>  res &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">lapply</span>(res, <span class="cf">function</span>(x) x<span class="op">/</span>baseline))</span>
+<span id="cb23-18"><a href="#cb23-18"></a>  <span class="kw">names</span>(res) &lt;-<span class="st"> </span><span class="kw">names</span>(x)</span>
+<span id="cb23-19"><a href="#cb23-19"></a>  <span class="kw">return</span>(<span class="kw">as.data.frame</span>(<span class="kw">lapply</span>(res, mean)))</span>
+<span id="cb23-20"><a href="#cb23-20"></a>}</span>
+<span id="cb23-21"><a href="#cb23-21"></a></span>
+<span id="cb23-22"><a href="#cb23-22"></a><span class="co"># we can do this in a second because R is speedy </span></span>
+<span id="cb23-23"><a href="#cb23-23"></a>perm_vips &lt;-<span class="st"> </span><span class="kw">lapply</span>(trained_models, <span class="cf">function</span>(x) <span class="kw">permutation_importance</span>(x, X_test, y_test, loss_mse, <span class="dt">n_rounds =</span> <span class="dv">30</span>))</span>
+<span id="cb23-24"><a href="#cb23-24"></a>pander<span class="op">::</span><span class="kw">pander</span>(perm_vips)</span></code></pre></div>
+<ul>
+<li><p><strong>lm</strong>:</p>
+<table style="width:96%;">
+<colgroup>
+<col width="11%" />
+<col width="13%" />
+<col width="18%" />
+<col width="12%" />
+<col width="12%" />
+<col width="27%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Age</th>
+<th align="center">Tonnage</th>
+<th align="center">passengers</th>
+<th align="center">length</th>
+<th align="center">cabins</th>
+<th align="center">passenger_density</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1.033</td>
+<td align="center">1.048</td>
+<td align="center">7.264</td>
+<td align="center">4.344</td>
+<td align="center">68.92</td>
+<td align="center">1.076</td>
+</tr>
+</tbody>
+</table></li>
+<li><p><strong>knn</strong>:</p>
+<table style="width:96%;">
+<colgroup>
+<col width="11%" />
+<col width="13%" />
+<col width="18%" />
+<col width="12%" />
+<col width="12%" />
+<col width="27%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Age</th>
+<th align="center">Tonnage</th>
+<th align="center">passengers</th>
+<th align="center">length</th>
+<th align="center">cabins</th>
+<th align="center">passenger_density</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1.247</td>
+<td align="center">1.854</td>
+<td align="center">2.101</td>
+<td align="center">3.125</td>
+<td align="center">2.807</td>
+<td align="center">1.258</td>
+</tr>
+</tbody>
+</table></li>
+<li><p><strong>rf</strong>:</p>
+<table style="width:96%;">
+<colgroup>
+<col width="11%" />
+<col width="13%" />
+<col width="18%" />
+<col width="12%" />
+<col width="12%" />
+<col width="27%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Age</th>
+<th align="center">Tonnage</th>
+<th align="center">passengers</th>
+<th align="center">length</th>
+<th align="center">cabins</th>
+<th align="center">passenger_density</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1.094</td>
+<td align="center">5.539</td>
+<td align="center">4.138</td>
+<td align="center">3.888</td>
+<td align="center">7.491</td>
+<td align="center">1.393</td>
+</tr>
+</tbody>
+</table></li>
+</ul>
+<!-- end of list -->
+<p>So, it looks like our importances are quite similar to the importances calculated by the models explicitly, so not a bad job! Lets go ahead and produce a nice plot!</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a><span class="kw">library</span>(tidyverse)</span>
+<span id="cb24-2"><a href="#cb24-2"></a>vip_flat &lt;-<span class="st"> </span><span class="kw">lapply</span>(perm_vips, gather)</span>
+<span id="cb24-3"><a href="#cb24-3"></a></span>
+<span id="cb24-4"><a href="#cb24-4"></a><span class="co"># Finally an appropriate use of superassignment!!</span></span>
+<span id="cb24-5"><a href="#cb24-5"></a><span class="kw">lapply</span>(<span class="kw">names</span>(vip_flat), <span class="cf">function</span>(x) {</span>
+<span id="cb24-6"><a href="#cb24-6"></a>  vip_flat[[x]][[<span class="st">&quot;model&quot;</span>]] &lt;&lt;-<span class="st"> </span>x</span>
+<span id="cb24-7"><a href="#cb24-7"></a>})  <span class="op">%&gt;%</span><span class="st"> </span>invisible</span>
+<span id="cb24-8"><a href="#cb24-8"></a></span>
+<span id="cb24-9"><a href="#cb24-9"></a><span class="kw">do.call</span>( rbind, vip_flat) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame <span class="op">%&gt;%</span></span>
+<span id="cb24-10"><a href="#cb24-10"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> key, <span class="dt">y =</span> value, <span class="dt">fill =</span> model)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_bar</span>(<span class="dt">stat =</span> <span class="st">&quot;identity&quot;</span>) <span class="op">+</span></span>
+<span id="cb24-11"><a href="#cb24-11"></a><span class="st">  </span><span class="kw">facet_grid</span>(model <span class="op">~</span><span class="st"> </span>., <span class="dt">scales =</span> <span class="st">&quot;free&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">coord_flip</span>() <span class="op">+</span><span class="st"> </span>ggthemes<span class="op">::</span><span class="kw">theme_fivethirtyeight</span>() <span class="op">+</span><span class="st"> </span></span>
+<span id="cb24-12"><a href="#cb24-12"></a><span class="st">  </span>ggthemes<span class="op">::</span><span class="kw">scale_fill_fivethirtyeight</span>() <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">&quot;Permutation Importance&quot;</span>)</span></code></pre></div>
+<p><img src="iml_files/figure-html/unnamed-chunk-11-1.svg" width="672" style="display: block; margin: auto;" /></p>
+<p>Looks like it worked alright!! Especially for random forest, we nicely identified the two most important features, however with little granularity. With our linear model, it is a little less clear, but we do see that the same three most important features carry through! However, we have no real granularity or idea the scale of the effect of the variable. We also carry a risk with permutation importance and correlated variables in general: we are using often unrealistic observations. For example, we may be looking a tiny boats (in length) which weigh the same as the largest boats (they would sink!!) with our permutations. This leads to often unreliable output with many permutation based tools, which we will also explore in this post.</p>
 </div>
 </div>
 </div>
