@@ -403,9 +403,10 @@ Where $\mathbb{P}_c$ is the marginal distribution of $x_c$, $\int p(x)dx_s$.
 
 We can then formulate this for a finite set of $n$ features using the Monte Carlo method:
 
-$$\widetilde {\mathrm{PDP}} (x_s) = \frac{1}{n} \sum_{i=1}^{i=k} \hat f (x_s, x_c^{(i)})$$
+$$\widetilde {\mathrm{PDP}} (x_j) = \frac{1}{n} \sum_{i=1}^{i=k} \hat f (x_j, x_{\setdiff j}^{(i)})$$
 
-where $x_c^{(i)}$ is a distinct observation(row) of $x_c$
+Note the change in notation we use when we move from the infinite world of derivatives to the finite world of sums, $x_j$ represents the feature(s) we are interested in, and $x_{\setdiff j}$ is set notation for "all the other features", that is $x_{\setdiff j}$ is the complement of $x_j$. $x_{\setdiff j}^{(i)}$ represents a single observation of $x_{\setdiff j}$. This means, we are holding the value of $x_j$ constant, and averaging the prediction as $x_{\setdiff j}$ changes .
+
 
 ## Code Implementation { .tabset .tabset-pills}
 
