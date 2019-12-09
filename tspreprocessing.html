@@ -12,7 +12,7 @@
 
 <meta name="author" content="David Josephs" />
 
-<meta name="date" content="2019-12-08" />
+<meta name="date" content="2019-12-09" />
 
 <title>Preprocessing Time Series Data</title>
 
@@ -426,7 +426,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Preprocessing Time Series Data</h1>
 <h4 class="author">David Josephs</h4>
-<h4 class="date">2019-12-08</h4>
+<h4 class="date">2019-12-09</h4>
 
 </div>
 
@@ -610,12 +610,12 @@ Spline Interpolation Between 8 points
 <span id="cb21-3"><a href="#cb21-3"></a>preprocess</span></code></pre></div>
 <pre><code>#&gt; function (...) 
 #&gt; Reduce(function(x, f) f(x), fs, ...)
-#&gt; &lt;bytecode: 0x12d280b8&gt;
-#&gt; &lt;environment: 0x12d208e8&gt;</code></pre>
+#&gt; &lt;bytecode: 0x11de3a18&gt;
+#&gt; &lt;environment: 0x11de4310&gt;</code></pre>
 <p>We now have a function that imports a directory of csv’s, converts the proper items to time series objects, spline interpolates the NAs, and converts to a hash table:</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>china &lt;-<span class="st"> </span><span class="kw">preprocess</span>(<span class="st">&quot;data/&quot;</span>)</span>
 <span id="cb23-2"><a href="#cb23-2"></a><span class="kw">str</span>(china)</span></code></pre></div>
-<pre><code>#&gt; &lt;environment: 0x18003760&gt;</code></pre>
+<pre><code>#&gt; &lt;environment: 0xf4e4038&gt;</code></pre>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="kw">head</span>(china<span class="op">$</span>BeijingPM_, <span class="dv">100</span>)</span></code></pre></div>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">

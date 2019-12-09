@@ -12,7 +12,7 @@
 
 <meta name="author" content="David Josephs" />
 
-<meta name="date" content="2019-12-08" />
+<meta name="date" content="2019-12-09" />
 
 <title>Interpretable Machine Learning Part 1</title>
 
@@ -502,7 +502,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Interpretable Machine Learning Part 1</h1>
 <h4 class="author">David Josephs</h4>
-<h4 class="date">2019-12-08</h4>
+<h4 class="date">2019-12-09</h4>
 
 </div>
 
@@ -624,12 +624,12 @@ VIP_{\mathrm{perm}}(x_s) = \frac{\mathcal{L}*}{\mathcal{L}}
 #&gt;                       verbose=0, warm_start=False)</code></pre>
 <p>Lets check out as a baseline truth which features are important in the random forest, and the strength of the predictors in our linear regression:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a>pprint(<span class="bu">dict</span>(<span class="bu">zip</span>(X_train.columns, rf.feature_importances_)))</span></code></pre></div>
-<pre><code>#&gt; {&#39;Age&#39;: 0.01976708719494377,
-#&gt;  &#39;Tonnage&#39;: 0.3988835078892925,
-#&gt;  &#39;cabins&#39;: 0.41726788221279,
-#&gt;  &#39;length&#39;: 0.061303480945635244,
-#&gt;  &#39;passenger_density&#39;: 0.012113936352101323,
-#&gt;  &#39;passengers&#39;: 0.09066410540523713}</code></pre>
+<pre><code>#&gt; {&#39;Age&#39;: 0.01422670179863795,
+#&gt;  &#39;Tonnage&#39;: 0.3568769846733401,
+#&gt;  &#39;cabins&#39;: 0.4786556914242404,
+#&gt;  &#39;length&#39;: 0.07435901686584687,
+#&gt;  &#39;passenger_density&#39;: 0.012527714040573979,
+#&gt;  &#39;passengers&#39;: 0.06335389119736061}</code></pre>
 <div class="sourceCode" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a>pprint({X_train.columns[i]: lm.coef_[:,i] <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(lm.coef_.shape[<span class="dv">1</span>])})</span></code></pre></div>
 <pre><code>#&gt; {&#39;Age&#39;: array([-0.01321228]),
 #&gt;  &#39;Tonnage&#39;: array([0.00316145]),
@@ -677,23 +677,23 @@ VIP_{\mathrm{perm}}(x_s) = \frac{\mathcal{L}*}{\mathcal{L}}
 <span id="cb10-8"><a href="#cb10-8"></a>    imps[get_name(m)] <span class="op">=</span> permutation_importance(m, X_test, y_test, loss_mse, <span class="va">True</span>,  X_train, y_train, n_rounds <span class="op">=</span> <span class="dv">5</span>)</span>
 <span id="cb10-9"><a href="#cb10-9"></a>pprint(imps)</span></code></pre></div>
 <pre><code>#&gt; {&#39;knn&#39;:         Age    Tonnage  passengers    length    cabins  passenger_density  baseline
-#&gt; 0  0.899015  16.029984    1.328386  1.003772  1.003043           1.413495  1.317795
-#&gt; 1  0.900652  18.598170    1.130109  0.999597  1.008771           1.232031  1.337501
-#&gt; 2  0.858176  22.164583    1.092869  1.004603  1.028949           1.096230  1.301425
-#&gt; 3  0.989329  20.035928    1.307547  1.013555  1.001159           1.439622  1.304213
-#&gt; 4  0.921761  19.987422    1.241358  0.991451  0.956518           1.383955  1.169701,
+#&gt; 0  0.898340  19.214893    1.358704  1.004603  0.983273           1.278605  1.309159
+#&gt; 1  0.982747  14.752163    1.371704  0.997004  0.960852           1.228224  1.295418
+#&gt; 2  0.974405  23.319695    1.091447  1.012813  0.990249           1.409518  1.309873
+#&gt; 3  0.897411  22.027942    1.074438  1.005181  0.974051           1.472451  1.311233
+#&gt; 4  0.951472  21.268577    1.113688  1.004538  1.005452           1.349239  1.163479,
 #&gt;  &#39;lm&#39;:         Age   Tonnage  passengers    length     cabins  passenger_density  baseline
-#&gt; 0  0.989378  1.045706    7.901919  4.752677  68.385126           1.106352  1.034697
-#&gt; 1  1.088449  1.094768    9.108660  4.976911  69.194413           1.112377  1.026447
-#&gt; 2  1.046929  1.031156    6.237027  4.319296  51.001614           1.156905  0.998948
-#&gt; 3  0.941999  1.059025    8.156007  3.825046  76.509465           1.081244  0.995868
-#&gt; 4  0.889920  1.028461    7.850081  4.806180  54.699030           1.097475  1.222961,
+#&gt; 0  1.010075  0.959397    8.586181  4.377396  73.340805           1.131672  1.079612
+#&gt; 1  1.128482  1.030758    8.185801  3.997229  56.702481           1.233177  1.276321
+#&gt; 2  0.988742  1.183393    8.074619  3.314392  69.657615           1.111151  1.160407
+#&gt; 3  0.925644  0.977002    7.758869  5.526004  56.397746           0.965704  1.020304
+#&gt; 4  1.123254  1.057175    6.825991  4.289364  49.759970           1.023012  1.006493,
 #&gt;  &#39;rf&#39;:         Age    Tonnage  passengers    length     cabins  passenger_density  baseline
-#&gt; 0  1.157681  15.512761    2.552971  1.683588  14.149798           1.245962  1.184423
-#&gt; 1  1.377698  17.000060    2.463507  1.913165  17.028706           1.410678  1.186954
-#&gt; 2  1.387360  15.845106    2.001012  2.020681  12.076296           1.337574  1.634686
-#&gt; 3  1.426351  14.998438    2.399903  2.252527  18.087975           1.190474  1.256263
-#&gt; 4  1.327451  14.377966    1.973414  2.100047  22.788169           1.098414  2.062719}</code></pre>
+#&gt; 0  1.189671  12.556704    1.980473  1.954994  26.296182           1.276125  1.759751
+#&gt; 1  1.163639  10.911428    1.900141  1.724710  19.960184           1.510991  2.597632
+#&gt; 2  1.201173  10.017687    2.250564  1.732999  26.517798           1.234170  2.279863
+#&gt; 3  1.209322  11.191036    2.115487  1.793733  24.988601           1.550975  1.161379
+#&gt; 4  1.154619   9.369567    1.923601  2.849990  22.201512           1.313908  1.204216}</code></pre>
 <p>This output is a bit hard to read, so lets go ahead and write a helper function which averages the importances, and plots them nicely!</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1"></a>plt.style.use(<span class="st">&quot;ggplot&quot;</span>)</span>
 <span id="cb12-2"><a href="#cb12-2"></a><span class="kw">def</span> plot_perm_imp(df, ax <span class="op">=</span> <span class="va">None</span>, color <span class="op">=</span> <span class="st">&#39;blue&#39;</span>):</span>
@@ -884,27 +884,27 @@ First, lets set up three models to test: A linear model, a knn model, and a rand
 <tbody>
 <tr class="odd">
 <td align="center"><strong>Age</strong></td>
-<td align="center">52.84</td>
+<td align="center">63.98</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>Tonnage</strong></td>
-<td align="center">408</td>
+<td align="center">441.9</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>passengers</strong></td>
-<td align="center">235.9</td>
+<td align="center">233.6</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>length</strong></td>
-<td align="center">301.4</td>
+<td align="center">184.7</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>cabins</strong></td>
-<td align="center">384.4</td>
+<td align="center">431.5</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>passenger_density</strong></td>
-<td align="center">27.87</td>
+<td align="center">29.08</td>
 </tr>
 </tbody>
 </table>
@@ -970,12 +970,12 @@ First, lets set up three models to test: A linear model, a knn model, and a rand
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">1.031</td>
-<td align="center">1.045</td>
-<td align="center">7.624</td>
-<td align="center">4.481</td>
-<td align="center">74.17</td>
-<td align="center">1.092</td>
+<td align="center">1.039</td>
+<td align="center">1.052</td>
+<td align="center">7.599</td>
+<td align="center">4.577</td>
+<td align="center">69.87</td>
+<td align="center">1.091</td>
 </tr>
 </tbody>
 </table></li>
@@ -1001,19 +1001,19 @@ First, lets set up three models to test: A linear model, a knn model, and a rand
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">1.278</td>
-<td align="center">1.742</td>
-<td align="center">2.043</td>
-<td align="center">2.97</td>
-<td align="center">2.64</td>
-<td align="center">1.301</td>
+<td align="center">1.212</td>
+<td align="center">1.824</td>
+<td align="center">1.981</td>
+<td align="center">3.035</td>
+<td align="center">2.724</td>
+<td align="center">1.276</td>
 </tr>
 </tbody>
 </table></li>
 <li><p><strong>rf</strong>:</p>
-<table style="width:94%;">
+<table style="width:96%;">
 <colgroup>
-<col width="9%" />
+<col width="11%" />
 <col width="13%" />
 <col width="18%" />
 <col width="12%" />
@@ -1032,12 +1032,12 @@ First, lets set up three models to test: A linear model, a knn model, and a rand
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">1.13</td>
-<td align="center">7.037</td>
-<td align="center">3.564</td>
-<td align="center">4.139</td>
-<td align="center">8.412</td>
-<td align="center">1.253</td>
+<td align="center">1.145</td>
+<td align="center">8.579</td>
+<td align="center">3.703</td>
+<td align="center">2.879</td>
+<td align="center">9.081</td>
+<td align="center">1.287</td>
 </tr>
 </tbody>
 </table></li>
@@ -1085,8 +1085,8 @@ First, lets set up three models to test: A linear model, a knn model, and a rand
 <p><span class="math display">\[\mathrm{PDP}(z_s) = E \left[ \hat f (x_s, x_c) \mid x_c  \right]\]</span></p>
 <p><span class="math display">\[ = \int \hat f (x_s, x_c) \mathbb{P}_c(x_c) dx_c\]</span> Where <span class="math inline">\(\mathbb{P}_c\)</span> is the marginal distribution of <span class="math inline">\(x_c\)</span>, <span class="math inline">\(\int p(x)dx_s\)</span>.</p>
 <p>We can then formulate this for a finite set of <span class="math inline">\(n\)</span> features using the Monte Carlo method:</p>
-<p><span class="math display">\[\widetilde {\mathrm{PDP}} (x_j) = \frac{1}{n} \sum_{i=1}^{i=k} \hat f (x_j, x_{\setdiff j}^{(i)})\]</span></p>
-<p>Note the change in notation we use when we move from the infinite world of derivatives to the finite world of sums, <span class="math inline">\(x_j\)</span> represents the feature(s) we are interested in, and <span class="math inline">\(x_{\setdiff j}\)</span> is set notation for “all the other features”, that is <span class="math inline">\(x_{\setdiff j}\)</span> is the complement of <span class="math inline">\(x_j\)</span>. <span class="math inline">\(x_{\setdiff j}^{(i)}\)</span> represents a single observation of <span class="math inline">\(x_{\setdiff j}\)</span>. This means, we are holding the value of <span class="math inline">\(x_j\)</span> constant, and averaging the prediction as <span class="math inline">\(x_{\setdiff j}\)</span> changes .</p>
+<p><span class="math display">\[\widetilde {\mathrm{PDP}} (x_j) = \frac{1}{n} \sum_{i=1}^{i=k} \hat f (x_j, x_{\backslash j}^{(i)})\]</span></p>
+<p>Note the change in notation we use when we move from the infinite world of derivatives to the finite world of sums, <span class="math inline">\(x_j\)</span> represents the feature(s) we are interested in, and <span class="math inline">\(x_{\backslash j}\)</span> is set notation for “all the other features”, that is <span class="math inline">\(x_{\backslash j}\)</span> is the complement of <span class="math inline">\(x_j\)</span>. <span class="math inline">\(x_{\backslash j}^{(i)}\)</span> represents a single observation of <span class="math inline">\(x_{\backslash j}\)</span>. This means, we are holding the value of <span class="math inline">\(x_j\)</span> constant, and averaging the prediction as <span class="math inline">\(x_{\backslash j}\)</span> changes .</p>
 </div>
 <div id="code-implementation-1" class="section level2 tabset tabset-pills">
 <h2>Code Implementation</h2>
@@ -1183,7 +1183,7 @@ First, lets set up three models to test: A linear model, a knn model, and a rand
 <span id="cb23-10"><a href="#cb23-10"></a>(rf_pdp &lt;-<span class="st"> </span><span class="kw">do.call</span>(rbind, <span class="kw">pdp_df</span>(trained_models[[<span class="dv">3</span>]], X_test)))</span></code></pre></div>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["value"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["avg_pred"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["variable"],"name":[3],"type":["chr"],"align":["left"]}],"data":[{"1":"44.000","2":"8.744617","3":"Age"},{"1":"36.000","2":"3.308176","3":"Age"},{"1":"29.000","2":"5.475928","3":"Age"},{"1":"27.000","2":"1.913180","3":"Age"},{"1":"25.000","2":"5.385091","3":"Age"},{"1":"25.000","2":"6.635807","3":"Age"},{"1":"25.000","2":"9.362171","3":"Age"},{"1":"22.000","2":"5.907712","3":"Age"},{"1":"22.000","2":"9.410187","3":"Age"},{"1":"22.000","2":"1.166972","3":"Age"},{"1":"21.000","2":"3.783028","3":"Age"},{"1":"21.000","2":"5.374024","3":"Age"},{"1":"21.000","2":"3.163465","3":"Age"},{"1":"19.000","2":"2.028502","3":"Age"},{"1":"16.000","2":"8.745304","3":"Age"},{"1":"16.000","2":"5.893861","3":"Age"},{"1":"16.000","2":"2.144474","3":"Age"},{"1":"15.000","2":"3.762679","3":"Age"},{"1":"15.000","2":"8.257903","3":"Age"},{"1":"14.000","2":"10.524026","3":"Age"},{"1":"14.000","2":"3.506012","3":"Age"},{"1":"13.000","2":"10.614542","3":"Age"},{"1":"13.000","2":"9.696050","3":"Age"},{"1":"13.000","2":"9.279283","3":"Age"},{"1":"13.000","2":"3.762679","3":"Age"},{"1":"12.000","2":"9.696050","3":"Age"},{"1":"12.000","2":"1.193484","3":"Age"},{"1":"12.000","2":"11.126954","3":"Age"},{"1":"12.000","2":"4.808188","3":"Age"},{"1":"11.000","2":"9.696050","3":"Age"},{"1":"11.000","2":"10.193303","3":"Age"},{"1":"9.000","2":"10.689853","3":"Age"},{"1":"9.000","2":"9.152013","3":"Age"},{"1":"9.000","2":"9.444010","3":"Age"},{"1":"7.000","2":"9.978823","3":"Age"},{"1":"7.000","2":"12.195586","3":"Age"},{"1":"6.000","2":"3.694615","3":"Age"},{"1":"6.000","2":"11.934023","3":"Age"},{"1":"6.000","2":"10.212086","3":"Age"},{"1":"5.000","2":"12.500737","3":"Age"},{"1":"133.500","2":"10.936066","3":"Tonnage"},{"1":"116.000","2":"10.551882","3":"Tonnage"},{"1":"110.239","2":"10.232856","3":"Tonnage"},{"1":"108.865","2":"9.724199","3":"Tonnage"},{"1":"105.000","2":"9.777481","3":"Tonnage"},{"1":"101.509","2":"9.737897","3":"Tonnage"},{"1":"101.509","2":"9.852972","3":"Tonnage"},{"1":"93.000","2":"9.721679","3":"Tonnage"},{"1":"91.000","2":"9.144205","3":"Tonnage"},{"1":"91.000","2":"9.178034","3":"Tonnage"},{"1":"91.000","2":"9.206580","3":"Tonnage"},{"1":"90.090","2":"9.250283","3":"Tonnage"},{"1":"90.000","2":"9.782452","3":"Tonnage"},{"1":"89.600","2":"9.626458","3":"Tonnage"},{"1":"85.619","2":"9.026875","3":"Tonnage"},{"1":"81.000","2":"8.954913","3":"Tonnage"},{"1":"78.491","2":"8.241452","3":"Tonnage"},{"1":"77.713","2":"8.377366","3":"Tonnage"},{"1":"73.941","2":"9.050460","3":"Tonnage"},{"1":"73.192","2":"9.008041","3":"Tonnage"},{"1":"70.327","2":"8.325384","3":"Tonnage"},{"1":"59.652","2":"6.129359","3":"Tonnage"},{"1":"52.926","2":"6.233836","3":"Tonnage"},{"1":"50.000","2":"5.314771","3":"Tonnage"},{"1":"42.000","2":"6.635240","3":"Tonnage"},{"1":"38.000","2":"5.759584","3":"Tonnage"},{"1":"34.250","2":"5.855233","3":"Tonnage"},{"1":"33.920","2":"6.003179","3":"Tonnage"},{"1":"33.000","2":"4.548959","3":"Tonnage"},{"1":"30.277","2":"4.888604","3":"Tonnage"},{"1":"30.277","2":"4.918869","3":"Tonnage"},{"1":"30.277","2":"4.889805","3":"Tonnage"},{"1":"28.430","2":"4.961320","3":"Tonnage"},{"1":"19.200","2":"3.955067","3":"Tonnage"},{"1":"19.093","2":"4.784190","3":"Tonnage"},{"1":"16.852","2":"4.889545","3":"Tonnage"},{"1":"16.800","2":"3.819576","3":"Tonnage"},{"1":"12.500","2":"3.726673","3":"Tonnage"},{"1":"3.341","2":"3.363542","3":"Tonnage"},{"1":"2.329","2":"3.663704","3":"Tonnage"},{"1":"39.590","2":"11.596745","3":"passengers"},{"1":"37.000","2":"10.722657","3":"passengers"},{"1":"31.000","2":"11.209869","3":"passengers"},{"1":"28.520","2":"8.652943","3":"passengers"},{"1":"27.580","2":"9.895614","3":"passengers"},{"1":"27.580","2":"9.980822","3":"passengers"},{"1":"27.580","2":"10.604451","3":"passengers"},{"1":"27.440","2":"8.771149","3":"passengers"},{"1":"27.200","2":"10.283844","3":"passengers"},{"1":"25.500","2":"9.874416","3":"passengers"},{"1":"25.010","2":"9.401172","3":"passengers"},{"1":"24.350","2":"8.424172","3":"passengers"},{"1":"23.940","2":"10.044746","3":"passengers"},{"1":"22.400","2":"9.955163","3":"passengers"},{"1":"21.440","2":"8.916078","3":"passengers"},{"1":"21.140","2":"9.082172","3":"passengers"},{"1":"20.320","2":"9.344059","3":"passengers"},{"1":"20.320","2":"9.405774","3":"passengers"},{"1":"20.320","2":"9.432964","3":"passengers"},{"1":"18.820","2":"8.893105","3":"passengers"},{"1":"17.910","2":"8.776408","3":"passengers"},{"1":"15.040","2":"6.353139","3":"passengers"},{"1":"13.200","2":"5.890421","3":"passengers"},{"1":"13.020","2":"5.892145","3":"passengers"},{"1":"12.140","2":"5.464689","3":"passengers"},{"1":"10.560","2":"5.591045","3":"passengers"},{"1":"10.520","2":"5.569871","3":"passengers"},{"1":"9.520","2":"3.540422","3":"passengers"},{"1":"8.080","2":"4.281873","3":"passengers"},{"1":"8.000","2":"3.674000","3":"passengers"},{"1":"7.000","2":"5.443197","3":"passengers"},{"1":"6.940","2":"4.297411","3":"passengers"},{"1":"6.840","2":"4.365257","3":"passengers"},{"1":"6.840","2":"4.296713","3":"passengers"},{"1":"4.900","2":"4.442238","3":"passengers"},{"1":"3.940","2":"2.839647","3":"passengers"},{"1":"3.200","2":"3.317903","3":"passengers"},{"1":"2.960","2":"3.123103","3":"passengers"},{"1":"0.940","2":"2.952703","3":"passengers"},{"1":"0.660","2":"2.625636","3":"passengers"},{"1":"10.930","2":"11.239316","3":"length"},{"1":"9.650","2":"9.044995","3":"length"},{"1":"9.650","2":"9.061932","3":"length"},{"1":"9.650","2":"9.087884","3":"length"},{"1":"9.650","2":"9.596637","3":"length"},{"1":"9.650","2":"9.647314","3":"length"},{"1":"9.630","2":"8.137074","3":"length"},{"1":"9.620","2":"9.280349","3":"length"},{"1":"9.610","2":"9.540944","3":"length"},{"1":"9.570","2":"9.048464","3":"length"},{"1":"9.510","2":"11.449264","3":"length"},{"1":"9.510","2":"11.539284","3":"length"},{"1":"9.510","2":"10.804178","3":"length"},{"1":"9.210","2":"9.067215","3":"length"},{"1":"9.150","2":"8.308552","3":"length"},{"1":"8.930","2":"10.290274","3":"length"},{"1":"8.930","2":"10.449650","3":"length"},{"1":"8.900","2":"10.567973","3":"length"},{"1":"8.800","2":"9.052536","3":"length"},{"1":"8.800","2":"9.018109","3":"length"},{"1":"8.660","2":"8.479922","3":"length"},{"1":"7.770","2":"6.207933","3":"length"},{"1":"7.180","2":"6.304831","3":"length"},{"1":"7.090","2":"5.205179","3":"length"},{"1":"7.080","2":"6.725619","3":"length"},{"1":"7.040","2":"5.669371","3":"length"},{"1":"6.160","2":"4.502633","3":"length"},{"1":"6.150","2":"5.827216","3":"length"},{"1":"5.940","2":"4.519212","3":"length"},{"1":"5.940","2":"4.554484","3":"length"},{"1":"5.940","2":"4.519296","3":"length"},{"1":"5.670","2":"5.930101","3":"length"},{"1":"5.600","2":"4.339329","3":"length"},{"1":"5.410","2":"4.249667","3":"length"},{"1":"5.370","2":"4.250881","3":"length"},{"1":"5.140","2":"3.184207","3":"length"},{"1":"5.130","2":"3.387150","3":"length"},{"1":"4.360","2":"3.168687","3":"length"},{"1":"2.960","2":"2.889783","3":"length"},{"1":"2.790","2":"2.595835","3":"length"},{"1":"16.370","2":"10.553835","3":"cabins"},{"1":"15.570","2":"10.269466","3":"cabins"},{"1":"14.870","2":"10.222464","3":"cabins"},{"1":"13.790","2":"9.346150","3":"cabins"},{"1":"13.560","2":"9.539080","3":"cabins"},{"1":"13.210","2":"9.357110","3":"cabins"},{"1":"13.000","2":"9.866377","3":"cabins"},{"1":"12.750","2":"8.795289","3":"cabins"},{"1":"11.970","2":"9.344094","3":"cabins"},{"1":"11.770","2":"8.701737","3":"cabins"},{"1":"11.380","2":"8.668744","3":"cabins"},{"1":"11.200","2":"9.399773","3":"cabins"},{"1":"10.940","2":"8.873488","3":"cabins"},{"1":"10.720","2":"8.739848","3":"cabins"},{"1":"10.560","2":"8.944949","3":"cabins"},{"1":"10.000","2":"8.517018","3":"cabins"},{"1":"9.750","2":"9.367719","3":"cabins"},{"1":"9.750","2":"9.350922","3":"cabins"},{"1":"9.750","2":"9.385169","3":"cabins"},{"1":"9.500","2":"8.328881","3":"cabins"},{"1":"9.350","2":"8.570057","3":"cabins"},{"1":"7.520","2":"6.394580","3":"cabins"},{"1":"6.600","2":"6.305347","3":"cabins"},{"1":"6.540","2":"6.290040","3":"cabins"},{"1":"6.070","2":"5.803852","3":"cabins"},{"1":"5.280","2":"5.912024","3":"cabins"},{"1":"5.260","2":"5.883185","3":"cabins"},{"1":"4.100","2":"4.921912","3":"cabins"},{"1":"4.000","2":"4.365425","3":"cabins"},{"1":"3.830","2":"4.487874","3":"cabins"},{"1":"3.550","2":"4.880026","3":"cabins"},{"1":"3.540","2":"5.839457","3":"cabins"},{"1":"3.420","2":"4.914617","3":"cabins"},{"1":"3.420","2":"4.866942","3":"cabins"},{"1":"2.450","2":"4.950677","3":"cabins"},{"1":"1.600","2":"3.908848","3":"cabins"},{"1":"1.480","2":"3.721089","3":"cabins"},{"1":"0.880","2":"3.779300","3":"cabins"},{"1":"0.450","2":"3.477470","3":"cabins"},{"1":"0.330","2":"3.340786","3":"cabins"},{"1":"71.430","2":"4.875254","3":"passenger_density"},{"1":"67.350","2":"3.572235","3":"passenger_density"},{"1":"60.000","2":"2.168131","3":"passenger_density"},{"1":"56.760","2":"1.929009","3":"passenger_density"},{"1":"50.620","2":"1.022866","3":"passenger_density"},{"1":"45.190","2":"5.954843","3":"passenger_density"},{"1":"44.780","2":"9.498629","3":"passenger_density"},{"1":"44.780","2":"9.550447","3":"passenger_density"},{"1":"44.780","2":"9.581126","3":"passenger_density"},{"1":"44.260","2":"3.773526","3":"passenger_density"},{"1":"44.260","2":"3.706590","3":"passenger_density"},{"1":"42.640","2":"3.703854","3":"passenger_density"},{"1":"41.290","2":"8.574685","3":"passenger_density"},{"1":"40.650","2":"6.050621","3":"passenger_density"},{"1":"40.500","2":"9.216311","3":"passenger_density"},{"1":"40.180","2":"10.194107","3":"passenger_density"},{"1":"39.470","2":"11.322422","3":"passenger_density"},{"1":"39.270","2":"8.413812","3":"passenger_density"},{"1":"38.850","2":"10.206932","3":"passenger_density"},{"1":"38.600","2":"10.766830","3":"passenger_density"},{"1":"37.780","2":"9.294678","3":"passenger_density"},{"1":"37.420","2":"11.855125","3":"passenger_density"},{"1":"36.810","2":"10.510946","3":"passenger_density"},{"1":"36.810","2":"10.581632","3":"passenger_density"},{"1":"36.020","2":"9.744096","3":"passenger_density"},{"1":"35.980","2":"5.274571","3":"passenger_density"},{"1":"35.190","2":"3.785388","3":"passenger_density"},{"1":"35.140","2":"10.178504","3":"passenger_density"},{"1":"33.720","2":"12.321775","3":"passenger_density"},{"1":"32.560","2":"5.187693","3":"passenger_density"},{"1":"32.230","2":"8.717821","3":"passenger_density"},{"1":"31.730","2":"1.734813","3":"passenger_density"},{"1":"30.940","2":"9.287132","3":"passenger_density"},{"1":"29.790","2":"11.752467","3":"passenger_density"},{"1":"27.940","2":"5.223276","3":"passenger_density"},{"1":"27.930","2":"6.429293","3":"passenger_density"},{"1":"25.660","2":"9.368652","3":"passenger_density"},{"1":"24.780","2":"1.276713","3":"passenger_density"},{"1":"23.870","2":"3.174844","3":"passenger_density"},{"1":"17.700","2":"3.238665","3":"passenger_density"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["value"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["avg_pred"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["variable"],"name":[3],"type":["chr"],"align":["left"]}],"data":[{"1":"44.000","2":"8.929254","3":"Age"},{"1":"36.000","2":"3.371747","3":"Age"},{"1":"29.000","2":"5.390390","3":"Age"},{"1":"27.000","2":"1.898516","3":"Age"},{"1":"25.000","2":"5.088353","3":"Age"},{"1":"25.000","2":"6.549241","3":"Age"},{"1":"25.000","2":"9.264401","3":"Age"},{"1":"22.000","2":"5.978521","3":"Age"},{"1":"22.000","2":"9.324300","3":"Age"},{"1":"22.000","2":"1.218488","3":"Age"},{"1":"21.000","2":"3.756794","3":"Age"},{"1":"21.000","2":"5.227595","3":"Age"},{"1":"21.000","2":"3.232580","3":"Age"},{"1":"19.000","2":"1.989525","3":"Age"},{"1":"16.000","2":"8.791461","3":"Age"},{"1":"16.000","2":"5.909189","3":"Age"},{"1":"16.000","2":"2.134156","3":"Age"},{"1":"15.000","2":"3.779325","3":"Age"},{"1":"15.000","2":"8.313353","3":"Age"},{"1":"14.000","2":"10.692536","3":"Age"},{"1":"14.000","2":"3.551565","3":"Age"},{"1":"13.000","2":"10.872751","3":"Age"},{"1":"13.000","2":"9.735779","3":"Age"},{"1":"13.000","2":"9.207443","3":"Age"},{"1":"13.000","2":"3.779325","3":"Age"},{"1":"12.000","2":"9.735779","3":"Age"},{"1":"12.000","2":"1.254806","3":"Age"},{"1":"12.000","2":"11.321347","3":"Age"},{"1":"12.000","2":"4.776352","3":"Age"},{"1":"11.000","2":"9.735779","3":"Age"},{"1":"11.000","2":"10.050822","3":"Age"},{"1":"9.000","2":"10.967255","3":"Age"},{"1":"9.000","2":"8.887147","3":"Age"},{"1":"9.000","2":"9.128137","3":"Age"},{"1":"7.000","2":"10.024580","3":"Age"},{"1":"7.000","2":"12.292301","3":"Age"},{"1":"6.000","2":"3.702772","3":"Age"},{"1":"6.000","2":"11.894637","3":"Age"},{"1":"6.000","2":"10.215062","3":"Age"},{"1":"5.000","2":"12.559096","3":"Age"},{"1":"133.500","2":"11.116394","3":"Tonnage"},{"1":"116.000","2":"10.485057","3":"Tonnage"},{"1":"110.239","2":"9.956156","3":"Tonnage"},{"1":"108.865","2":"9.836576","3":"Tonnage"},{"1":"105.000","2":"9.806106","3":"Tonnage"},{"1":"101.509","2":"9.861150","3":"Tonnage"},{"1":"101.509","2":"10.037923","3":"Tonnage"},{"1":"93.000","2":"9.595023","3":"Tonnage"},{"1":"91.000","2":"9.043300","3":"Tonnage"},{"1":"91.000","2":"9.144436","3":"Tonnage"},{"1":"91.000","2":"9.147689","3":"Tonnage"},{"1":"90.090","2":"8.930571","3":"Tonnage"},{"1":"90.000","2":"9.568763","3":"Tonnage"},{"1":"89.600","2":"9.649963","3":"Tonnage"},{"1":"85.619","2":"9.058270","3":"Tonnage"},{"1":"81.000","2":"8.808444","3":"Tonnage"},{"1":"78.491","2":"8.419711","3":"Tonnage"},{"1":"77.713","2":"8.286041","3":"Tonnage"},{"1":"73.941","2":"8.805963","3":"Tonnage"},{"1":"73.192","2":"8.723759","3":"Tonnage"},{"1":"70.327","2":"8.231263","3":"Tonnage"},{"1":"59.652","2":"6.193740","3":"Tonnage"},{"1":"52.926","2":"6.286661","3":"Tonnage"},{"1":"50.000","2":"5.330763","3":"Tonnage"},{"1":"42.000","2":"6.627556","3":"Tonnage"},{"1":"38.000","2":"5.684684","3":"Tonnage"},{"1":"34.250","2":"5.662922","3":"Tonnage"},{"1":"33.920","2":"5.906707","3":"Tonnage"},{"1":"33.000","2":"4.708201","3":"Tonnage"},{"1":"30.277","2":"5.029123","3":"Tonnage"},{"1":"30.277","2":"5.137127","3":"Tonnage"},{"1":"30.277","2":"5.103134","3":"Tonnage"},{"1":"28.430","2":"5.112644","3":"Tonnage"},{"1":"19.200","2":"4.144777","3":"Tonnage"},{"1":"19.093","2":"4.918392","3":"Tonnage"},{"1":"16.852","2":"4.927751","3":"Tonnage"},{"1":"16.800","2":"3.998616","3":"Tonnage"},{"1":"12.500","2":"3.975142","3":"Tonnage"},{"1":"3.341","2":"3.617670","3":"Tonnage"},{"1":"2.329","2":"3.897929","3":"Tonnage"},{"1":"39.590","2":"11.513666","3":"passengers"},{"1":"37.000","2":"10.582733","3":"passengers"},{"1":"31.000","2":"11.078855","3":"passengers"},{"1":"28.520","2":"8.566453","3":"passengers"},{"1":"27.580","2":"10.095632","3":"passengers"},{"1":"27.580","2":"10.325726","3":"passengers"},{"1":"27.580","2":"10.754162","3":"passengers"},{"1":"27.440","2":"8.631013","3":"passengers"},{"1":"27.200","2":"10.294047","3":"passengers"},{"1":"25.500","2":"9.975091","3":"passengers"},{"1":"25.010","2":"9.289751","3":"passengers"},{"1":"24.350","2":"8.552844","3":"passengers"},{"1":"23.940","2":"9.948750","3":"passengers"},{"1":"22.400","2":"9.832635","3":"passengers"},{"1":"21.440","2":"8.806130","3":"passengers"},{"1":"21.140","2":"9.120072","3":"passengers"},{"1":"20.320","2":"9.479092","3":"passengers"},{"1":"20.320","2":"9.548639","3":"passengers"},{"1":"20.320","2":"9.551447","3":"passengers"},{"1":"18.820","2":"8.717352","3":"passengers"},{"1":"17.910","2":"8.654696","3":"passengers"},{"1":"15.040","2":"6.279947","3":"passengers"},{"1":"13.200","2":"5.874164","3":"passengers"},{"1":"13.020","2":"5.903056","3":"passengers"},{"1":"12.140","2":"5.468303","3":"passengers"},{"1":"10.560","2":"5.598145","3":"passengers"},{"1":"10.520","2":"5.483522","3":"passengers"},{"1":"9.520","2":"3.639691","3":"passengers"},{"1":"8.080","2":"4.296502","3":"passengers"},{"1":"8.000","2":"3.798983","3":"passengers"},{"1":"7.000","2":"5.388565","3":"passengers"},{"1":"6.940","2":"4.223649","3":"passengers"},{"1":"6.840","2":"4.351042","3":"passengers"},{"1":"6.840","2":"4.249633","3":"passengers"},{"1":"4.900","2":"4.587934","3":"passengers"},{"1":"3.940","2":"2.769099","3":"passengers"},{"1":"3.200","2":"3.374614","3":"passengers"},{"1":"2.960","2":"3.232318","3":"passengers"},{"1":"0.940","2":"2.973468","3":"passengers"},{"1":"0.660","2":"2.863425","3":"passengers"},{"1":"10.930","2":"11.644530","3":"length"},{"1":"9.650","2":"9.253616","3":"length"},{"1":"9.650","2":"9.352494","3":"length"},{"1":"9.650","2":"9.361911","3":"length"},{"1":"9.650","2":"9.627619","3":"length"},{"1":"9.650","2":"9.790695","3":"length"},{"1":"9.630","2":"8.233344","3":"length"},{"1":"9.620","2":"9.271980","3":"length"},{"1":"9.610","2":"9.804633","3":"length"},{"1":"9.570","2":"9.268541","3":"length"},{"1":"9.510","2":"11.560572","3":"length"},{"1":"9.510","2":"11.889840","3":"length"},{"1":"9.510","2":"11.425317","3":"length"},{"1":"9.210","2":"9.070282","3":"length"},{"1":"9.150","2":"8.586297","3":"length"},{"1":"8.930","2":"10.799202","3":"length"},{"1":"8.930","2":"10.995106","3":"length"},{"1":"8.900","2":"10.909022","3":"length"},{"1":"8.800","2":"8.950116","3":"length"},{"1":"8.800","2":"8.853801","3":"length"},{"1":"8.660","2":"8.555318","3":"length"},{"1":"7.770","2":"6.013346","3":"length"},{"1":"7.180","2":"6.114461","3":"length"},{"1":"7.090","2":"4.905552","3":"length"},{"1":"7.080","2":"6.535012","3":"length"},{"1":"7.040","2":"5.271270","3":"length"},{"1":"6.160","2":"4.181865","3":"length"},{"1":"6.150","2":"5.454855","3":"length"},{"1":"5.940","2":"4.091245","3":"length"},{"1":"5.940","2":"4.235374","3":"length"},{"1":"5.940","2":"4.168716","3":"length"},{"1":"5.670","2":"5.599118","3":"length"},{"1":"5.600","2":"4.136395","3":"length"},{"1":"5.410","2":"3.908449","3":"length"},{"1":"5.370","2":"3.944949","3":"length"},{"1":"5.140","2":"2.807326","3":"length"},{"1":"5.130","2":"3.090173","3":"length"},{"1":"4.360","2":"2.800266","3":"length"},{"1":"2.960","2":"2.527553","3":"length"},{"1":"2.790","2":"2.257968","3":"length"},{"1":"16.370","2":"10.261325","3":"cabins"},{"1":"15.570","2":"9.904161","3":"cabins"},{"1":"14.870","2":"9.688561","3":"cabins"},{"1":"13.790","2":"9.372888","3":"cabins"},{"1":"13.560","2":"9.434815","3":"cabins"},{"1":"13.210","2":"9.389732","3":"cabins"},{"1":"13.000","2":"9.894588","3":"cabins"},{"1":"12.750","2":"8.695819","3":"cabins"},{"1":"11.970","2":"9.385384","3":"cabins"},{"1":"11.770","2":"8.485937","3":"cabins"},{"1":"11.380","2":"8.394306","3":"cabins"},{"1":"11.200","2":"9.352463","3":"cabins"},{"1":"10.940","2":"8.725282","3":"cabins"},{"1":"10.720","2":"8.523382","3":"cabins"},{"1":"10.560","2":"8.822589","3":"cabins"},{"1":"10.000","2":"8.427722","3":"cabins"},{"1":"9.750","2":"9.373826","3":"cabins"},{"1":"9.750","2":"9.364400","3":"cabins"},{"1":"9.750","2":"9.378525","3":"cabins"},{"1":"9.500","2":"8.494458","3":"cabins"},{"1":"9.350","2":"8.443347","3":"cabins"},{"1":"7.520","2":"6.577256","3":"cabins"},{"1":"6.600","2":"6.458898","3":"cabins"},{"1":"6.540","2":"6.456701","3":"cabins"},{"1":"6.070","2":"5.795763","3":"cabins"},{"1":"5.280","2":"5.822152","3":"cabins"},{"1":"5.260","2":"5.739054","3":"cabins"},{"1":"4.100","2":"4.892086","3":"cabins"},{"1":"4.000","2":"4.506892","3":"cabins"},{"1":"3.830","2":"4.632209","3":"cabins"},{"1":"3.550","2":"4.958798","3":"cabins"},{"1":"3.540","2":"5.984559","3":"cabins"},{"1":"3.420","2":"5.033868","3":"cabins"},{"1":"3.420","2":"4.991725","3":"cabins"},{"1":"2.450","2":"5.141147","3":"cabins"},{"1":"1.600","2":"4.163459","3":"cabins"},{"1":"1.480","2":"3.962741","3":"cabins"},{"1":"0.880","2":"3.925928","3":"cabins"},{"1":"0.450","2":"3.783937","3":"cabins"},{"1":"0.330","2":"3.489697","3":"cabins"},{"1":"71.430","2":"4.888833","3":"passenger_density"},{"1":"67.350","2":"3.750612","3":"passenger_density"},{"1":"60.000","2":"2.198157","3":"passenger_density"},{"1":"56.760","2":"1.920034","3":"passenger_density"},{"1":"50.620","2":"1.087976","3":"passenger_density"},{"1":"45.190","2":"6.029561","3":"passenger_density"},{"1":"44.780","2":"9.673448","3":"passenger_density"},{"1":"44.780","2":"9.681667","3":"passenger_density"},{"1":"44.780","2":"9.706495","3":"passenger_density"},{"1":"44.260","2":"3.783968","3":"passenger_density"},{"1":"44.260","2":"3.703362","3":"passenger_density"},{"1":"42.640","2":"3.644681","3":"passenger_density"},{"1":"41.290","2":"8.579248","3":"passenger_density"},{"1":"40.650","2":"6.023912","3":"passenger_density"},{"1":"40.500","2":"9.156362","3":"passenger_density"},{"1":"40.180","2":"10.078060","3":"passenger_density"},{"1":"39.470","2":"11.685286","3":"passenger_density"},{"1":"39.270","2":"8.420206","3":"passenger_density"},{"1":"38.850","2":"10.080518","3":"passenger_density"},{"1":"38.600","2":"10.917535","3":"passenger_density"},{"1":"37.780","2":"9.100604","3":"passenger_density"},{"1":"37.420","2":"11.984439","3":"passenger_density"},{"1":"36.810","2":"10.812737","3":"passenger_density"},{"1":"36.810","2":"10.982779","3":"passenger_density"},{"1":"36.020","2":"9.509934","3":"passenger_density"},{"1":"35.980","2":"5.154217","3":"passenger_density"},{"1":"35.190","2":"3.792654","3":"passenger_density"},{"1":"35.140","2":"10.186252","3":"passenger_density"},{"1":"33.720","2":"12.587177","3":"passenger_density"},{"1":"32.560","2":"5.011971","3":"passenger_density"},{"1":"32.230","2":"8.816991","3":"passenger_density"},{"1":"31.730","2":"1.745371","3":"passenger_density"},{"1":"30.940","2":"9.307475","3":"passenger_density"},{"1":"29.790","2":"11.672455","3":"passenger_density"},{"1":"27.940","2":"5.163639","3":"passenger_density"},{"1":"27.930","2":"6.443499","3":"passenger_density"},{"1":"25.660","2":"9.218734","3":"passenger_density"},{"1":"24.780","2":"1.363673","3":"passenger_density"},{"1":"23.870","2":"3.244168","3":"passenger_density"},{"1":"17.700","2":"3.278435","3":"passenger_density"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 <p>Finally, lets plot these pdps!</p>
@@ -1228,8 +1228,19 @@ First, lets set up three models to test: A linear model, a knn model, and a rand
 </div>
 <div id="discussion" class="section level2">
 <h2>Discussion</h2>
-<p>Something is off!!!</p>
+<p>Something odd is happening here, our partial dependence importances are way off (and if you look at the partial dependence graphs, something is off there too)! If we just focus on the random forest plots, we immediately see that are importances are completely wrong relative to the truth. Why is this? To investigate, lets look at the correlation of our variables:</p>
+<div class="figure">
+<img src="iml_files/figure-html/unnamed-chunk-20-1.svg" alt="Correlation Heatmap" width="960" />
+<p class="caption">
+Correlation Heatmap
+</p>
 </div>
+<p>Our variables are highly correlated! This represents a massive problem to most interpretable ML techniques, especially those which rely on marginal distributions. There are multiple problems here. First, we have already mentioned the problem of unrealistic observations, such as boats which would be physically incapable of floating, or ones that are less buoyant than air. Another problem is the problem of averaging, in which we are actually averaging the effects of the variables correlated with <span class="math inline">\(x_s\)</span> over <span class="math inline">\(x_s\)</span>. If the correlations are strong and set up right, they can actually nullify the effect of the variable when we take this average. We will now look at two methods which are robust to correlation!</p>
+</div>
+</div>
+<div id="individual-conditional-expectation-ice" class="section level1">
+<h1>Individual Conditional Expectation (ICE)</h1>
+<p>ICE is very simple to understand. If we are having trouble with the averaging step with PDP, why don’t we just get rid of it! Partial dependence, through averaging, hides potential complex effects and interactions between the variables</p>
 </div>
 
 

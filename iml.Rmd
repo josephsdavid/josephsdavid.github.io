@@ -403,9 +403,9 @@ Where $\mathbb{P}_c$ is the marginal distribution of $x_c$, $\int p(x)dx_s$.
 
 We can then formulate this for a finite set of $n$ features using the Monte Carlo method:
 
-$$\widetilde {\mathrm{PDP}} (x_j) = \frac{1}{n} \sum_{i=1}^{i=k} \hat f (x_j, x_{\setdiff j}^{(i)})$$
+$$\widetilde {\mathrm{PDP}} (x_j) = \frac{1}{n} \sum_{i=1}^{i=k} \hat f (x_j, x_{\backslash j}^{(i)})$$
 
-Note the change in notation we use when we move from the infinite world of derivatives to the finite world of sums, $x_j$ represents the feature(s) we are interested in, and $x_{\setdiff j}$ is set notation for "all the other features", that is $x_{\setdiff j}$ is the complement of $x_j$. $x_{\setdiff j}^{(i)}$ represents a single observation of $x_{\setdiff j}$. This means, we are holding the value of $x_j$ constant, and averaging the prediction as $x_{\setdiff j}$ changes .
+Note the change in notation we use when we move from the infinite world of derivatives to the finite world of sums, $x_j$ represents the feature(s) we are interested in, and $x_{\backslash j}$ is set notation for "all the other features", that is $x_{\backslash j}$ is the complement of $x_j$. $x_{\backslash j}^{(i)}$ represents a single observation of $x_{\backslash j}$. This means, we are holding the value of $x_j$ constant, and averaging the prediction as $x_{\backslash j}$ changes .
 
 
 ## Code Implementation { .tabset .tabset-pills}
@@ -572,4 +572,30 @@ pdp_imps%>%  ggplot(aes(x = variable, y = importance, fill = model)) + geom_bar(
 
 ## Discussion
 
-Something is off!!!
+Something odd is happening here, our partial dependence importances are way off (and if you look at the partial dependence graphs, something is off there too)! If we just focus on the random forest plots, we immediately see that are importances are completely wrong relative to the truth. Why is this? To investigate, lets look at the correlation of our variables:
+
+```{r, echo = F, warn = F, message = F, fig.cap = "Correlation Heatmap", fig.width = 10, fig.height = 10}
+
+library(corrplot) 
+
+
+correlator  <-  function(df){
+	df %>%
+		keep(is.numeric) %>%
+		tidyr::drop_na() %>%
+		cor %>%
+		corrplot("upper", addCoef.col = "white", number.digits = 2,
+			 number.cex = 0.5, method="square",
+			 order="hclust", 
+			 tl.srt=45, tl.cex = 0.8)
+}
+
+X_test %>% correlator
+```
+
+Our variables are highly correlated! This represents a massive problem to most interpretable ML techniques, especially those which rely on marginal distributions. There are multiple problems here. First, we have already mentioned the problem of unrealistic observations, such as boats which would be physically incapable of floating, or ones that are less buoyant than air. Another problem is the problem of averaging, in which we are actually averaging the effects of the variables correlated with $x_s$ over $x_s$. If the correlations are strong and set up right, they can actually nullify the effect of the variable when we take this average. We will now look at two methods which are robust to correlation!
+
+# Individual Conditional Expectation (ICE)
+
+ICE is very simple to understand. If we are having trouble with the averaging step with PDP, why don't we just get rid of it! Partial dependence, through averaging, hides potential complex effects and interactions between the variables
+
