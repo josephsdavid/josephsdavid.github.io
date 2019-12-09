@@ -510,7 +510,7 @@ pdp_var <- function(model, x, var){
 }
 ```
 
-Next lets scale that up over the entire data frame!
+Next, lets scale that up over the entire data frame!
 
 ```{r}
 pdp_df <- function(model, x) {
