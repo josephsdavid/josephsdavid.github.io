@@ -959,11 +959,8 @@ $$
 
 Then we accumulate (sum) those throughout neighborhoods:
 
-$$
-
-{\widetilde {\mathrm{ALE}}}(x_{j}) = \sum^{k_j(x)} _{k=1}
-\frac{1}{n_j(k)} \sum_{i:x_j^{(i)} \in N_j(k)}\left[ \hat f(z_{k,j}, x^{(i)}_{\setminus j}) - \hat f(z_{k-1,j}, x^{(i)}_{\setminus j}) \right]
-$$
+$${\widetilde {\mathrm{ALE}}}(x_{j}) = \sum^{k_j(x)} _{k=1}
+\frac{1}{n_j(k)} \sum_{i:x_j^{(i)} \in N_j(k)}\left[ \hat f(z_{k,j}, x^{(i)}_{\setminus j}) - \hat f(z_{k-1,j}, x^{(i)}_{\setminus j}) \right]$$
 
 Finally, we subtract the mean to center the ALE on zero!
 
