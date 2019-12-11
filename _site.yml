@@ -33,4 +33,3 @@ output:
         theme: united
         highlight: haddock
         df_print: paged
-        header_includes: header.html

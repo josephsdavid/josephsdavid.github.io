@@ -4,6 +4,7 @@ author: "David Josephs"
 date: "`r Sys.Date()`"
 output:
   html_document:
+    in_header: headeriml.html
     df_print: paged
     toc: true
     toc_float: 
