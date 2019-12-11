@@ -175,7 +175,7 @@ Now we are all set up to implement permutation importance in python and in R
 
 ### In Python
 
-First, lets set up three models to test: A linear model, a neural network, and a random forest:
+First, lets set up three models to test: A linear model, knn, and a random forest:
 
 ```{python}
 lm = LinearRegression()
