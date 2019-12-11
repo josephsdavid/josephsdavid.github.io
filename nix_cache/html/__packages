@@ -1,3 +1,17 @@
 base
 colorout
 tint
+reticulate
+randomForest
+kknn
+tidyverse
+ggplot2
+tibble
+tidyr
+readr
+purrr
+dplyr
+stringr
+forcats
+ggthemes
+corrplot

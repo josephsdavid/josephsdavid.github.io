@@ -4,8 +4,6 @@ author: "David Josephs"
 date: "`r Sys.Date()`"
 output:
   html_document:
-    theme: darkly
-    highlight: breezedark
     df_print: paged
     toc: true
     toc_float: 
@@ -14,11 +12,6 @@ output:
 ---
 
 
-<style>
-div.blue pre { background-color:#d8ecf2; }
-div.blue pre.r { background-color:black; }
-div.blue pre.python { background-color:black; }
-</style>
 
 ```{r setup, include = F}
 knitr::opts_chunk$set(dev = "svg", message = F)
@@ -27,7 +20,46 @@ library(reticulate)
 knitr::opts_chunk$set(comment = "#>")
 ```
 
-In this blog post, we are going to talk about a few tools
+```{js, echo = F}
+ $chunks.each(function () {
+
+    // add button to source code chunks
+    if ( $(this).hasClass('s') ) {
+      $('pre.r', this).prepend("<div class=\"showopt\">Show Source</div><br style=\"line-height:22px;\"/>");
+      $('pre.r', this).children('code').attr('class', 'folded');
+    }
+
+    // add button to output chunks
+    if ( $(this).hasClass('o') ) {
+      $('pre:not(.r)', this).has('code').prepend("<div class=\"showopt\">Show Output</div><br style=\"line-height:22px;\"/>");
+      $('pre:not(.r)', this).children('code:not(r)').addClass('folded');
+
+      // add button to plots
+      $(this).find('img').wrap('<pre class=\"plot\"></pre>');
+      $('pre.plot', this).prepend("<div class=\"showopt\">Show Plot</div><br style=\"line-height:22px;\"/>");
+      $('pre.plot', this).children('img').addClass('folded');
+
+    }
+  });
+
+  // hide all chunks when document is loaded
+  $('.folded').css('display', 'none')
+
+  // function to toggle the visibility
+  $('.showopt').click(function() {
+    var label = $(this).html();
+    if (label.indexOf("Show") >= 0) {
+      $(this).html(label.replace("Show", "Hide"));
+    } else {
+      $(this).html(label.replace("Hide", "Show"));
+    }
+    $(this).siblings('code, img').slideToggle('fast', 'swing');
+  });
+});
+
+```
+
+In this blog post, we are going to talk about a few tools for interpretable machine learning. I believe the importance of the subject is rather clear, as we can not only use it to help mitigate and deploying biased models, but also to help us remain relevant should autoML take off in the next 10 years. We will go over the tools in order of (in my opinion) increasing utility, starting with simple Permutation Importance, then PDPs and ICE, and finally ALE.
 
 
 # Permutation Importance: Math and Intuition
@@ -144,7 +176,6 @@ Now we are all set up to implement permutation importance in python and in R
 
 First, lets set up three models to test: A linear model, a neural network, and a random forest:
 
-<div class = "blue">
 ```{python}
 lm = LinearRegression()
 knn = KNeighborsRegressor(13) 
@@ -252,12 +283,10 @@ plt.show()
 ```
 
 Looks like it worked alright!! Especially for random forest, we nicely identified the two most important features, however with little granularity. With our linear model, it is a little less clear, but we do see that the same three most important features carry through! However, we have no real granularity or idea the scale of the effect of the variable. We also carry a risk with permutation importance and correlated variables in general: we are using often unrealistic observations. For example, we may be looking a tiny boats (in length) which weigh the same as the largest boats (they would sink!!) with our permutations. This leads to often unreliable output with many permutation based tools, which we will also explore in this post.
-</div>
 
 ### In R
 
 First, lets set up three models to test: A linear model, a knn model, and a random forest:
-<div class="blue">
 ```{R}
 
 library(randomForest)
@@ -361,7 +390,6 @@ do.call( rbind, vip_flat) %>% as.data.frame %>%
   facet_grid(model ~ ., scales = "free") + coord_flip() + ggthemes::theme_fivethirtyeight() + 
   ggthemes::scale_fill_fivethirtyeight() + ggtitle("Permutation Importance")
 ```
-</div>
 
 
 
@@ -373,6 +401,7 @@ Looks like it worked alright!! Especially for random forest, we nicely identifie
 # Partial Dependence
 
 Let's try and think of a annother way to quantify the effect of a variable. We previously answered the question: "How much worse will my prediction be, given a feature has been replaced with noise?". Now, lets ask a new question: 
+
 > What will my prediction be, in general, when a feature is at a specific value?
 
 This is Partial Dependence in a nutshell. Stemming off from this, we can make the claim:
@@ -401,9 +430,9 @@ $$\mathrm{PDP}(z_s) = E \left[ \hat f (x_s, x_c) \mid x_c  \right]$$
 $$ = \int \hat f (x_s, x_c) \mathbb{P}_c(x_c) dx_c$$
 Where $\mathbb{P}_c$ is the marginal distribution of $x_c$, $\int p(x)dx_s$.
 
-We can then formulate this for a finite set of $n$ features using the Monte Carlo method:
+We can then formulate this for a finite set of $k$ features and $n$ observations using the Monte Carlo method:
 
-$$\widetilde {\mathrm{PDP}} (x_j) = \frac{1}{n} \sum_{i=1}^{i=k} \hat f (x_j, x_{\backslash j}^{(i)})$$
+$$\widetilde {\mathrm{PDP}} (x_j) = \frac{1}{n} \sum_{i=1}^{i=n} \hat f (x_j, x_{\backslash j}^{(i)})$$
 
 Note the change in notation we use when we move from the infinite world of derivatives to the finite world of sums, $x_j$ represents the feature(s) we are interested in, and $x_{\backslash j}$ is set notation for "all the other features", that is $x_{\backslash j}$ is the complement of $x_j$. $x_{\backslash j}^{(i)}$ represents a single observation of $x_{\backslash j}$. This means, we are holding the value of $x_j$ constant, and averaging the prediction as $x_{\backslash j}$ changes .
 
@@ -514,7 +543,7 @@ Next, lets scale that up over the entire data frame!
 
 ```{r}
 pdp_df <- function(model, x) {
-pdps <- lapply(colnames(x), function(n) {
+  pdps <- lapply(colnames(x), function(n) {
     res <- pdp_var(model, x, n)
     res$variable <- n
     return(res)
@@ -574,28 +603,527 @@ pdp_imps%>%  ggplot(aes(x = variable, y = importance, fill = model)) + geom_bar(
 
 Something odd is happening here, our partial dependence importances are way off (and if you look at the partial dependence graphs, something is off there too)! If we just focus on the random forest plots, we immediately see that are importances are completely wrong relative to the truth. Why is this? To investigate, lets look at the correlation of our variables:
 
-```{r, echo = F, warn = F, message = F, fig.cap = "Correlation Heatmap", fig.width = 10, fig.height = 10}
+<div class="fold s">
+
+```{r, warn = F, message = F, fig.cap = "Correlation Heatmap", fig.width = 10, fig.height = 10, fig.align = "center"}
 
 library(corrplot) 
-
-
 correlator  <-  function(df){
 	df %>%
 		keep(is.numeric) %>%
 		tidyr::drop_na() %>%
 		cor %>%
 		corrplot("upper", addCoef.col = "white", number.digits = 2,
-			 number.cex = 0.5, method="square",
+			 number.cex = 0.8, method="circle",
 			 order="hclust", 
-			 tl.srt=45, tl.cex = 0.8)
+			 tl.srt=45, tl.cex = 1)
 }
 
 X_test %>% correlator
 ```
 
+</div>
+
 Our variables are highly correlated! This represents a massive problem to most interpretable ML techniques, especially those which rely on marginal distributions. There are multiple problems here. First, we have already mentioned the problem of unrealistic observations, such as boats which would be physically incapable of floating, or ones that are less buoyant than air. Another problem is the problem of averaging, in which we are actually averaging the effects of the variables correlated with $x_s$ over $x_s$. If the correlations are strong and set up right, they can actually nullify the effect of the variable when we take this average. We will now look at two methods which are robust to correlation!
 
 # Individual Conditional Expectation (ICE)
 
-ICE is very simple to understand. If we are having trouble with the averaging step with PDP, why don't we just get rid of it! Partial dependence, through averaging, hides potential complex effects and interactions between the variables
+ICE is very simple to understand. If we are having trouble with the averaging step with PDP, why don't we just get rid of it! Partial dependence, through averaging, hides potential complex effects and interactions between the variables. By taking out this averaging step, maybe we can learn a bit more about whats going on!
 
+As a corrolary to this, [this paper](https://arxiv.org/abs/1805.04755) suggests we can also calculate a correlation robust variable importance with ICE. To do so, we calculate the standard deviation of each ICE curve, and then average **those**. This should yield an accurate variable importance!
+
+## Code Implementation {.tabset .tabset-pills}
+
+### In Python
+
+The code implementation of ICE is rather simple, it is the exact same as the PDP code, only without averaging! First we will calculate the ICE curve for a single variable:
+
+```{python}
+
+def ICE_var(model, x, var):
+    explan = sorted(x[var])
+    med = explan
+    preds = []
+    for i in range(0, len(explan)):
+        tmp = []
+        X_tmp = x.copy()
+        # pandas is dumb
+        val = np.asarray(explan)[i]
+        X_tmp[var] = val
+        preds.append(model.predict(X_tmp))
+    preds = np.asarray(preds).reshape(len(x), len(explan))
+    return(explan, preds)
+```
+
+Next, lets go ahead and scale that up for an entire data frame and plot those ICE curves. 
+
+```{python}
+
+def plotICE(ex, values, ax = None):
+    for i in range(0, len(ex)):
+        if (ax is None):
+            plt.plot(ex,values[i,:], 'black', alpha = 0.1)
+        else:
+            ax.plot(ex,values[i,:], 'black', alpha = 0.1)
+
+
+fig = plt.figure(figsize = (10,10))
+for i in range(len(X_test.columns)):
+    iceX, iceY = ICE_var(rf, X_test, X_test.columns[i])
+    ax = fig.add_subplot(2,3, i+1)
+    plotICE(iceX, iceY, ax = ax)
+    ax.set_title(X_test.columns[i])
+
+plt.show()
+```
+
+So, what to these plots tell us? Since there are so many lines, it is hard to glean any truly useful numeric solutions from this. We can tell two useful things from this. The first thing to look at is the range of the peaks of the highest curves to the troughs of the lowest curves. This gives us an idea of the strength of the variable. The next thing to look out for is big splits in the curves, such as those seen in cabins and tonnage. These are indicative of heterogenous effects (interactions between correlated variables), and also show us why PDP fails. If we average these variables with large spits, we are hiding that effect, and cancelling out a lot of it. For example, if you look at cabins, there is a large symmetric split. When we average these curves, we will end up with a pretty flat curve with a very small range. This is why when we have these complicated, correlated, effects, partial dependence (or any tool which relies on averages of predictions of correlated variables) fails. It is also important to look back to the correlation plot and see the lack of correlation in passengers and passenger density. This is evident in the ICE curves as well! We can now look at the variable importance using ICE, and see whether it is improved or not.
+
+```{python}
+def ICE_vips(model, x):
+    imps = {}
+    for i in range(len(x.columns)):
+        icex, icey = ICE_var(model, x, x.columns[i])
+        imps[x.columns[i]] = (np.std(icey, 0)).mean()
+    return(imps)
+
+
+ice_imps = {get_name(m): ICE_vips(m, X) for m in models}
+
+def plot_ICE_imp(d, ax = None, color = "blue"):
+    df = pd.DataFrame()
+    df["Variable"] = d.keys()
+    df["Importance"] = d.values()
+    df.sort_values("Importance").plot(kind = "barh", x = "Variable", y = "Importance", width = 0.8, ax = ax, color = c)
+
+fig = plt.figure(figsize = (10,10))
+for i in range(len(ice_imps.keys())):
+    ax = fig.add_subplot(len(list(ice_imps.keys())),1, i+1)
+    #c = cm.Paired(i/len(imps.keys()), 1)
+    c = sns.color_palette("hls", i+1)[i]
+    plot_ICE_imp(ice_imps[list(ice_imps.keys())[i]], ax = ax, color = c)
+    ax.set_title(list(ice_imps.keys())[i])
+plt.show()
+```
+
+Look at that! The relative importances match up with those calculated both for the random forest and for the linear model, even though we have correlated values!
+
+### In R
+
+
+The code implementation of ICE is rather simple, it is the exact same as the PDP code, only without averaging! First we will calculate the ICE curve for a single variable:
+
+
+```{R}
+ice_var <- function(model, x, var){
+  x_sorted <- x[order(x[[var]], decreasing = TRUE),]
+  # predefine matrix!
+  out <- matrix(nrow = nrow(x), ncol = nrow(x))
+  for (i in 1:nrow(x)) {
+    tmp_df <- x_sorted
+    tmp_df[[var]] <- tmp_df[[var]][i]
+    out[i,] <- predict(model, tmp_df)
+  }
+  return(data.frame("value" = x_sorted[[var]], "ICE" = t(out)))
+}
+
+```
+
+
+Sweet, now lets go ahead and scale this up to run over an entire data frame. First, lets scale the ice function:
+
+```{R}
+ice_df <- function(model, df) {
+  out <- lapply(colnames(df), function(x) {
+    res <- ice_var(model, df, x)
+    res$variable <- x
+    return(res)
+  })
+  return(out)
+}
+
+
+# for reference
+(rf_ice <- do.call(rbind,ice_df(trained_models[[3]], X_test)))
+```
+
+Next, lets plot those ice curves! This should be pretty simple with a for loop, facet wrap, and `aes_string`:
+
+```{R, fig.width = 10, fig.height = 10, fig.cap = "Random Forest ICE curves", fig.align = "center"}
+plot_ice <- function(df) {
+  p <- ggplot(df)
+  ice_cols <- names(df)[-c(1, ncol(df))]
+
+  plot_single_curve_set <- function(col) {
+    # superassignment modify out of scope variable
+    p <<- p + geom_line(aes_string(x = "value", y = col), color = "black", alpha = 0.6) + 
+      facet_wrap(variable ~ ., scales = "free")
+  }
+
+  # iterate through columns
+  for (i in 1:length(ice_cols)) {
+    plot_single_curve_set(ice_cols[i])
+  }
+
+  return(p + labs(y = "Prediction", x = "Value") + theme_fivethirtyeight())
+}
+
+plot_ice(rf_ice)
+```
+
+
+So, what to these plots tell us? Since there are so many lines, it is hard to glean any truly useful numeric solutions from this. We can tell two useful things from this. The first thing to look at is the range of the peaks of the highest curves to the troughs of the lowest curves. This gives us an idea of the strength of the variable. The next thing to look out for is big splits in the curves, such as those seen in cabins and tonnage. These are indicative of heterogenous effects (interactions between correlated variables), and also show us why PDP fails. If we average these variables with large spits, we are hiding that effect, and cancelling out a lot of it.For example, the cabins curve has a large symmetric split. When we average these curves, we will end up with a pretty flat curve with a very small range. This is why when we have these complicated, correlated, effects, partial dependence (or any tool which relies on averages of predictions of correlated variables) fails. It is also important to look back to the correlation plot and see the lack of correlation in passengers and passenger density. This is evident in the ICE curves as well! We can now look at the variable importance using ICE, and see whether it is improved or not.
+
+
+```{R, fig.width = 10, fig.height = 10, fig.cap = "Ice Importances!", fig.align = "center"}
+
+# pretty ugly chain of apply's to be honest, open to suggested improvements
+ice_imp <- function(xs) {
+  # get the standard deviation of each ice curve and then avergae them, for each variable
+  out <- as.data.frame(lapply(xs, function(x) {mean(apply((x[,-c(1, ncol(x))]), 1,sd))}))
+  colnames(out) <- sapply(xs, function(x) x$variable[1])
+  return((out))
+}
+
+# scale up for entire set of models
+ices <- lapply(trained_models, function(x) ice_df(x, X_test))
+ice_imps <- lapply(ices, ice_imp)
+
+# tidy and plot!
+ice_imp_df <- do.call(rbind, ice_imps)
+
+# no need for superassignment!
+ice_imp_df$model <- rownames(ice_imp_df)
+
+ice_imp_df %>% gather(key = "key", value = "value", -model) %>%
+  ggplot(aes(x = key, y = value, fill = model)) +
+  geom_bar(stat = "identity") + 
+  facet_grid(model ~ . , scales = "free") +
+  coord_flip() + 
+  theme_fivethirtyeight() +
+  scale_fill_fivethirtyeight() +
+  ggtitle("ICE Variable Importance!")
+```
+
+
+Look at that! The relative importances match up with those calculated both for the random forest and for the linear model, even though we have correlated values!
+
+## Discussion
+
+ICE is impressive, and pretty intuitive. However, the combination of ICE and PDP still have one major issue: the inclusion of unrealistic values, of unfloating boats. We will next look at a solution to this (and the rest of the problems we have been facing)!
+
+# Accumulate Local Effects (ALE)
+
+Accumulated Local Effects, otherwise known as ALE, is more or less the most state of the art, *fully functional* tool we have to understand our models. There are few practical drawbacks of ALE, however there is one big one: it is incredibly challenging to implement in practice. There are only three successful implementations of ALE (to my knowledge): [an R package by the author of ALE](https://rdrr.io/cran/ALEPlot/), [an R package by the author of a brilliant IML book](https://github.com/christophM/iml), and a work in progress [ALE python pacage](https://github.com/blent-ai/ALEPython). Therefor, for the purposes of this blog post, we are not going to go in on the implementation of ALE (this could make up a future blog post - or a series of them), and instead we will focus on understanding it in depth, and of using it. If you are a strong python programmer and would like to work on writing a complete ALE package, tweet me or email me! The code shown here should give you a strong idea of how to formulate ALE on a real dataset.
+
+## Understanding ALE
+
+To understand ALE, we must first understand the deficiencies of our other methods. The first is that we are using a marginal distribution of our $x_c$ and $x_s$ sets, meaning we are completely ignoring any sort of effects of correlation in our calculations, assuming they are not present. First, let us make two correlated variables to show what we are doing!
+
+```{R}
+n <- 200
+r <- 0.9
+df <- data.frame(MASS::mvrnorm(n=n, mu = c(0,0), Sigma = matrix(c(1,r,r,1), nrow = 2), empirical = TRUE))
+names(df) <- c("x", "y")
+# highly correlated data
+cor(df)
+p <-  ggplot() + geom_point(data = df, aes(x=x, y=y))
+p
+```
+
+
+
+Before we get into the details, first let us take a look the ALE algorithm. We will get into each step and try to understand the intuition later:
+
+  1. Break the data ($(x_s, x_s)$) into $k$ neighborhoods, bounded by $z_{k-1, s}$ and $z_{k, s}$
+  2. For each $x_c$ in the neighborhood, calculate the prediction at the lower bound and the upper bound, $\hat f (z_{k-1, s}, x_s)$ and $\hat f (z_{k, s}, x_s)$
+  3. Difference those predictions. This is known as the "local effect".
+  4. Average the local effects in the neighborhood
+  5. Accumulate (sum) the average local effects across neighborhoods
+  6. Center the accumulated local effects on zero by subtracting the mean, for readability.
+
+### Step One: Break it up!
+
+The first step of ALE is rather intuitive. We want to be dealing in conditional distributions, rather than marginal ones, so we must break up our data into neighborhoods:
+
+```{r}
+# We are following the code example from the IML book, by Christoph Molnar
+# He is much smarter than I and the plots in this section should mostly be credited to him!
+p <-  ggplot(df) + geom_point(aes(x = x, y = y)) +
+  theme(panel.grid.major.y = element_blank(), 
+    panel.grid.minor.y = element_blank(), 
+    panel.grid.major.x = element_blank(), 
+    panel.grid.minor.x = element_blank()) 
+
+grid <- data.frame(x = quantile(-3:3, prob = seq(from=0, to = 1, length.out = 6)))
+labels <- data.frame(x = grid[1:5,])
+labels$xlab <- labels$x + .5
+labels$ylab <- 2.95
+labels$labels <- sapply(1:5, function(x) paste0("N(", x, ")"))
+
+breaks <- c(expression(z[0~","~x]),  expression(z[1~","~x]), expression(z[2~","~x]), expression(z[3~","~x]),
+  expression(z[4~","~x]), expression(z[5~","~x]))
+
+p2 <- p + geom_vline(data = grid, aes(xintercept = x)) + 
+      scale_x_continuous(limits = c(-3, 3), labels = breaks, breaks = seq(from = -3, to = 3, length.out = 6)) +
+      geom_label(data = labels, aes(x = xlab, y = ylab, label = labels))
+p2
+```
+
+So again, we are interested in the effect of $x$, so we break the data into $k$ neighborhoods, bounded by $x$. We define the upper bound as $z_{k, x}$ and the lower bound as $z_{k-1, x}$, where $k$ is the number of the neighborhood. So in this case, $x$ is our interest set, $x_s$, and $y$ is our complement, $x_c$
+
+###  Step 2: Calculate Local Effects!
+
+This is the really interesting and satisfying part. In PDP, we were calculating the average prediction across variables, which allows their effect to mix in with the effect of $x_s$. With ALE, we are finding a clever way to remove the influence of $x_c$. How are we going to do this?
+
+We are going to hold $x_c$ constant and going to calculate the change in prediction across $x_s$, cancelling out the effects of $x_c$. That is:
+
+* For each instance of $x_c$ in a neighborhood:
+  * push $x_s$ to $z_{k-1, s}$, and calculate the lower prediction, $\hat f (z_{k-1, s}, x_x)$
+  * push $x_s$ to $z_{k, s}$, and calculate the upper prediction, $\hat f (z_{k, s}, x_x)$
+  * calculate the difference, $\Delta \hat f = \hat f (z_{k, s}, x_x) - \hat f (z_{k-1, s}, x_x)$ 
+
+As the number of neighbors approaches infinity, we are getting to the change in prediction with respect to the change in $x_s$, that is:
+
+$$\widehat {\mathrm{Local Effect}}(x_s) = \frac{\partial} {\partial x_s} \hat f (x_s,x_c) = \lim_{k \to \infty} \Delta \hat f$$
+
+
+Or visually what we are doing:
+
+```{r, fig.width = 10, fig.height = 10, dev = "png", fig.align = "center", eval = F}
+
+ind <- cut(df$x, grid$x, include.lowest = T)
+
+data_grouped <- split(df, ind)
+#> names(data_grouped)
+#> [1] "[-3,-1.8]"   "(-1.8,-0.6]" "(-0.6,0.6]"  "(0.6,1.8]"   "(1.8,3]"    
+data_grouped[[1]]$upper <- -1.8
+data_grouped[[1]]$lower <- -3
+data_grouped[[2]]$upper <- -0.6
+data_grouped[[2]]$lower <- -1.8
+data_grouped[[3]]$upper <- 0.6
+data_grouped[[3]]$lower <- -0.6
+data_grouped[[4]]$upper <- 1.8
+data_grouped[[4]]$lower <- 0.6
+data_grouped[[5]]$upper <- 3
+data_grouped[[5]]$lower <- 1.8
+
+data_grouped <- do.call(rbind, data_grouped)
+#> names(data_grouped)
+#> [1] "x"     "y"     "upper" "lower"
+data_grouped <- rename(data_grouped, initial = x)
+data_grouped <- gather(data_grouped, key = "state", value = "loc", -y)
+
+
+ggplot(data_grouped) + geom_point(aes(x = loc, y = y)) + 
+      geom_vline(data = grid, aes(xintercept = x)) + 
+      scale_x_continuous(limits = c(-3, 3), labels = breaks, breaks = seq(from = -3, to = 3, length.out = 6)) +
+      geom_label(data = labels, aes(x = xlab, y = ylab, label = labels)) + 
+      transition_states(state, transition_length = 1, state_length = 2)
+```
+
+```{r, fig.width = 10, fig.height = 10, dev = "png", fig.align = "center", echo = F}
+knitr::include_graphics("mover.gif")
+```
+
+So again, we are moving the entire neighborhood to the lower bound, making a prediction, moving the entire neighborhood to the upper bound, making a prediction, differencing those, and averaging those differences. We are averaging them weighted by the conditional distribution of of $x_c$ in this case, or more formally:
+$$
+E \left[ \hat {\mathrm{local effects}}(x_s, x_c)\mid x_s = z_s \right] =
+\int \mathbb{p}_{c \mid s}(x_c\mid z_{s})\hat {\mathrm{local effects}}(z_{ s}, x_s)dx_c
+$$
+
+### Step 3: Accumulate and Center
+
+We have made it out of the hairy part, understanding wise. All that is left now is to sum the local effects through each neighborhood, which can be mathematically written as just an integral over the neighborhoods:
+
+$$
+\mathrm{ALE}(x_s) = \int_{z_s, 0}^{x_S} E \left[ \hat {\mathrm{local effects}}(x_s, x_c)\mid x_s = z_s \right] dz_s - D
+$$
+
+Where D is some constant which centers the the ALE on 0 (typically the mean). 
+
+### Estimating ALE
+
+We must now sadly leave the world of the infinite world of integrals and fun and enter the real world of sums and estimation. We will now talk mathematically about estimating ALE, which is again, not too too hard:
+
+First, we calculate the local effects for each variable in the neighborhood:
+
+$$\Delta f =  \left[ \hat f(z_{k,j}, x^{(i)}_{\setminus j}) - \hat f(z_{k-1,j}, x^{(i)}_{\setminus j}) \right]$$
+
+Next, we average those through the neighborhood (note the notation change, just as we did for PDP):
+
+$$
+\frac{1}{n_j(k)} \sum_{i:x_j^{(i)} \in N_j(k)}\left[ \hat f(z_{k,j}, x^{(i)}_{\setminus j}) - \hat f(z_{k-1,j}, x^{(i)}_{\setminus j}) \right]
+$$
+
+Then we accumulate (sum) those throughout neighborhoods:
+
+$$
+
+{\widetilde {\mathrm{ALE}}}(x_{j}) = \sum^{k_j(x)} _{k=1}
+\frac{1}{n_j(k)} \sum_{i:x_j^{(i)} \in N_j(k)}\left[ \hat f(z_{k,j}, x^{(i)}_{\setminus j}) - \hat f(z_{k-1,j}, x^{(i)}_{\setminus j}) \right]
+$$
+
+Finally, we subtract the mean to center the ALE on zero!
+
+$$
+\mathrm{ALE}(x) ={\widetilde {\mathrm{ALE}}}(x_j)- \frac{1}{n} \sum_{i=1}^n {\widetilde {\mathrm{ALE}}}(x_j^{(i)})
+$$
+
+## ALE in practice
+
+As I mentioned before, we are not going to implement ALE ourselves in this already very long blog post, instead, we will look at the basic usage of ALE, its interpretation, and what I think to be some clever uses
+
+First, lets load in the necessary library: 
+
+```{r}
+library(iml)
+
+forest <- trained_models[[3]]
+```
+
+Next, we are going to simply calculate ALE!
+
+```{r}
+model <- Predictor$new(forest, data = X, y = y$crew)
+
+# calculate effects!
+effect <- FeatureEffects$new(model)
+
+# its that easy!
+plot(effect)
+```
+
+So, how do we read this? It is very similar to the partial dependence plots, except we think in terms of average prediction. So, if we look at the passengers plot, we are saying that if passengers = 20, the prediction will be 0.5 higher than normal! It is pretty easy to interpret, but it is very powerful. Again, the nice thing about ALE is that we ***know*** these variables are in complete isolation of each other, with no sneaky interactions coming in or out. If you are interested in ALE for categorical variables, which is possible, I highly suggest reading [the original paper](https://arxiv.org/pdf/1612.08468.pdf)
+
+We can also do ALE in 2 dimensions. What does this show us? This shows, amazingly, the effect of ***purely the interaction*** between two variables! This is incredibly powerful. Lets check it out!
+
+```{r, warning = F, fig.align = "center"}
+# note we are using Effect not Effects this time
+ALE <- FeatureEffect$new(model, c("Tonnage","cabins"))
+plot(ALE)
+```
+
+
+Well what does this tell us? This tells us many things! First, we have 100% guaranteed proof that our random forest is modeling an interaction between Tonnage and Cabins, and second, we know exactly what the effect of that interaction is. This is amazing! We can actually use these effects to view how a single prediction is built, which is in my opinion amazing. Before I end this blog post, I will show how to do this:
+
+### Anatomy of a Prediction
+
+To understand how our prediction is actually made, we first want to make up a new instance of data, as our test case. We will say that this test case represents the wonderful ship, the S.S. David:
+
+```{R}
+set.seed(33)
+(david <- X[sample(1:nrow(X), 1),])
+
+# also grab the predictions, to get the average prediction
+preds <- predict(forest, X)
+pmean <- mean(preds)
+```
+
+Next, we can hack together some ugly code to get the ALE values from the ALE project. Note, I am not proud of this code, but it certainly works!
+
+```{R}
+# get the results from the effect object for a single feature:
+
+getALE <- function(feat, val) {
+  out <- effect$results[[feat]][1:3] %>%  data.frame
+  outdt <- out$.feature %>% data.frame
+  names(outdt) = "x"
+  outdt$val <- val
+  mindist <- abs(outdt$x - outdt$val)
+  # find the closest effect (it is a grid after all)
+  nn <- outdt$x[which.min(mindist)]
+  res <- effect$results[[feat]][1:3] %>% 
+    filter(.feature == nn) %>% 
+    select(.ale) 
+  return(as.numeric(res))
+
+  }
+
+```
+
+Next, we want to scale this up over all variables (this is the way I approach a lot of programming problems, if thats not apparent).
+
+```{R}
+generalEffect <- function(boat) {
+  p  <- pmean
+  nms <- names(boat)
+  ales <- lapply(nms, function(x) getALE(x, boat[[x]]))
+  return(ales)
+}
+
+# ges for generaleffects
+ges <- generalEffect(david)
+names(ges) <- names(david)
+```
+
+Next, lets also get the interaction between cabins and tonnage, for fun! Getting all interactions is left as an excercise for the reader ;)
+
+```{R}
+getInteractALE <- function(boat) {
+  t <- boat$Tonnage 
+  c <- boat$cabins
+  tdist <-  abs(ALE$results$Tonnage - t) 
+  cdist <-  abs(ALE$results$cabins - c) 
+  tnn <- ALE$results$Tonnage[which.min(tdist)]
+  cnn <- ALE$results$cabins[which.min(cdist)]
+  res <- ALE$results %>%
+    filter(Tonnage == tnn & cabins == cnn) %>% select(.ale)
+    return(as.numeric(res))
+}
+
+ges$interact <- getInteractALE(david)
+(ges <- as.data.frame(ges))
+```
+
+
+Next, lets build the prediction! This is pretty simple, we are going to add the mean to one column, then add in the effects of the other columns. This is best done with a for loop.
+
+```{R, fig.width = 20, fig.height = 20, fig.align = "center", dev = "png", eval = F}
+
+ges <- cbind("mean" = pmean, ges)
+
+for (i in 2:ncol(ges)) {
+  ges[i] <- ges[i] + ges[i-1] 
+}
+
+ge_gather <- gather(ges, key = "variable", value = "prediction") 
+# for our lovely animation
+ge_gather$idx <- 1:nrow(ge_gather)
+
+ge_gather$variable <- factor(ge_gather$variable, levels = ge_gather$variable)
+ge_gather %>% ggplot() + geom_point(aes(x =variable, y = prediction, color = variable), size = 5) +coord_flip() + scale_color_few() + ggtitle("Prediction") + theme_hc() +  transition_reveal(idx) 
+```
+
+```{R, echo = F, fig.height = 20, fig.width = 20, fig.align = "center"}
+knitr::include_graphics("anim.gif")
+```
+
+And there we have it! We have actually built and looked at the mechanics of our prediction. The amazing part about these tools, is we can use essentially any model that makes a prediction, in any language, and look inside and understand what's going on. Please note, because I did not include the other interactive effects, the final value of our ALE prediction is actually slightly off, but we can see that in general, it is correct. This plot was inspired by the break-down plots discussed [here](https://pbiecek.github.io/PM_VEE/iBreakDown.html). For a bit more on ALE, I would reccommend reading the [original paper](https://arxiv.org/pdf/1612.08468.pdf), the IML book referenced below, and [this chapter (or whole book)](https://pbiecek.github.io/PM_VEE/accumulatedLocalProfiles.html). 
+
+# What About SHAP and LIME?
+
+SHAP and LIME are two other well known IML tools that are used often. However, [a paper](https://arxiv.org/abs/1911.02508v1) has recently come out that calls them into question, really for the same reason we questioned permutation importance, partial dependence, and ICE: unrealistic observations. This paper went so far as to train a truly biased model and show how it manages to fool both LIME and SHAP. Until this is resolved, I think our best bet is to use ALE in general, but we have only scratched the surface of IML tools in this blog post. This leads us to our next topic: resources
+
+# Software Resources for IML
+
+* [drWhy.AI](https://github.com/ModelOriented/DrWhy)
+  * A collection of AMAZING R-based tools for interpretable ML. Note that these tools even work out of the box with sklearn and Keras, highly recommended
+* [iml R package](https://github.com/christophM/iml) 
+  * Terrific R package for interpretable machine learning. Highly recommended.
+* [ALEpython](https://github.com/blent-ai/ALEPython) 
+  * Python package for ALE, contribute if you can!! 
+* [yellowbrick](https://www.scikit-yb.org/en/latest/quickstart.html) 
+  * Amazing python tool for model visualizations
+* [ELI5](https://eli5.readthedocs.io/en/latest/) 
+  * Permutation Importance and LIME in python. Excellent tutorials
+
+
+# Books and papers which were valuable to me
+
+
+* [Amazing IML book](https://christophm.github.io/interpretable-ml-book/ale.html)
+  * I refer to this constantly, to me it is the IML bible 
+* [ALE original paper](https://arxiv.org/pdf/1612.08468.pdf)
+* [PDP and ICE importance paper (easy read)](https://arxiv.org/abs/1805.04755)
+* [Another very nice IML book](https://pbiecek.github.io/PM_VEE/introduction.html)

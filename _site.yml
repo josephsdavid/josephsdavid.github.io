@@ -29,7 +29,7 @@ navbar:
                   href: https://twitter.com/Daved256
 
 output:
-  html_document:
-    theme: darkly
-    highlight: breezedark
-    df_print: paged
+    html_document:
+        theme: united
+        highlight: haddock
+        df_print: paged

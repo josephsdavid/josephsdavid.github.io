@@ -12,13 +12,13 @@
 
 <meta name="author" content="David Josephs" />
 
-<meta name="date" content="2019-12-09" />
+<meta name="date" content="2019-12-11" />
 
 <title>Preprocessing Time Series Data</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/darkly.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/united.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
@@ -57,46 +57,38 @@ pre.numberSource code > span > a:first-child::before
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
     padding: 0 4px; width: 4em;
-    background-color: #232629;
-    color: #7a7c7d;
+    color: #aaaaaa;
   }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #7a7c7d;  padding-left: 4px; }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  { color: #cfcfc2; background-color: #232629; }
+  {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span. { color: #cfcfc2; } /* Normal */
-code span.al { color: #95da4c; } /* Alert */
-code span.an { color: #3f8058; } /* Annotation */
-code span.at { color: #2980b9; } /* Attribute */
-code span.bn { color: #f67400; } /* BaseN */
-code span.bu { color: #7f8c8d; } /* BuiltIn */
-code span.cf { color: #fdbc4b; } /* ControlFlow */
-code span.ch { color: #3daee9; } /* Char */
-code span.cn { color: #27aeae; } /* Constant */
-code span.co { color: #7a7c7d; } /* Comment */
-code span.cv { color: #7f8c8d; } /* CommentVar */
-code span.do { color: #a43340; } /* Documentation */
-code span.dt { color: #2980b9; } /* DataType */
-code span.dv { color: #f67400; } /* DecVal */
-code span.er { color: #da4453; } /* Error */
-code span.ex { color: #0099ff; } /* Extension */
-code span.fl { color: #f67400; } /* Float */
-code span.fu { color: #8e44ad; } /* Function */
-code span.im { color: #27ae60; } /* Import */
-code span.in { color: #c45b00; } /* Information */
-code span.kw { color: #cfcfc2; } /* Keyword */
-code span.op { color: #cfcfc2; } /* Operator */
-code span.ot { color: #27ae60; } /* Other */
-code span.pp { color: #27ae60; } /* Preprocessor */
-code span.re { color: #2980b9; } /* RegionMarker */
-code span.sc { color: #3daee9; } /* SpecialChar */
-code span.ss { color: #da4453; } /* SpecialString */
-code span.st { color: #f44f4f; } /* String */
-code span.va { color: #27aeae; } /* Variable */
-code span.vs { color: #da4453; } /* VerbatimString */
-code span.wa { color: #da4453; } /* Warning */
+code span.al { color: #ff0000; } /* Alert */
+code span.an { color: #008000; } /* Annotation */
+code span.at { } /* Attribute */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #0000ff; } /* ControlFlow */
+code span.ch { color: #008080; } /* Char */
+code span.cn { } /* Constant */
+code span.co { color: #008000; } /* Comment */
+code span.cv { color: #008000; } /* CommentVar */
+code span.do { color: #008000; } /* Documentation */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.im { } /* Import */
+code span.in { color: #008000; } /* Information */
+code span.kw { color: #0000ff; } /* Keyword */
+code span.op { } /* Operator */
+code span.ot { color: #ff4000; } /* Other */
+code span.pp { color: #ff4000; } /* Preprocessor */
+code span.sc { color: #008080; } /* SpecialChar */
+code span.ss { color: #008080; } /* SpecialString */
+code span.st { color: #008080; } /* String */
+code span.va { } /* Variable */
+code span.vs { color: #008080; } /* VerbatimString */
+code span.wa { color: #008000; font-weight: bold; } /* Warning */
 
 </style>
 <script>
@@ -188,33 +180,33 @@ summary {
 <style type="text/css">
 /* padding for bootstrap navbar */
 body {
-  padding-top: 60px;
+  padding-top: 51px;
   padding-bottom: 40px;
 }
 /* offset scroll position for anchor links (for fixed navbar)  */
 .section h1 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 56px;
+  margin-top: -56px;
 }
 .section h2 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 56px;
+  margin-top: -56px;
 }
 .section h3 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 56px;
+  margin-top: -56px;
 }
 .section h4 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 56px;
+  margin-top: -56px;
 }
 .section h5 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 56px;
+  margin-top: -56px;
 }
 .section h6 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 56px;
+  margin-top: -56px;
 }
 .dropdown-submenu {
   position: relative;
@@ -426,7 +418,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Preprocessing Time Series Data</h1>
 <h4 class="author">David Josephs</h4>
-<h4 class="date">2019-12-09</h4>
+<h4 class="date">2019-12-11</h4>
 
 </div>
 
@@ -610,12 +602,12 @@ Spline Interpolation Between 8 points
 <span id="cb21-3"><a href="#cb21-3"></a>preprocess</span></code></pre></div>
 <pre><code>#&gt; function (...) 
 #&gt; Reduce(function(x, f) f(x), fs, ...)
-#&gt; &lt;bytecode: 0x113619b8&gt;
-#&gt; &lt;environment: 0x113627b8&gt;</code></pre>
+#&gt; &lt;bytecode: 0x13c8c250&gt;
+#&gt; &lt;environment: 0x13c8cb48&gt;</code></pre>
 <p>We now have a function that imports a directory of csv’s, converts the proper items to time series objects, spline interpolates the NAs, and converts to a hash table:</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>china &lt;-<span class="st"> </span><span class="kw">preprocess</span>(<span class="st">&quot;data/&quot;</span>)</span>
 <span id="cb23-2"><a href="#cb23-2"></a><span class="kw">str</span>(china)</span></code></pre></div>
-<pre><code>#&gt; &lt;environment: 0x10d86db8&gt;</code></pre>
+<pre><code>#&gt; &lt;environment: 0x1496a230&gt;</code></pre>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="kw">head</span>(china<span class="op">$</span>BeijingPM_, <span class="dv">100</span>)</span></code></pre></div>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">

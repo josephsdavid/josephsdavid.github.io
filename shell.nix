@@ -61,6 +61,7 @@ in
       python37Packages.matplotlib
       python37Packages.seaborn
       python37Packages.pprintpp
+      rPackages.magick
       hugo
     ];
     shellHook = ''

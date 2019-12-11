@@ -32,9 +32,9 @@ I am a:
 
 ## Data Science Blog:
 
-[Home Page](DSblog.html)
-
 ### Recent Articles:
+
+[Interpretable Machine Learning: Part 1](iml.html)
 
 [Building a Reproducible Data Science Environment with Nix](nix.html)
 
@@ -73,21 +73,19 @@ Work in progress
 * My dog
 
 # Things I am doing
-* Getting a master's in data science
 
-* Working on my capstone project (Unsupervised and Supervised Learning for MS Diagnoses):
-  * Build SVM and LSTM based classifiers using gait data to determine EDSS score computationally
-  * Cluster gait data to build a new mobility metric for MS patients as well as highlight relationships between other MS phenotypes and gait
+* Working on my master's thesis (Unsupervised and Supervised Learning for MS Diagnoses):
+  * Build SVM and LSTM based classifiers using gait data to assess the ordinality of EDSS scores in MS patients
+  * Clustering gait data to build a new mobility metric for MS patients.
 
-* Helping graduate students succeed and understand the entire data science workflow from data attainment to deployment (head TA for a survey of data science course)
-
-* Going in depth with deep learning
-  * Building fake images of food with a GAN  (future blog post)
-  * Working on image classification with CNNs
-  * Time series analysis with LSTMs and WaveNet CNN architecture
-  * (Hopefully) building a chess AI that uses reinforcement learning
+* Helping graduate students succeed and understand the entire data science workflow from data attainment to deployment (head TA for a survey of data science course, and weekend lecturer for an advanced machine learning course)
 
 * Maintaining and growing my first [large python library](https://pypi.org/project/n2d/)
+
+* Looking for projects to keep me busy. Ideas:
+  * More blog posts!
+  * Interpretable Machine Learning
+  * Build a VAE picture based "restaurant"
 
 
 # Things I have done
