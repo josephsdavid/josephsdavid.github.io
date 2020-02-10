@@ -34,7 +34,9 @@ I am a:
 
 ### Recent Articles:
 
-[Interpretable Machine Learning: Part 1](iml.html)
+Important note, I am having some serious issues with systme fonts lately, therefore some graphics may look a bit funny...
+
+[Interpretable Machine Learning: Part 1](iml.html) 
 
 [Building a Reproducible Data Science Environment with Nix](nix.html)
 
@@ -48,28 +50,15 @@ Work in progress
 
 # Things I love
 
-* R
-
 * Python
-
+* R 
 * [Nix](https://nixos.org/nix/)
-
 * Long walks
-
 * Chess
-
 * Writing
-
-* Ensemble Models
-
+* Explainable Models
+* Parametrized Deep Learning
 * Time Series
-
-* Dynamic Time Warping
-
-* Keras
-
-* American cheese
-
 * My dog
 
 # Things I am doing
@@ -79,9 +68,7 @@ Work in progress
 
 
 * Helping graduate students succeed and understand the entire data science workflow from data attainment to deployment (head TA for a survey of data science course, and weekend lecturer for an advanced machine learning course)
-
 * Maintaining and growing my first [large python library](https://pypi.org/project/n2d/)
-
 * Looking for projects to keep me busy. Ideas:
   * More blog posts!
   * Interpretable Machine Learning
@@ -91,21 +78,13 @@ Work in progress
 # Things I have done
 
 * Worked for NASA
-
   * Acted as translator, astronomer, and lead scout for the [ultima thule mission](https://www.nasa.gov/feature/nasa-s-new-horizons-team-strikes-gold-in-argentina/)
-
   * [Conducted televised interviews in Argentina](https://twitter.com/UVaOccultChaser/status/885859356054622209)
-
 * Performed [extensive time series analysis](https://github.com/josephsdavid/ChinesePM) of $PM_{2.5}$ content in Beijing, using models ranging from ARIMA and VAR to LSTMs, and ensembling methods
-
 * Conducted [ARM using R](https://github.com/drake-smu/7331-lab-3) on census data, yielding unsurprising results
-
 * Extensively done [classification on census data using python](https://github.com/drake-smu/7331-lab-2)
-
 * Built a snowflake schema data store at [treehouse](https://www.dmagazine.com/sponsored/2017/06/treehouse-has-arrived-in-dallas/)
-  
   * Developed a SKU system for all products, ranging from paint to refrigerators
-
 * Managed data analytics for a local election at [Uptown Dallas, Inc](http://uptowndallas.net/)
 
 

@@ -11,7 +11,7 @@ navbar:
                         - text: "Nix for Data Science 1"
                           href: nix.html
                         - text: "Nix for Data Science 2: COMING SOON"
-                          href: advancedNix.html
+                          href: nix2.html
                 - text: "IML"
                   menu:
                           - text: "Interpretable Machine Learning: Part 1"
@@ -30,6 +30,6 @@ navbar:
 
 output:
     html_document:
-        theme: united
+        theme: readable
         highlight: haddock
         df_print: paged

@@ -15,7 +15,7 @@
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/darkly.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/readable.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
@@ -188,33 +188,33 @@ summary {
 <style type="text/css">
 /* padding for bootstrap navbar */
 body {
-  padding-top: 60px;
+  padding-top: 66px;
   padding-bottom: 40px;
 }
 /* offset scroll position for anchor links (for fixed navbar)  */
 .section h1 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 71px;
+  margin-top: -71px;
 }
 .section h2 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 71px;
+  margin-top: -71px;
 }
 .section h3 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 71px;
+  margin-top: -71px;
 }
 .section h4 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 71px;
+  margin-top: -71px;
 }
 .section h5 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 71px;
+  margin-top: -71px;
 }
 .section h6 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 71px;
+  margin-top: -71px;
 }
 .dropdown-submenu {
   position: relative;
@@ -444,7 +444,7 @@ div.tocify {
       <a href="nix.html">Nix for Data Science 1</a>
     </li>
     <li>
-      <a href="advancedNix.html">Nix for Data Science 2: COMING SOON</a>
+      <a href="nix2.html">Nix for Data Science 2: COMING SOON</a>
     </li>
   </ul>
 </li>
@@ -521,17 +521,8 @@ div.tocify {
 <span id="cb1-7"><a href="#cb1-7"></a><span class="kw">write</span>(x,<span class="st">&quot;&quot;</span>)</span></code></pre></div>
 <p>We will name this file <code>sponge.R</code>. Lets test it out:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="bu">echo</span> <span class="st">&quot;use nix&quot;</span> <span class="kw">|</span> <span class="ex">sponge.R</span></span></code></pre></div>
-<pre><code>## these paths will be fetched (0.51 MiB download, 2.47 MiB unpacked):
-##   /nix/store/d2iqwqxxq19jyvakh7l4jfvwnbz9rkka-bash-interactive-4.4-p23-dev
-##   /nix/store/g0wql6lf0ysg7kb6ymmarz6x8glds8if-bash-interactive-4.4-p23-info
-##   /nix/store/im6sdk69k5s7c8jxzhzfvb2j9nwg7hmg-bash-interactive-4.4-p23-man
-##   /nix/store/ppa5zzafkz86aaipg5lb3yvyih21p7jd-bash-interactive-4.4-p23-doc
-## copying path &#39;/nix/store/ppa5zzafkz86aaipg5lb3yvyih21p7jd-bash-interactive-4.4-p23-doc&#39; from &#39;https://cache.nixos.org&#39;...
-## copying path &#39;/nix/store/g0wql6lf0ysg7kb6ymmarz6x8glds8if-bash-interactive-4.4-p23-info&#39; from &#39;https://cache.nixos.org&#39;...
-## copying path &#39;/nix/store/im6sdk69k5s7c8jxzhzfvb2j9nwg7hmg-bash-interactive-4.4-p23-man&#39; from &#39;https://cache.nixos.org&#39;...
-## copying path &#39;/nix/store/d2iqwqxxq19jyvakh7l4jfvwnbz9rkka-bash-interactive-4.4-p23-dev&#39; from &#39;https://cache.nixos.org&#39;...
-##  --------- 
-## | Use NIX |
+<pre><code>##  --------- 
+## | USE nIx |
 ##  --------- 
 ##   \\
 ##    \\    *
@@ -545,7 +536,7 @@ div.tocify {
 ##             &lt;&lt;    &lt;&lt;
 ##            ###   ###
 ##  --------- 
-## | Use NIX |
+## | USE nIx |
 ##  --------- 
 ##   \\
 ##    \\    *
