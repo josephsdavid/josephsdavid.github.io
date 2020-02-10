@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 <meta name="author" content="David Josephs" />
 
-<meta name="date" content="2019-12-11" />
+<meta name="date" content="2020-02-10" />
 
 <title>Preprocessing Time Series Data</title>
 
@@ -309,6 +308,7 @@ $(document).ready(function () {
   border: none;
   display: inline-block;
   border-radius: 4px;
+  background-color: transparent;
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li {
@@ -418,7 +418,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Preprocessing Time Series Data</h1>
 <h4 class="author">David Josephs</h4>
-<h4 class="date">2019-12-11</h4>
+<h4 class="date">2020-02-10</h4>
 
 </div>
 
@@ -452,19 +452,18 @@ $(document).ready(function () {
 <span id="cb2-6"><a href="#cb2-6"></a>    files &lt;-<span class="st"> </span><span class="kw">list.files</span>(path)</span>
 <span id="cb2-7"><a href="#cb2-7"></a>    <span class="co"># next we search for csvs using grepl</span></span>
 <span id="cb2-8"><a href="#cb2-8"></a>    files &lt;-<span class="st"> </span>files[<span class="kw">grepl</span>(files, <span class="dt">pattern =</span> <span class="st">&quot;.csv&quot;</span>)]</span>
-<span id="cb2-9"><a href="#cb2-9"></a>    <span class="co"># next we append the path to the list of files: we use vapply because we</span></span>
-<span id="cb2-10"><a href="#cb2-10"></a>    <span class="co"># want vector output, and its incredibly fast (the fastest of the apply</span></span>
-<span id="cb2-11"><a href="#cb2-11"></a>    <span class="co"># family)</span></span>
-<span id="cb2-12"><a href="#cb2-12"></a>    filepaths &lt;-<span class="st"> </span><span class="kw">vapply</span>(files, <span class="cf">function</span>(x) <span class="kw">paste0</span>(path, x), <span class="kw">character</span>(<span class="dv">1</span>))</span>
-<span id="cb2-13"><a href="#cb2-13"></a>    <span class="co"># import the files as a list</span></span>
-<span id="cb2-14"><a href="#cb2-14"></a>    imports &lt;-<span class="st"> </span><span class="kw">lapply</span>(filepaths, fread)</span>
-<span id="cb2-15"><a href="#cb2-15"></a>    <span class="co"># next we set up the names of each import to the list</span></span>
-<span id="cb2-16"><a href="#cb2-16"></a>    filenames &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;.csv&quot;</span>, <span class="st">&quot;&quot;</span>, files)</span>
-<span id="cb2-17"><a href="#cb2-17"></a>    <span class="co"># and any numbers</span></span>
-<span id="cb2-18"><a href="#cb2-18"></a>    filenames &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;[[:digit:]]+&quot;</span>, <span class="st">&quot;&quot;</span>, filenames)</span>
-<span id="cb2-19"><a href="#cb2-19"></a>    <span class="kw">names</span>(imports) &lt;-<span class="st"> </span>filenames</span>
-<span id="cb2-20"><a href="#cb2-20"></a>    <span class="kw">return</span>(imports)</span>
-<span id="cb2-21"><a href="#cb2-21"></a>}</span></code></pre></div>
+<span id="cb2-9"><a href="#cb2-9"></a>    <span class="co"># next we append the path to the list of files: we use vapply because we want</span></span>
+<span id="cb2-10"><a href="#cb2-10"></a>    <span class="co"># vector output, and its incredibly fast (the fastest of the apply family)</span></span>
+<span id="cb2-11"><a href="#cb2-11"></a>    filepaths &lt;-<span class="st"> </span><span class="kw">vapply</span>(files, <span class="cf">function</span>(x) <span class="kw">paste0</span>(path, x), <span class="kw">character</span>(<span class="dv">1</span>))</span>
+<span id="cb2-12"><a href="#cb2-12"></a>    <span class="co"># import the files as a list</span></span>
+<span id="cb2-13"><a href="#cb2-13"></a>    imports &lt;-<span class="st"> </span><span class="kw">lapply</span>(filepaths, fread)</span>
+<span id="cb2-14"><a href="#cb2-14"></a>    <span class="co"># next we set up the names of each import to the list</span></span>
+<span id="cb2-15"><a href="#cb2-15"></a>    filenames &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;.csv&quot;</span>, <span class="st">&quot;&quot;</span>, files)</span>
+<span id="cb2-16"><a href="#cb2-16"></a>    <span class="co"># and any numbers</span></span>
+<span id="cb2-17"><a href="#cb2-17"></a>    filenames &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;[[:digit:]]+&quot;</span>, <span class="st">&quot;&quot;</span>, filenames)</span>
+<span id="cb2-18"><a href="#cb2-18"></a>    <span class="kw">names</span>(imports) &lt;-<span class="st"> </span>filenames</span>
+<span id="cb2-19"><a href="#cb2-19"></a>    <span class="kw">return</span>(imports)</span>
+<span id="cb2-20"><a href="#cb2-20"></a>}</span></code></pre></div>
 <div id="checking-for-missing-data" class="section level2">
 <h2>Checking for Missing Data</h2>
 <p><span class="newthought">The next important step</span> is to check for missing data, so we know wether or not we have to import it. We can do this quickly with <code>rapply</code>, which recursively applies a function to the deepest itemset of each item in a nested list:</p>
@@ -602,12 +601,12 @@ Spline Interpolation Between 8 points
 <span id="cb21-3"><a href="#cb21-3"></a>preprocess</span></code></pre></div>
 <pre><code>#&gt; function (...) 
 #&gt; Reduce(function(x, f) f(x), fs, ...)
-#&gt; &lt;bytecode: 0x130df0d0&gt;
-#&gt; &lt;environment: 0x130d2068&gt;</code></pre>
+#&gt; &lt;bytecode: 0x11078b90&gt;
+#&gt; &lt;environment: 0x11075700&gt;</code></pre>
 <p>We now have a function that imports a directory of csv’s, converts the proper items to time series objects, spline interpolates the NAs, and converts to a hash table:</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>china &lt;-<span class="st"> </span><span class="kw">preprocess</span>(<span class="st">&quot;data/&quot;</span>)</span>
 <span id="cb23-2"><a href="#cb23-2"></a><span class="kw">str</span>(china)</span></code></pre></div>
-<pre><code>#&gt; &lt;environment: 0x15e7c2a0&gt;</code></pre>
+<pre><code>#&gt; &lt;environment: 0x1327e0b8&gt;</code></pre>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="kw">head</span>(china<span class="op">$</span>BeijingPM_, <span class="dv">100</span>)</span></code></pre></div>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">

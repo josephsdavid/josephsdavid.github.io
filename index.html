@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
@@ -220,6 +219,7 @@ $(document).ready(function () {
   border: none;
   display: inline-block;
   border-radius: 4px;
+  background-color: transparent;
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li {
@@ -381,10 +381,9 @@ $(document).ready(function () {
 <div id="things-i-am-doing" class="section level1">
 <h1>Things I am doing</h1>
 <ul>
-<li><p>Working on my master’s thesis (Unsupervised and Supervised Learning for MS Diagnoses):</p>
+<li><p>Working on my master’s thesis (Fast Classification of sEMG signal):</p>
 <ul>
-<li>Build SVM and LSTM based classifiers using gait data to assess the ordinality of EDSS scores in MS patients</li>
-<li>Clustering gait data to build a new mobility metric for MS patients.</li>
+<li>Fast classification of electrical signals in muscles. The idea is we can quickly classify a broad range of motions in very short time windows, using deep techniques on the near raw electrical signals. The usage of this would be mainly in prosthetics which predict gestures based on what the user wants, and body controlled electrical arms. Our classifier is able to classify 12 fine finger movements, 17 wrist movements, 23 functional motions, and rest with relatively high accuracy in less than 300 milliseconds, which makes it inherently useful. However, in the future I believe that an unsupervised or reinforcement based approach would be more useful, the presence of classes at all is a hindrance on the functionality of these models.</li>
 </ul></li>
 <li><p>Helping graduate students succeed and understand the entire data science workflow from data attainment to deployment (head TA for a survey of data science course, and weekend lecturer for an advanced machine learning course)</p></li>
 <li><p>Maintaining and growing my first <a href="https://pypi.org/project/n2d/">large python library</a></p></li>

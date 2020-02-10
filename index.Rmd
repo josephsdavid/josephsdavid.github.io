@@ -74,9 +74,9 @@ Work in progress
 
 # Things I am doing
 
-* Working on my master's thesis (Unsupervised and Supervised Learning for MS Diagnoses):
-  * Build SVM and LSTM based classifiers using gait data to assess the ordinality of EDSS scores in MS patients
-  * Clustering gait data to build a new mobility metric for MS patients.
+* Working on my master's thesis (Fast Classification of sEMG signal):
+  * Fast classification of electrical signals in muscles. The idea is we can quickly classify a broad range of motions in very short time windows, using deep techniques on the near raw electrical signals. The usage of this would be mainly in prosthetics which predict gestures based on what the user wants, and body controlled electrical arms. Our classifier is able to classify 12 fine finger movements, 17 wrist movements,  23 functional motions, and rest with relatively high accuracy in less than 300 milliseconds, which makes it inherently useful. However, in the future I believe that an unsupervised or reinforcement based approach would be more useful, the presence of classes at all is a hindrance on the functionality of these models.
+
 
 * Helping graduate students succeed and understand the entire data science workflow from data attainment to deployment (head TA for a survey of data science course, and weekend lecturer for an advanced machine learning course)
 
