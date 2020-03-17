@@ -521,8 +521,17 @@ div.tocify {
 <span id="cb1-7"><a href="#cb1-7"></a><span class="kw">write</span>(x,<span class="st">&quot;&quot;</span>)</span></code></pre></div>
 <p>We will name this file <code>sponge.R</code>. Lets test it out:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="bu">echo</span> <span class="st">&quot;use nix&quot;</span> <span class="kw">|</span> <span class="ex">sponge.R</span></span></code></pre></div>
-<pre><code>##  --------- 
-## | USE nIx |
+<pre><code>## these paths will be fetched (0.51 MiB download, 2.47 MiB unpacked):
+##   /nix/store/d2iqwqxxq19jyvakh7l4jfvwnbz9rkka-bash-interactive-4.4-p23-dev
+##   /nix/store/g0wql6lf0ysg7kb6ymmarz6x8glds8if-bash-interactive-4.4-p23-info
+##   /nix/store/im6sdk69k5s7c8jxzhzfvb2j9nwg7hmg-bash-interactive-4.4-p23-man
+##   /nix/store/ppa5zzafkz86aaipg5lb3yvyih21p7jd-bash-interactive-4.4-p23-doc
+## copying path &#39;/nix/store/ppa5zzafkz86aaipg5lb3yvyih21p7jd-bash-interactive-4.4-p23-doc&#39; from &#39;https://cache.nixos.org&#39;...
+## copying path &#39;/nix/store/g0wql6lf0ysg7kb6ymmarz6x8glds8if-bash-interactive-4.4-p23-info&#39; from &#39;https://cache.nixos.org&#39;...
+## copying path &#39;/nix/store/im6sdk69k5s7c8jxzhzfvb2j9nwg7hmg-bash-interactive-4.4-p23-man&#39; from &#39;https://cache.nixos.org&#39;...
+## copying path &#39;/nix/store/d2iqwqxxq19jyvakh7l4jfvwnbz9rkka-bash-interactive-4.4-p23-dev&#39; from &#39;https://cache.nixos.org&#39;...
+##  --------- 
+## | USe NIx |
 ##  --------- 
 ##   \\
 ##    \\    *
@@ -536,7 +545,7 @@ div.tocify {
 ##             &lt;&lt;    &lt;&lt;
 ##            ###   ###
 ##  --------- 
-## | USE nIx |
+## | USe NIx |
 ##  --------- 
 ##   \\
 ##    \\    *

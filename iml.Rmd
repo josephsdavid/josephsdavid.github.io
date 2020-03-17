@@ -389,7 +389,7 @@ lapply(names(vip_flat), function(x) {
 do.call( rbind, vip_flat) %>% as.data.frame %>%
   ggplot(aes(x = key, y = value, fill = model)) + geom_bar(stat = "identity") +
   facet_grid(model ~ ., scales = "free") + coord_flip() + ggthemes::theme_fivethirtyeight() + 
-  ggthemes::scale_fill_fivethirtyeight() + ggtitle("Permutation Importance")
+  ggthemes::scale_fill_fivethirtyeight() + ggtitle("Permutation Importance") + theme(text = element_text(family="Serif"))
 ```
 
 
@@ -562,7 +562,7 @@ library(ggthemes)
 rf_pdp %>% ggplot(aes(color = variable, y =  avg_pred, x = value)) + 
   geom_line(size = 1.5) +
   facet_wrap(variable ~ ., scales = "free") +
-  theme_fivethirtyeight() + scale_color_hc()
+  theme_fivethirtyeight() + scale_color_hc()+ theme(text = element_text(family="Serif"))
 ```
 
 Remember, we said that the variability in partial dependence is equivalent to the importance of a variable. Lets go ahead and write that up too! We are going to do a lot of `lapply`, as we are dealing with a list of lists of dataframes, and trying to quickly get that to a tidy format for ggplot
@@ -596,7 +596,7 @@ pdp_imps <- do.call(rbind, pdp_imps)
 
 pdp_imps%>%  ggplot(aes(x = variable, y = importance, fill = model)) + geom_bar(stat = "identity") +
   facet_grid(model ~ ., scales = "free") + coord_flip() + ggthemes::theme_fivethirtyeight() + 
-  ggthemes::scale_fill_fivethirtyeight() + ggtitle("Partial Dependence Importance")
+  ggthemes::scale_fill_fivethirtyeight() + ggtitle("Partial Dependence Importance")+ theme(text = element_text(family="Serif"))
 ```
 
 
@@ -617,9 +617,8 @@ correlator  <-  function(df){
 		corrplot("upper", addCoef.col = "white", number.digits = 2,
 			 number.cex = 0.8, method="circle",
 			 order="hclust", 
-			 tl.srt=45, tl.cex = 1)
+			 tl.srt=45, tl.cex = 1, number.font=3)
 }
-
 X_test %>% correlator
 ```
 
@@ -758,7 +757,7 @@ plot_ice <- function(df) {
   plot_single_curve_set <- function(col) {
     # superassignment modify out of scope variable
     p <<- p + geom_line(aes_string(x = "value", y = col), color = "black", alpha = 0.6) + 
-      facet_wrap(variable ~ ., scales = "free")
+      facet_wrap(variable ~ ., scales = "free")+ theme(text = element_text(family="Serif"))
   }
 
   # iterate through columns
@@ -803,7 +802,7 @@ ice_imp_df %>% gather(key = "key", value = "value", -model) %>%
   coord_flip() + 
   theme_fivethirtyeight() +
   scale_fill_fivethirtyeight() +
-  ggtitle("ICE Variable Importance!")
+  ggtitle("ICE Variable Importance!")+ theme(text = element_text(family="Serif"))
 ```
 
 
@@ -828,7 +827,7 @@ df <- data.frame(MASS::mvrnorm(n=n, mu = c(0,0), Sigma = matrix(c(1,r,r,1), nrow
 names(df) <- c("x", "y")
 # highly correlated data
 cor(df)
-p <-  ggplot() + geom_point(data = df, aes(x=x, y=y))
+p <-  ggplot() + geom_point(data = df, aes(x=x, y=y))+ theme(text = element_text(family="Serif"))
 p
 ```
 
@@ -854,7 +853,7 @@ p <-  ggplot(df) + geom_point(aes(x = x, y = y)) +
   theme(panel.grid.major.y = element_blank(), 
     panel.grid.minor.y = element_blank(), 
     panel.grid.major.x = element_blank(), 
-    panel.grid.minor.x = element_blank()) 
+    panel.grid.minor.x = element_blank()) + theme(text = element_text(family="Serif"))
 
 grid <- data.frame(x = quantile(-3:3, prob = seq(from=0, to = 1, length.out = 6)))
 labels <- data.frame(x = grid[1:5,])
@@ -920,7 +919,7 @@ ggplot(data_grouped) + geom_point(aes(x = loc, y = y)) +
       geom_vline(data = grid, aes(xintercept = x)) + 
       scale_x_continuous(limits = c(-3, 3), labels = breaks, breaks = seq(from = -3, to = 3, length.out = 6)) +
       geom_label(data = labels, aes(x = xlab, y = ylab, label = labels)) + 
-      transition_states(state, transition_length = 1, state_length = 2)
+      transition_states(state, transition_length = 1, state_length = 2)+ theme(text = element_text(family="Serif"))
 ```
 
 ```{r, fig.width = 10, fig.height = 10, dev = "png", fig.align = "center", echo = F}
@@ -1090,7 +1089,7 @@ ge_gather <- gather(ges, key = "variable", value = "prediction")
 ge_gather$idx <- 1:nrow(ge_gather)
 
 ge_gather$variable <- factor(ge_gather$variable, levels = ge_gather$variable)
-ge_gather %>% ggplot() + geom_point(aes(x =variable, y = prediction, color = variable), size = 5) +coord_flip() + scale_color_few() + ggtitle("Prediction") + theme_hc() +  transition_reveal(idx) 
+ge_gather %>% ggplot() + geom_point(aes(x =variable, y = prediction, color = variable), size = 5) +coord_flip() + scale_color_few() + ggtitle("Prediction") + theme_hc() +  transition_reveal(idx)+ theme(text = element_text(family="Serif")) 
 ```
 
 ```{R, echo = F, fig.height = 20, fig.width = 20, fig.align = "center"}
