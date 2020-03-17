@@ -521,17 +521,53 @@ div.tocify {
 <span id="cb1-7"><a href="#cb1-7"></a><span class="kw">write</span>(x,<span class="st">&quot;&quot;</span>)</span></code></pre></div>
 <p>We will name this file <code>sponge.R</code>. Lets test it out:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="bu">echo</span> <span class="st">&quot;use nix&quot;</span> <span class="kw">|</span> <span class="ex">sponge.R</span></span></code></pre></div>
-<pre><code>## these paths will be fetched (0.51 MiB download, 2.47 MiB unpacked):
-##   /nix/store/d2iqwqxxq19jyvakh7l4jfvwnbz9rkka-bash-interactive-4.4-p23-dev
-##   /nix/store/g0wql6lf0ysg7kb6ymmarz6x8glds8if-bash-interactive-4.4-p23-info
-##   /nix/store/im6sdk69k5s7c8jxzhzfvb2j9nwg7hmg-bash-interactive-4.4-p23-man
-##   /nix/store/ppa5zzafkz86aaipg5lb3yvyih21p7jd-bash-interactive-4.4-p23-doc
-## copying path &#39;/nix/store/ppa5zzafkz86aaipg5lb3yvyih21p7jd-bash-interactive-4.4-p23-doc&#39; from &#39;https://cache.nixos.org&#39;...
-## copying path &#39;/nix/store/g0wql6lf0ysg7kb6ymmarz6x8glds8if-bash-interactive-4.4-p23-info&#39; from &#39;https://cache.nixos.org&#39;...
-## copying path &#39;/nix/store/im6sdk69k5s7c8jxzhzfvb2j9nwg7hmg-bash-interactive-4.4-p23-man&#39; from &#39;https://cache.nixos.org&#39;...
-## copying path &#39;/nix/store/d2iqwqxxq19jyvakh7l4jfvwnbz9rkka-bash-interactive-4.4-p23-dev&#39; from &#39;https://cache.nixos.org&#39;...
+<pre><code>## these derivations will be built:
+##   /nix/store/8dxjaysbfav8y2wk6y0rx2ynvy2q28wg-r-spongebob-0.4.0.drv
+## these paths will be fetched (1.52 MiB download, 8.28 MiB unpacked):
+##   /nix/store/0863j1w7ld767r5fqvixcfdq03n3bk27-bash-interactive-4.4-p23-dev
+##   /nix/store/gybkcnfgqjj9k6lgpfd928p3dwd4yls3-bash-interactive-4.4-p23
+##   /nix/store/hdvis89gbljnqa4lv9sl3426fxwx0d22-spongebob_0.4.0.tar.gz
+##   /nix/store/kp0iz9h4r1j29g9p7wfg62shavlfvgfi-readline-7.0p5
+##   /nix/store/n8vkglm5ak3qzq6f4a0bb446h07446g9-bash-interactive-4.4-p23-info
+##   /nix/store/v5q0yyl5m6m79fasl9rqiabjyx2768qz-bash-interactive-4.4-p23-man
+##   /nix/store/xjdhgq8x2qnpn7s3vbqlqppk7nph7xy5-bash-interactive-4.4-p23-doc
+## copying path &#39;/nix/store/v5q0yyl5m6m79fasl9rqiabjyx2768qz-bash-interactive-4.4-p23-man&#39; from &#39;https://cache.nixos.org&#39;...
+## copying path &#39;/nix/store/xjdhgq8x2qnpn7s3vbqlqppk7nph7xy5-bash-interactive-4.4-p23-doc&#39; from &#39;https://cache.nixos.org&#39;...
+## copying path &#39;/nix/store/n8vkglm5ak3qzq6f4a0bb446h07446g9-bash-interactive-4.4-p23-info&#39; from &#39;https://cache.nixos.org&#39;...
+## copying path &#39;/nix/store/kp0iz9h4r1j29g9p7wfg62shavlfvgfi-readline-7.0p5&#39; from &#39;https://cache.nixos.org&#39;...
+## copying path &#39;/nix/store/hdvis89gbljnqa4lv9sl3426fxwx0d22-spongebob_0.4.0.tar.gz&#39; from &#39;https://cache.nixos.org&#39;...
+## building &#39;/nix/store/8dxjaysbfav8y2wk6y0rx2ynvy2q28wg-r-spongebob-0.4.0.drv&#39;...
+## copying path &#39;/nix/store/gybkcnfgqjj9k6lgpfd928p3dwd4yls3-bash-interactive-4.4-p23&#39; from &#39;https://cache.nixos.org&#39;...
+## unpacking sources
+## unpacking source archive /nix/store/hdvis89gbljnqa4lv9sl3426fxwx0d22-spongebob_0.4.0.tar.gz
+## source root is spongebob
+## setting SOURCE_DATE_EPOCH to timestamp 1551513603 of file spongebob/MD5
+## patching sources
+## configuring
+## building
+## running tests
+## installing
+## copying path &#39;/nix/store/0863j1w7ld767r5fqvixcfdq03n3bk27-bash-interactive-4.4-p23-dev&#39; from &#39;https://cache.nixos.org&#39;...
+## * installing *source* package &#39;spongebob&#39; ...
+## ** package &#39;spongebob&#39; successfully unpacked and MD5 sums checked
+## ** using staged installation
+## ** R
+## ** byte-compile and prepare package for lazy loading
+## ** help
+## *** installing help indices
+## ** building package indices
+## ** testing if installed package can be loaded from temporary location
+## ** testing if installed package can be loaded from final location
+## ** testing if installed package keeps a record of temporary installation path
+## * DONE (spongebob)
+## post-installation fixup
+## shrinking RPATHs of ELF executables and libraries in /nix/store/xddksmk8dmpsfrb3a82mcb7nx2xv90hz-r-spongebob-0.4.0
+## strip is /nix/store/m6bb8cbdmb5yirxm8pa9ah9xri4557v7-binutils-2.31.1/bin/strip
+## patching script interpreter paths in /nix/store/xddksmk8dmpsfrb3a82mcb7nx2xv90hz-r-spongebob-0.4.0
+## checking for references to /build/ in /nix/store/xddksmk8dmpsfrb3a82mcb7nx2xv90hz-r-spongebob-0.4.0...
+## WARNING: ignoring environment value of R_HOME
 ##  --------- 
-## | USe NIx |
+## | uSE nIx |
 ##  --------- 
 ##   \\
 ##    \\    *
@@ -545,7 +581,7 @@ div.tocify {
 ##             &lt;&lt;    &lt;&lt;
 ##            ###   ###
 ##  --------- 
-## | USe NIx |
+## | uSE nIx |
 ##  --------- 
 ##   \\
 ##    \\    *
