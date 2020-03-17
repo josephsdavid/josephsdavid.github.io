@@ -866,7 +866,7 @@ breaks <- c(expression(z[0~","~x]),  expression(z[1~","~x]), expression(z[2~","~
 
 p2 <- p + geom_vline(data = grid, aes(xintercept = x)) + 
       scale_x_continuous(limits = c(-3, 3), labels = breaks, breaks = seq(from = -3, to = 3, length.out = 6)) +
-      geom_label(data = labels, aes(x = xlab, y = ylab, label = labels))
+      geom_label(data = labels, aes(x = xlab, y = ylab, label = labels)) + theme(text = element_text(family="Serif"))
 p2
 ```
 
@@ -988,7 +988,7 @@ model <- Predictor$new(forest, data = X, y = y$crew)
 effect <- FeatureEffects$new(model)
 
 # its that easy!
-plot(effect)
+plot(effect) + theme(text = element_text(family="Serif"))
 ```
 
 So, how do we read this? It is very similar to the partial dependence plots, except we think in terms of average prediction. So, if we look at the passengers plot, we are saying that if passengers = 20, the prediction will be 0.5 higher than normal! It is pretty easy to interpret, but it is very powerful. Again, the nice thing about ALE is that we ***know*** these variables are in complete isolation of each other, with no sneaky interactions coming in or out. If you are interested in ALE for categorical variables, which is possible, I highly suggest reading [the original paper](https://arxiv.org/pdf/1612.08468.pdf)
@@ -998,7 +998,7 @@ We can also do ALE in 2 dimensions. What does this show us? This shows, amazingl
 ```{r, warning = F, fig.align = "center"}
 # note we are using Effect not Effects this time
 ALE <- FeatureEffect$new(model, c("Tonnage","cabins"))
-plot(ALE)
+plot(ALE) + theme(text = element_text(family="Serif"))
 ```
 
 
