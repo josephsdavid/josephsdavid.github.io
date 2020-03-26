@@ -19,7 +19,7 @@ I am a:
 
 * Aspiring data scientist
 
-* Open source contributor (author of 1.5 [R packages](https://rdrr.io/github/josephsdavid/tswgewrapped/) and 1 [python package](https://pypi.org/project/n2d/))
+* Open source contributor (author of 1.5 [R packages](https://rdrr.io/github/josephsdavid/tswgewrapped/) and 1 [python package](https://pypi.org/project/n2d/), as well as 2 somewhat widely used covid research packages)
 
 * [Chess player](https://lichess.org/@/SchevyHeavy)
 
@@ -62,6 +62,11 @@ Work in progress
 * My dog
 
 # Things I am doing
+
+* Dropping everything to work on COVID-19
+  * Direct contributions:
+    * [Tools for parsing COVID papers](https://pypi.org/project/cord-19-tools/)
+    * [Tools for covid modeling](https://pypi.org/project/covid-modeling/)
 
 * Working on my master's thesis (Fast Classification of sEMG signal):
   * Fast classification of electrical signals in muscles. The idea is we can quickly classify a broad range of motions in very short time windows, using deep techniques on the near raw electrical signals. The usage of this would be mainly in prosthetics which predict gestures based on what the user wants, and body controlled electrical arms. Our classifier is able to classify 12 fine finger movements, 17 wrist movements,  23 functional motions, and rest with relatively high accuracy in less than 300 milliseconds, which makes it inherently useful. However, in the future I believe that an unsupervised or reinforcement based approach would be more useful, the presence of classes at all is a hindrance on the functionality of these models.

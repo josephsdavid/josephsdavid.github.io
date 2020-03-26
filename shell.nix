@@ -1,10 +1,28 @@
 let
-  pkgs = import <nixpkgs> {};
+  pkgs = import <nixpkgs> {
+    overlays = [
+      (self: super: {
+        bundler = super.bundler.overrideAttrs(old: {
+          name="bundler-2.1.4";
+          src = super.fetchurl {
+            url = "https://rubygems.org/gems/bundler-2.1.4.gem";
+            sha256= "12glbb1357x91fvd004jgkw7ihlkpc9dwr349pd7j83isqhls0ah";
+          };
+        });
+      })
+    ];
+  };
 in
   pkgs.mkShell {
     name = "blogR";
     buildInputs = with pkgs; [
       vscode
+      bundler_HEAD
+      ruby
+      bundix
+      gitAndTools.gitFull
+      rubyPackages_2_6.jekyll
+      jekyll
       rPackages.prettydoc
       rPackages.formatR
       rPackages.tswge
