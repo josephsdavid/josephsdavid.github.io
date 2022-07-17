@@ -1,9 +1,0 @@
----
-title: "Understanding Autoencoders"
-author: "David Josephs"
-date: "`r Sys.Date()`"
-#  rmdformats::readthedown:
-#    css: custom.css
-#    df_print: paged
-#    cards: false
----

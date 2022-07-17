@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-Rscript knit-all.R
-git add .
-git commit -m "routine update"
-git push origin master
