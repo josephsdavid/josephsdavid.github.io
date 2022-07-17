@@ -1,0 +1,4 @@
+name = "blog"
+uuid = "cd937f80-6dc7-49ed-acd6-5d0f88fabeab"
+authors = ["josephsdavid <josephsd@smu.edu>"]
+version = "0.1.0"
