@@ -7,17 +7,10 @@ created: 2022-07-15
 version: 0.0.11
 tangle: {
     languages: {
-        julia: ./src/hc.jl
+        julia: ../../src/hc.jl
     }
     scope: all
 }
-@end
-
-#tangle ./src/blog.jl
-@code julia
-module blog
-include("hc.jl")
-end
 @end
 
 * Herbstclient configuration in julia
@@ -29,7 +22,7 @@ end
 
   Next, we will create a type which stores an expression as a command:
 
-#tangle ./src/CmdOperator.jl
+#tangle ../../src/CmdOperator.jl
 @code julia 
 struct Op{T}
   operation::T
@@ -40,7 +33,7 @@ Op(s::Union{Symbol, String, Number, Expr}) = Op(`$(s)`)
 
   And then some dispatches for it:
 
-#tangle ./src/CmdOperator.jl
+#tangle ../../src/CmdOperator.jl
 @code julia 
 function _splitter(delim)
   return (x,y) -> `$(x) $(delim) $(y)` 
@@ -55,7 +48,7 @@ _spacer = _splitter(` `)
 
   Finally, lets define some macros for creating operators!
 
-#tangle ./src/CmdOperator.jl
+#tangle ../../src/CmdOperator.jl
 @code julia 
 
 macro op(x)
@@ -75,7 +68,7 @@ end
 * Actually configuring
 
 
-  #tangle ./src/scratch.jl
+  #tangle ../../src/scratch.jl
   @code julia
   ###
   ### configuration

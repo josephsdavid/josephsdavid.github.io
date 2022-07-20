@@ -1,4 +1,3 @@
-name = "blog"
-uuid = "cd937f80-6dc7-49ed-acd6-5d0f88fabeab"
-authors = ["josephsdavid <josephsd@smu.edu>"]
-version = "0.1.0"
+[deps]
+Franklin = "713c75ef-9fc9-4b05-94a9-213340da978e"
+NodeJS = "2bd173c7-0d6d-553b-b6af-13a54713934c"

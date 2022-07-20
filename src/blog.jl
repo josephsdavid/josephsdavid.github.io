@@ -1,3 +1,4 @@
 module blog
-include("hc.jl")
+include("CmdOperator.jl")
+export Op, @op
 end
