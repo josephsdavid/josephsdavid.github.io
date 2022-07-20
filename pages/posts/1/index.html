@@ -1,0 +1,56 @@
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/libs/highlight/styles/github.min.css"> <link rel=stylesheet  href="/css/franklin.css"> <link rel=stylesheet  href="/css/basic.css"> <link rel=icon  href="/assets/favicon.png"> <title>Herbstclient configuration in julia</title> <header> <div class=blog-name ><a href="/">A blog</a></div> <nav> <ul> <li><a href="/">Home</a> <li><a href="/pages/posts/">Posts</a> <li><a href="/pages/musings/">Musings</a> <li><a href="/pages/ramblings/">Ramblings</a> </ul> <img src="/assets/hamburger.svg" id=menu-icon > </nav> </header> <div class=franklin-content ><h1 id=herbstclient_configuration_in_julia ><a href="#herbstclient_configuration_in_julia" class=header-anchor >Herbstclient configuration in julia</a></h1> <p>Lets make a thing for configuring herbstluftwm in julia&#33;&#33;</p> <p>First, we will make this all a module:</p> <p>Next, we will create a type which stores an expression as a command:</p> <pre><code class="julia hljs"><span class=hljs-keyword >struct</span> Op{T}
+  operation::T
+<span class=hljs-keyword >end</span>
+Op(s::<span class=hljs-built_in >Union</span>{<span class=hljs-built_in >Symbol</span>, <span class=hljs-built_in >String</span>, <span class=hljs-built_in >Number</span>, <span class=hljs-built_in >Expr</span>}) = Op(<span class=hljs-string >`<span class=hljs-subst >$(s)</span>`</span>)</code></pre> <p>And then some dispatches for it:</p> <pre><code class="julia hljs"><span class=hljs-keyword >function</span> _splitter(delim)
+  <span class=hljs-keyword >return</span> (x,y) -&gt; <span class=hljs-string >`<span class=hljs-subst >$(x)</span> <span class=hljs-subst >$(delim)</span> <span class=hljs-subst >$(y)</span>`</span> 
+<span class=hljs-keyword >end</span>
+_chainer = _splitter(<span class=hljs-string >` . `</span>)
+_spacer = _splitter(<span class=hljs-string >` `</span>)
+
+(o::Op)() = <span class=hljs-string >`<span class=hljs-subst >$(o.operation)</span>`</span> 
+(o::Op)(x) =  _spacer(o.operation, x)
+(o::Op)(x...)= reduce(_spacer, [x...]; init = o())</code></pre> <p>Finally, lets define some macros for creating operators&#33;</p> <pre><code class="julia hljs"><span class=hljs-keyword >macro</span> op(x)
+  <span class=hljs-keyword >return</span> Op(x)
+<span class=hljs-keyword >end</span>
+
+<span class=hljs-keyword >macro</span> op(x::<span class=hljs-built_in >Vararg</span>{<span class=hljs-built_in >Union</span>{<span class=hljs-built_in >Symbol</span>, <span class=hljs-built_in >String</span>, <span class=hljs-built_in >Number</span>, <span class=hljs-built_in >Expr</span>}})
+  Op(reduce( _spacer, [x...]))
+<span class=hljs-keyword >end</span></code></pre> <h1 id=actually_configuring ><a href="#actually_configuring" class=header-anchor >Actually configuring</a></h1> <pre><code class="julia hljs"><span class=hljs-comment >###</span>
+<span class=hljs-comment >### configuration</span>
+<span class=hljs-comment >###</span>
+super(x) = <span class=hljs-string >`Mod4-<span class=hljs-subst >$(x)</span>`</span>
+super(x...) = reduce((x,y) -&gt; <span class=hljs-string >`<span class=hljs-subst >$(x)</span>-<span class=hljs-subst >$(y)</span>`</span>, [x...]; init=<span class=hljs-string >`Mod4`</span>)
+
+hc = <span class=hljs-meta >@op</span> herbstclient
+k = <span class=hljs-meta >@op</span> hc(:keybind) super(:backspace) super <span class=hljs-string >&quot;hot&quot;</span> <span class=hljs-number >4</span> (<span class=hljs-meta >@op</span> hc(:unlock))((chain(super(<span class=hljs-number >5</span>), :ok, :wow)))
+k2 = <span class=hljs-meta >@op</span> herbstclient keybind
+rename = <span class=hljs-meta >@op</span> hc(:rename)
+
+commands = [rename(:default, tags[<span class=hljs-number >1</span>])]
+
+<span class=hljs-keyword >function</span> make_virtual_monitor(name, key)
+    [hc(:add, name),
+        k(super(key), :use_index, name-<span class=hljs-number >1</span>)]
+<span class=hljs-keyword >end</span>
+
+
+tags = collect(<span class=hljs-number >1</span>:<span class=hljs-number >9</span>)
+vms = make_virtual_monitor.(tags, tags)
+commands = vcat(commands, vcat(vms...))
+
+<span class=hljs-comment ># rotate frames in current monitor</span>
+rotate(n) = chain(:lock, repeat([:rotate], n)..., :unlock)
+
+keybinds = [
+(super(:slash), :spawn, <span class=hljs-string >&quot;~/scripts/menus/system-menu.sh&quot;</span>),
+(super(:Shift, :q), :spawn, <span class=hljs-string >&quot;~/scripts/menus/locker.sh&quot;</span>),
+(super(:Shift, :r), :reload),
+(super(:y), rotate(<span class=hljs-number >3</span>)),
+(super(:Alt, :y), rotate(<span class=hljs-number >2</span>)),
+(super(:Shift, :y), rotate(<span class=hljs-number >1</span>))
+]
+commands = vcat(commands, ( ((x) -&gt; k(x...)).(keybinds) ))
+
+commands
+
+run(hc(rotate(<span class=hljs-number >3</span>)))</code></pre> <div class=page-foot > <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> David Josephs. Last modified: July 20, 2022. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>. </div> </div> <script src="/libs/highlight/highlight.min.js"></script> <script>hljs.highlightAll();hljs.configure({tabReplace: ' '});</script>
